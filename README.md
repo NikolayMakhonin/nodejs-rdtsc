@@ -10,7 +10,7 @@ rdtsc() return counts the number of cycles since computer start
 
 Example:
 ```js
-import { rdtsc, calcPerformance } from 'rdtsc';
+var { rdtsc, calcPerformance } = require('rdtsc');
 
 // calcPerformance(func0, func1, testTimeMilliseconds);
 // result = <min time of func1> - <min time of func0>;

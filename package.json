@@ -1,6 +1,6 @@
 {
   "name": "rdtsc",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "The most high resolution timing in NodeJs that use processor command RDTSC",
   "main": "build/Release/binding.node",
   "scripts": {
@@ -8,7 +8,29 @@
     "test": "cls && npm run build && npm run testjs",
     "testjs": "node test.js"
   },
-  "author": "Nikolay Makhonin",
+  "keywords": [
+	"native",
+	"high-resolution",
+    "performance",
+    "timing",
+	"rdtsc",
+    "benchmark",
+    "processor-cycles",
+    "tick",
+    "stopwatch",
+    "duration"
+  ],
+  "bugs": {
+    "url": "https://github.com/NikolayMakhonin/nodejs-rdtsc/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:NikolayMakhonin/nodejs-rdtsc.git"
+  },
+  "author": {
+    "name": "Nikolay Makhonin",
+    "url": "https://github.com/NikolayMakhonin/"
+  },
   "license": "GNU General Public License v3.0",
   "devDependencies": {
     "node-gyp": "^3.8.0"
