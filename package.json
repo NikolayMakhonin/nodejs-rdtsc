@@ -1,6 +1,6 @@
 {
   "name": "rdtsc",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "The most high resolution timing in NodeJs that use processor command RDTSC",
   "main": "build/Release/binding.node",
   "scripts": {
