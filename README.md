@@ -4,7 +4,7 @@ This module provide function rdtsc() that call C++ function __rdtsc() that call 
 
 rdtsc() return counts the number of cycles since computer start
 
-(rdtsc() - rdtsc()) is always > 0
+(rdtsc() - rdtsc()) is always < 0
 
 ** Tested on Windows **
 
