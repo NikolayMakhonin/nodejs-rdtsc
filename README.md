@@ -6,6 +6,8 @@ rdtsc() return counts the number of cycles since computer start
 
 (rdtsc() - rdtsc()) is always > 0
 
+** Tested on Windows **
+
 Example:
 ```js
 import { rdtsc, calcPerformance } from 'rdtsc';
