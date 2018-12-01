@@ -12,10 +12,10 @@ Example:
 ```js
 import { rdtsc, calcPerformance } from 'rdtsc';
 
-// binding.calcPerformance(func0, func1, testTimeMilliseconds);
+// calcPerformance(func0, func1, testTimeMilliseconds);
 // result = <min time of func1> - <min time of func0>;
 
-var result = binding.calcPerformance(
+var result = calcPerformance(
 () => {
 
 },
