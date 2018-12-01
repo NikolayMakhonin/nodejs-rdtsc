@@ -8,6 +8,11 @@ rdtsc() return counts the number of cycles since computer start
 
 ** Tested on Windows **
 
+Install:
+```bash
+npm i rdtsc -S
+```
+
 Example:
 ```js
 var { rdtsc, calcPerformance } = require('rdtsc');
