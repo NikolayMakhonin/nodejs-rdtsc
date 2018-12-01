@@ -28,4 +28,4 @@ var result = binding.calcPerformance(
 
 console.log('(x + y) time =', result);
 
-//assert.ok(minTime > 0);
+assert.ok(result > 5);
