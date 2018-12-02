@@ -1,16 +1,16 @@
-#if V8_OS_POSIX
-#include <unistd.h>
-#endif
+//#if V8_OS_POSIX
+//#include <unistd.h>
+//#endif
 
-#if V8_OS_MACOSX
-#include <pthread.h>
-#endif
+//#if V8_OS_MACOSX
+//#include <pthread.h>
+//#endif
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
-#include <chrono>
+//#include <chrono>
 #include <node.h>
 #include <v8.h>
 
@@ -21,7 +21,7 @@ void rdtsc(const FunctionCallbackInfo<Value>& args) {
   args.GetReturnValue().Set(BigInt::New(isolate, __rdtsc()));
 }
 
-static unsigned __int64 cycles0;
+static uint64_t cycles0;
 
 void rdtsc0(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
@@ -29,7 +29,7 @@ void rdtsc0(const FunctionCallbackInfo<Value>& args) {
 }
 
 void rdtsc1(const FunctionCallbackInfo<Value>& args) {
-  unsigned __int64 cycles = __rdtsc() - cycles0;
+  uint64_t cycles = __rdtsc() - cycles0;
   Isolate* isolate = args.GetIsolate();
   args.GetReturnValue().Set(BigInt::New(isolate, cycles));
 }
