@@ -10,6 +10,8 @@ rdtsc() return counts the number of cycles since computer start
 
 Tested on Windows
 
+Notice: you should not use parallel threads since you calc performance
+
 # Install
 
 ```bash
