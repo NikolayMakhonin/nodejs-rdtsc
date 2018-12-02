@@ -1,6 +1,6 @@
 {
   "name": "rdtsc",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "The most high resolution timing in NodeJs that use processor command RDTSC",
   "main": "index.js",
   "files": [
@@ -8,7 +8,8 @@
     "HISTORY.md",
 	"binding.cc",
 	"binding.gyp",
-    "index.js"
+    "index.js",
+    "test.js"
   ],
   "scripts": {
     "build": "node-gyp configure && node-gyp build",

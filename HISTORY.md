@@ -1,4 +1,4 @@
-1.0.4 / 2018-12-02
+1.0.5 / 2018-12-02
 ===================
 
   * Added function: runInRealtimePriority
