@@ -13,8 +13,7 @@
   ],
   "scripts": {
     "build": "node-gyp configure && node-gyp build",
-    "test": "cls && npm run build && npm run testjs",
-    "testjs": "node test.js"
+    "test": "node test.js"
   },
   "keywords": [
 	"native",

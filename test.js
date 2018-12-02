@@ -149,7 +149,7 @@ console.log("== calcPerformance self cycles ==");
 var result = calcPerformance(
 	null,
 	() => {},
-	2000
+	1000
 );
 
 console.log('calcPerformance() self =', result);
@@ -170,7 +170,7 @@ calcPerformance(
 			minCycles = cycles;
 		}
 	},
-	2000
+	1000
 );
 
 console.log('rdtsc() self =', minCycles);
@@ -188,7 +188,7 @@ result = calcPerformance(
 	() => {
 		rdtsc();
 	},
-	2000
+	1000
 );
 
 console.log('rdtsc() self 2 =', result);
@@ -203,7 +203,7 @@ var object = { x: 1 };
 result = calcPerformance(
 	() => {},
 	() => {return Object.keys(object)},
-	2000
+	1000
 );
 console.log('Object.keys({ 1 item }) =', result);
 assert.ok(result > 10);
