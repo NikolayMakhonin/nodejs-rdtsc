@@ -41,6 +41,8 @@ cycles = rdtsc1();
 
 ## Calc Performance
 
+Accuracy: +/- 4 cycles
+
 ### Syntax
 ```js
 calcPerformance(func0, func1, testTimeMilliseconds);
