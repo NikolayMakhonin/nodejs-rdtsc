@@ -87,5 +87,39 @@ const THREAD_PRIORITY_BELOW_NORMAL = -1;
 const THREAD_PRIORITY_NORMAL = 0;
 const THREAD_PRIORITY_ABOVE_NORMAL = 1;
 const THREAD_PRIORITY_HIGHEST = 2;
-const THREAD_PRIORITY_TIME_CRITICAL = 15;
+const THREAD_PRIORITY_REALTIME = 15; // THREAD_PRIORITY_TIME_CRITICAL
+```
+
+## Process Prioriies
+
+Implemented only for Windows platform
+
+### Example
+
+```js
+const { setProcessPriority, getProcessPriority, isWin, PROCESS_PRIORITY_REALTIME } = require('rdtsc');
+
+if (isWin) {
+	console.log(getProcessPriority()); // === PROCESS_PRIORITY_NORMAL
+} else {
+	console.log(getProcessPriority()); // === undefined
+}
+
+var previousPriority = setProcessPriority(PROCESS_PRIORITY_REALTIME);
+
+try {
+	<your code>
+} finally {
+	setProcessPriority(previousPriority);
+}
+```
+
+### Priorities list
+```js
+const PROCESS_PRIORITY_IDLE = 0x00000040; // IDLE_PRIORITY_CLASS
+const PROCESS_PRIORITY_BELOW_NORMAL = 0x00004000; // BELOW_NORMAL_PRIORITY_CLASS
+const PROCESS_PRIORITY_NORMAL = 0x00000020; // NORMAL_PRIORITY_CLASS
+const PROCESS_PRIORITY_ABOVE_NORMAL = 0x00008000; // ABOVE_NORMAL_PRIORITY_CLASS
+const PROCESS_PRIORITY_HIGHEST = 0x00000080; // HIGH_PRIORITY_CLASS
+const PROCESS_PRIORITY_REALTIME = 0x00000100; // REALTIME_PRIORITY_CLASS
 ```

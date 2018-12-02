@@ -1,13 +1,30 @@
 'use strict';
 const assert = require('assert');
-const { rdtsc, calcPerformance, setThreadPriority, getThreadPriority, isWin, THREAD_PRIORITY_HIGHEST } = require('./index');
+const { 
+	rdtsc, 
+	calcPerformance, 
+	setThreadPriority, 
+	getThreadPriority, 
+	setProcessPriority, 
+	getProcessPriority, 
+	isWin, 
+	THREAD_PRIORITY_HIGHEST, 
+	PROCESS_PRIORITY_HIGHEST 
+} = require('./index');
 
 //base tests
+console.log("== Base tests ==");
+
 assert.ok(rdtsc() > 0);
 assert.ok(rdtsc() - rdtsc() < 0);
+console.log('rdtsc() =', rdtsc());
 console.log('rdtsc() - rdtsc() =', rdtsc() - rdtsc());
 
+console.log();
+
 // Test multiple loading of the same module.
+console.log("== Test multiple loading of the same module ==");
+
 const bindingPath = require.resolve('./build/Release/binding');
 delete require.cache[bindingPath];
 const { rerdtsc } = require('./index');
@@ -15,7 +32,11 @@ assert.ok(rdtsc() > 0);
 assert.ok(rdtsc() - rdtsc() < 0);
 assert.notStrictEqual(rdtsc, rerdtsc);
 
+console.log();
+
 //thread priority
+console.log("== Thread priority ==");
+
 var previousPriority = setThreadPriority(THREAD_PRIORITY_HIGHEST);
 console.log("previousPriority = ", previousPriority);
 if (isWin) {
@@ -40,7 +61,40 @@ if (isWin) {
 	assert.equal(priority, previousPriority);
 }
 
+console.log();
+
+//process priority
+console.log("== Process priority ==");
+
+var previousPriority = setProcessPriority(PROCESS_PRIORITY_HIGHEST);
+console.log("previousPriority = ", previousPriority);
+if (isWin) {
+	assert.notEqual(previousPriority, undefined);
+} else {
+	assert.strictEqual(previousPriority, undefined);
+}
+
+var priority = getProcessPriority();
+console.log("priority = ", priority);
+if (isWin) {
+	assert.equal(priority, PROCESS_PRIORITY_HIGHEST);
+} else {
+	assert.strictEqual(priority, undefined);
+}
+
+if (isWin) {
+	var testPriority = setProcessPriority(previousPriority);
+	assert.equal(testPriority, PROCESS_PRIORITY_HIGHEST);
+	priority = getProcessPriority();
+	console.log("priority = ", priority);
+	assert.equal(priority, previousPriority);
+}
+
+console.log();
+
 //try catch
+console.log("== try catch ==");
+
 var exception;
 try {
 	calcPerformance(
@@ -57,12 +111,15 @@ try {
 
 console.log("Test exeption:");
 console.log(JSON.stringify(exception), exception.stack);
-console.log();
 
 assert.ok(exception);
 assert.ok(exception.stack);
 
+console.log();
+
 // calcPerformance self
+console.log("== calcPerformance self cysles ==");
+
 var result = calcPerformance(
 	null,
 	() => {},
@@ -72,7 +129,11 @@ var result = calcPerformance(
 console.log('calcPerformance() self =', result);
 assert.ok(result > 50);
 
+console.log();
+
 // rdtsc self
+console.log("== rdtsc self cysles ==");
+
 var minCycles;
 
 calcPerformance(
@@ -89,7 +150,11 @@ calcPerformance(
 console.log('rdtsc() self =', minCycles);
 assert.ok(minCycles > 50);
 
+console.log();
+
 // rdtsc self 2
+console.log("== rdtsc self cysles 2 ==");
+
 var minCycles;
 
 result = calcPerformance(
@@ -103,7 +168,11 @@ result = calcPerformance(
 console.log('rdtsc() self 2 =', result);
 assert.ok(result > 50);
 
+console.log();
+
 //calc Object.keys performance
+console.log("== calc Object.keys performance ==");
+
 var object = { x: 1 };
 result = calcPerformance(
 	() => {},
@@ -112,3 +181,5 @@ result = calcPerformance(
 );
 console.log('Object.keys({ 1 item }) =', result);
 assert.ok(result > 10);
+
+console.log();

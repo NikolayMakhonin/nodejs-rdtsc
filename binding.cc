@@ -50,9 +50,9 @@ void setThreadPriority(const FunctionCallbackInfo<Value>& args) {
   int priority = args[0].As<Number>()->Value();
 
   #ifdef _WIN32
-  int previous_priority = GetThreadPriority(GetCurrentThread());
+  int previousPriority = GetThreadPriority(GetCurrentThread());
   SetThreadPriority(GetCurrentThread(), priority);
-  args.GetReturnValue().Set(Number::New(isolate, previous_priority));
+  args.GetReturnValue().Set(Number::New(isolate, previousPriority));
   #endif
   
 }
@@ -69,6 +69,42 @@ void getThreadPriority(const FunctionCallbackInfo<Value>& args) {
   
 }
 
+void setProcessPriority(const FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = args.GetIsolate();
+
+  // Check the number of arguments passed.
+  if (args.Length() < 1) {
+    // Throw an Error that is passed back to JavaScript
+    isolate->ThrowException(Exception::TypeError(
+        String::NewFromUtf8(isolate,
+                            "You must provide process priority arguments: setProcessPriority(int)",
+                            NewStringType::kNormal).ToLocalChecked()));
+    return;
+  }
+    
+  Local<Context> context = isolate->GetCurrentContext();
+  int priority = args[0].As<Number>()->Value();
+
+  #ifdef _WIN32
+  int previousPriority = GetPriorityClass(GetCurrentProcess());
+  SetPriorityClass(GetCurrentProcess(), priority);
+  args.GetReturnValue().Set(Number::New(isolate, previousPriority));
+  #endif
+  
+}
+
+void getProcessPriority(const FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = args.GetIsolate();
+
+  Local<Context> context = isolate->GetCurrentContext();
+
+  #ifdef _WIN32
+  int priority = GetPriorityClass(GetCurrentProcess());
+  args.GetReturnValue().Set(Number::New(isolate, priority));
+  #endif
+  
+}
+
 // Not using the full NODE_MODULE_INIT() macro here because we want to test the
 // addon loader's reaction to the FakeInit() entry point below.
 extern "C" NODE_MODULE_EXPORT void
@@ -78,6 +114,8 @@ NODE_MODULE_INITIALIZER(Local<Object> exports,
   NODE_SET_METHOD(exports, "rdtsc", rdtsc);
   NODE_SET_METHOD(exports, "setThreadPriority", setThreadPriority);
   NODE_SET_METHOD(exports, "getThreadPriority", getThreadPriority);
+  NODE_SET_METHOD(exports, "setProcessPriority", setProcessPriority);
+  NODE_SET_METHOD(exports, "getProcessPriority", getProcessPriority);
   NODE_SET_METHOD(exports, "isWin", isWin);
 }
 
