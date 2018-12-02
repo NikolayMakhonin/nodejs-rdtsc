@@ -1,6 +1,6 @@
 # Description
 
-The most high resolution timing in NodeJs
+**The most high resolution timing in NodeJs**
 
 This module provide function rdtsc() that call C++ function __rdtsc() that call processor command [RDTSC (Read Time Stamp Counter)](https://en.wikipedia.org/wiki/Time_Stamp_Counter)
 
@@ -8,7 +8,7 @@ rdtsc() return counts the number of cycles since computer start
 
 (rdtsc() - rdtsc()) is always < 0
 
-** Tested on Windows **
+Tested on Windows
 
 # Install
 
@@ -29,16 +29,14 @@ console.log(rdtsc() - rdtsc()); // -2971 cycles
 
 ### Syntax
 ```js
-/* 
   calcPerformance(func0, func1, testTimeMilliseconds);
-  result = <min time of func1> - <min time of func0>;
+  // result = <min time of func1> - <min time of func0>;
 
   calcPerformance(null, func1, testTimeMilliseconds);
-  result = <min time of func1>;
+  // result = <min time of func1>;
 
   calcPerformance(func0, null, testTimeMilliseconds);
-  result = <min time of func0>
-*/
+  // result = <min time of func0>
 ```
 
 ### Example
@@ -62,9 +60,10 @@ console.log('"Object.keys(Math)" min cycles =', result); //about 20-40 cycles
 Implemented only for Windows platform
 
 ### Example
-const { setThreadPriority, getThreadPriority, isWin } = require('rdtsc');
 
 ```js
+	const { setThreadPriority, getThreadPriority, isWin, THREAD_PRIORITY_TIME_CRITICAL } = require('rdtsc');
+	
 	if (isWin) {
 		console.log(getThreadPriority()); // === THREAD_PRIORITY_NORMAL
 	} else {
