@@ -40,7 +40,7 @@
     "name": "Nikolay Makhonin",
     "url": "https://github.com/NikolayMakhonin/"
   },
-  "license": "GNU General Public License v3.0",
+  "license": "CC0-1.0",
   "devDependencies": {
     "node-gyp": "^3.8.0"
   }
