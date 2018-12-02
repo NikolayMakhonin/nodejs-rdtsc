@@ -25,7 +25,7 @@ console.log(rdtsc()); // 3864063236708616 cycles
 console.log(rdtsc() - rdtsc()); // -2971 cycles
 ```
 
-## Cacl Performance
+## Calc Performance
 
 ### Syntax
 ```js
@@ -55,7 +55,7 @@ var result = calcPerformance(
 console.log('"Object.keys(Math)" min cycles =', result); //about 20-40 cycles
 ```
 
-## Thread Prioriies
+## Thread Priority
 
 Implemented only for Windows platform
 
@@ -90,7 +90,7 @@ const THREAD_PRIORITY_HIGHEST = 2;
 const THREAD_PRIORITY_REALTIME = 15; // THREAD_PRIORITY_TIME_CRITICAL
 ```
 
-## Process Prioriies
+## Process Priority
 
 Implemented only for Windows platform
 
