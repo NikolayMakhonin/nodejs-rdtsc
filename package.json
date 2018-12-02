@@ -6,6 +6,8 @@
   "files": [
     "LICENSE",
     "HISTORY.md",
+	"binding.cc",
+	"binding.gyp",
     "index.js"
   ],
   "scripts": {
