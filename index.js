@@ -1,4 +1,4 @@
-const { rdtsc, setThreadPriority, getThreadPriority, setProcessPriority, getProcessPriority, isWin=isWin() } = require('./build/Release/binding');
+const { rdtsc, rdtsc0, rdtsc1, setThreadPriority, getThreadPriority, setProcessPriority, getProcessPriority, isWin=isWin() } = require('./build/Release/binding');
 
 const THREAD_PRIORITY_IDLE = -15;
 const THREAD_PRIORITY_LOWEST = -2;
@@ -53,7 +53,7 @@ const calcPerformance = function (func0, func1, testTimeMilliseconds) {
 			do {
 				let cycles0;
 				
-				cycles0=rdtsc();lastResult=func0();cycles0=rdtsc()-cycles0;
+				rdtsc0();lastResult=func0();cycles0=rdtsc1();
 				
 				if (minCycles0 == null || cycles0 < minCycles0) {
 					minCycles0 = cycles0;
@@ -68,11 +68,11 @@ const calcPerformance = function (func0, func1, testTimeMilliseconds) {
 			let cycles0, cycles1;
 
 			if (i % 2) {
-				cycles0=rdtsc();lastResult=func0();cycles0=rdtsc()-cycles0;
-				cycles1=rdtsc();lastResult=func1();cycles1=rdtsc()-cycles1;
+				rdtsc0();lastResult=func0();cycles0=rdtsc1();
+				rdtsc0();lastResult=func1();cycles1=rdtsc1();
 			} else {
-				cycles1=rdtsc();lastResult=func1();cycles1=rdtsc()-cycles1;
-				cycles0=rdtsc();lastResult=func0();cycles0=rdtsc()-cycles0;
+				rdtsc0();lastResult=func1();cycles1=rdtsc1();
+				rdtsc0();lastResult=func0();cycles0=rdtsc1();
 			}
 
 			if (minCycles0 == null || cycles0 < minCycles0) {
@@ -90,7 +90,7 @@ const calcPerformance = function (func0, func1, testTimeMilliseconds) {
 };
 
 module.exports = {
-	rdtsc,
+	rdtsc, rdtsc0, rdtsc1,
 	calcPerformance,
 	isWin,
 	

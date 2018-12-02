@@ -21,6 +21,19 @@ void rdtsc(const FunctionCallbackInfo<Value>& args) {
   args.GetReturnValue().Set(BigInt::New(isolate, __rdtsc()));
 }
 
+static unsigned __int64 cycles0;
+
+void rdtsc0(const FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = args.GetIsolate();
+  cycles0 = __rdtsc();
+}
+
+void rdtsc1(const FunctionCallbackInfo<Value>& args) {
+  unsigned __int64 cycles = __rdtsc() - cycles0;
+  Isolate* isolate = args.GetIsolate();
+  args.GetReturnValue().Set(BigInt::New(isolate, cycles));
+}
+
 void isWin(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
 
@@ -112,6 +125,8 @@ NODE_MODULE_INITIALIZER(Local<Object> exports,
                         Local<Value> module,
                         Local<Context> context) {
   NODE_SET_METHOD(exports, "rdtsc", rdtsc);
+  NODE_SET_METHOD(exports, "rdtsc0", rdtsc0);
+  NODE_SET_METHOD(exports, "rdtsc1", rdtsc1);
   NODE_SET_METHOD(exports, "setThreadPriority", setThreadPriority);
   NODE_SET_METHOD(exports, "getThreadPriority", getThreadPriority);
   NODE_SET_METHOD(exports, "setProcessPriority", setProcessPriority);

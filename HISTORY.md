@@ -1,3 +1,9 @@
+1.1.0 / 2018-12-02
+===================
+
+  * Added function: rdtsc0, rdtsc1 for better quality resolution. Examlpe to use: rdtsc0();func();cycles=rdtsc1();
+  * Improved calcPerformance function
+
 1.0.6 / 2018-12-02
 ===================
 

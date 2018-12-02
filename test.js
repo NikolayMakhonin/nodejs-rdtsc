@@ -1,7 +1,7 @@
 'use strict';
 const assert = require('assert');
 const { 
-	rdtsc, 
+	rdtsc, rdtsc0, rdtsc1,
 	calcPerformance, 
 	setThreadPriority, 
 	getThreadPriority, 
@@ -22,6 +22,7 @@ assert.ok(rdtsc() > 0);
 assert.ok(rdtsc() - rdtsc() < 0);
 console.log('rdtsc() =', rdtsc());
 console.log('rdtsc() - rdtsc() =', rdtsc() - rdtsc());
+console.log('rdtsc0(); rdtsc1() =', rdtsc0() || rdtsc1());
 
 console.log();
 
@@ -153,7 +154,7 @@ var result = calcPerformance(
 );
 
 console.log('calcPerformance() self =', result);
-assert.ok(result > 50);
+assert.ok(result > 10);
 
 console.log();
 
