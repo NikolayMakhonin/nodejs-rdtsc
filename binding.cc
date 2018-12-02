@@ -14,78 +14,59 @@
 #include <node.h>
 #include <v8.h>
 
-// simulation of Windows GetTickCount()
-unsigned long long getTickCount()
-{
-    using namespace std::chrono;
-    return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
-}
-
 using namespace v8;
 
 void rdtsc(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
-  Handle<Function> func1 = Handle<Function>::Cast(args[2]);
   args.GetReturnValue().Set(BigInt::New(isolate, __rdtsc()));
 }
 
-void calcPerformance(const FunctionCallbackInfo<Value>& args) {
+void isWin(const FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = args.GetIsolate();
+
+  bool isWin = false;
+  
+  #ifdef _WIN32
+  isWin = true;
+  #endif
+  
+  args.GetReturnValue().Set(Boolean::New(isolate, isWin));
+}
+
+void setThreadPriority(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
 
   // Check the number of arguments passed.
-  if (args.Length() < 3) {
+  if (args.Length() < 1) {
     // Throw an Error that is passed back to JavaScript
     isolate->ThrowException(Exception::TypeError(
         String::NewFromUtf8(isolate,
-                            "You must provide arguments: calcPerformance(func0, func1, iterations)",
+                            "You must provide thread priority arguments: setThreadPriority(int)",
                             NewStringType::kNormal).ToLocalChecked()));
     return;
   }
-  
+    
   Local<Context> context = isolate->GetCurrentContext();
-  Local<Function> func0 = Local<Function>::Cast(args[0]);
-  Local<Function> func1 = Local<Function>::Cast(args[1]);
-  int testTime = args[2].As<Number>()->Value();
+  int priority = args[0].As<Number>()->Value();
 
   #ifdef _WIN32
-  // Increase the thread priority to reduces the chances of having a context
-  // switch during a reading of the TSC and the performance counter.
   int previous_priority = GetThreadPriority(GetCurrentThread());
-  SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+  SetThreadPriority(GetCurrentThread(), priority);
+  args.GetReturnValue().Set(Number::New(isolate, previous_priority));
   #endif
   
-  unsigned __int64 minCycles0 = 0;
-  unsigned __int64 minCycles1 = 0;
-  unsigned long startTime = getTickCount();
-  int i = 0;
-  do {
-	  if (i % 2) {
-		  unsigned __int64 cycles0 = __rdtsc();
-		  func0->Call(context, Null(isolate), 0, NULL).ToLocalChecked();
-		  cycles0 = __rdtsc() - cycles0;
+}
 
-		  if (i <= 1 || cycles0 < minCycles0) {
-			  minCycles0 = cycles0;
-		  }
-	  } else {
-		  unsigned __int64 cycles1 = __rdtsc();
-		  func1->Call(context, Null(isolate), 0, NULL).ToLocalChecked();
-		  cycles1 = __rdtsc() - cycles1;
+void getThreadPriority(const FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = args.GetIsolate();
 
-		  if (i <= 1 || cycles1 < minCycles1) {
-			  minCycles1 = cycles1;
-		  }
-	  }
-	  
-	  i++;
-  } while (getTickCount() - startTime < testTime);
+  Local<Context> context = isolate->GetCurrentContext();
 
   #ifdef _WIN32
-  // Reset the thread priority.
-  SetThreadPriority(GetCurrentThread(), previous_priority);
+  int priority = GetThreadPriority(GetCurrentThread());
+  args.GetReturnValue().Set(Number::New(isolate, priority));
   #endif
   
-  args.GetReturnValue().Set(BigInt::New(isolate, minCycles1 - minCycles0));
 }
 
 // Not using the full NODE_MODULE_INIT() macro here because we want to test the
@@ -95,7 +76,9 @@ NODE_MODULE_INITIALIZER(Local<Object> exports,
                         Local<Value> module,
                         Local<Context> context) {
   NODE_SET_METHOD(exports, "rdtsc", rdtsc);
-  NODE_SET_METHOD(exports, "calcPerformance", calcPerformance);
+  NODE_SET_METHOD(exports, "setThreadPriority", setThreadPriority);
+  NODE_SET_METHOD(exports, "getThreadPriority", getThreadPriority);
+  NODE_SET_METHOD(exports, "isWin", isWin);
 }
 
 static void FakeInit(Local<Object> exports,

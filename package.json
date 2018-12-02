@@ -1,8 +1,13 @@
 {
   "name": "rdtsc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The most high resolution timing in NodeJs that use processor command RDTSC",
-  "main": "build/Release/binding.node",
+  "main": "index.js",
+  "files": [
+    "LICENSE",
+    "HISTORY.md",
+    "index.js"
+  ],
   "scripts": {
     "build": "node-gyp configure && node-gyp build",
     "test": "cls && npm run build && npm run testjs",
@@ -18,7 +23,11 @@
     "processor-cycles",
     "tick",
     "stopwatch",
-    "duration"
+    "duration",
+    "setThreadPriority",
+    "getThreadPriority",
+    "thread-priority",
+    "process-priority"
   ],
   "bugs": {
     "url": "https://github.com/NikolayMakhonin/nodejs-rdtsc/issues"
