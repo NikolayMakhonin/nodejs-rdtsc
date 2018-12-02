@@ -29,14 +29,14 @@ console.log(rdtsc() - rdtsc()); // -2971 cycles
 
 ### Syntax
 ```js
-  calcPerformance(func0, func1, testTimeMilliseconds);
-  // result = <min time of func1> - <min time of func0>;
+calcPerformance(func0, func1, testTimeMilliseconds);
+// result = <min time of func1> - <min time of func0>;
 
-  calcPerformance(null, func1, testTimeMilliseconds);
-  // result = <min time of func1>;
+calcPerformance(null, func1, testTimeMilliseconds);
+// result = <min time of func1>;
 
-  calcPerformance(func0, null, testTimeMilliseconds);
-  // result = <min time of func0>
+calcPerformance(func0, null, testTimeMilliseconds);
+// result = <min time of func0>
 ```
 
 ### Example
@@ -62,21 +62,21 @@ Implemented only for Windows platform
 ### Example
 
 ```js
-	const { setThreadPriority, getThreadPriority, isWin, THREAD_PRIORITY_TIME_CRITICAL } = require('rdtsc');
-	
-	if (isWin) {
-		console.log(getThreadPriority()); // === THREAD_PRIORITY_NORMAL
-	} else {
-		console.log(getThreadPriority()); // === undefined
-	}
+const { setThreadPriority, getThreadPriority, isWin, THREAD_PRIORITY_TIME_CRITICAL } = require('rdtsc');
 
-	var previousPriority = setThreadPriority(THREAD_PRIORITY_TIME_CRITICAL);
-	
-	try {
-		<your code>
-	} finally {
-		setThreadPriority(previousPriority);
-	}
+if (isWin) {
+	console.log(getThreadPriority()); // === THREAD_PRIORITY_NORMAL
+} else {
+	console.log(getThreadPriority()); // === undefined
+}
+
+var previousPriority = setThreadPriority(THREAD_PRIORITY_TIME_CRITICAL);
+
+try {
+	<your code>
+} finally {
+	setThreadPriority(previousPriority);
+}
 ```
 
 ### Priorities list
