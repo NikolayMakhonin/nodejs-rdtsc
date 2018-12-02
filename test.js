@@ -9,7 +9,10 @@ const {
 	getProcessPriority, 
 	isWin, 
 	THREAD_PRIORITY_HIGHEST, 
-	PROCESS_PRIORITY_HIGHEST 
+	PROCESS_PRIORITY_HIGHEST,
+	THREAD_PRIORITY_REALTIME,
+	PROCESS_PRIORITY_REALTIME,
+	runInRealtimePriority	
 } = require('./index');
 
 //base tests
@@ -19,6 +22,29 @@ assert.ok(rdtsc() > 0);
 assert.ok(rdtsc() - rdtsc() < 0);
 console.log('rdtsc() =', rdtsc());
 console.log('rdtsc() - rdtsc() =', rdtsc() - rdtsc());
+
+console.log();
+
+//runInRealtimePriority
+console.log("== runInRealtimePriority ==");
+
+console.log('rdtsc() - rdtsc() =', runInRealtimePriority(() => rdtsc() - rdtsc()));	
+
+console.log("previous ThreadPriority = ", getThreadPriority()); 
+console.log("previous ProcessPriority = ", getProcessPriority()); 
+
+runInRealtimePriority(() => {
+	let threadPriority, processPriority;
+	console.log("ThreadPriority = ", threadPriority = getThreadPriority()); // === THREAD_PRIORITY_REALTIME
+	console.log("ProcessPriority = ", processPriority = getProcessPriority()); // === PROCESS_PRIORITY_REALTIME
+	if (isWin) {
+		assert.strictEqual(threadPriority, THREAD_PRIORITY_REALTIME);
+		assert.strictEqual(processPriority, PROCESS_PRIORITY_REALTIME);
+	} else {
+		assert.strictEqual(threadPriority, undefined);
+		assert.strictEqual(processPriority, undefined);
+	}
+});
 
 console.log();
 
@@ -118,7 +144,7 @@ assert.ok(exception.stack);
 console.log();
 
 // calcPerformance self
-console.log("== calcPerformance self cysles ==");
+console.log("== calcPerformance self cycles ==");
 
 var result = calcPerformance(
 	null,
@@ -132,7 +158,7 @@ assert.ok(result > 50);
 console.log();
 
 // rdtsc self
-console.log("== rdtsc self cysles ==");
+console.log("== rdtsc self cycles ==");
 
 var minCycles;
 
@@ -153,7 +179,7 @@ assert.ok(minCycles > 50);
 console.log();
 
 // rdtsc self 2
-console.log("== rdtsc self cysles 2 ==");
+console.log("== rdtsc self cycles 2 ==");
 
 var minCycles;
 

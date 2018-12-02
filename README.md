@@ -59,10 +59,22 @@ console.log('"Object.keys(Math)" min cycles =', result); //about 20-40 cycles
 
 Implemented only for Windows platform
 
-### Example
+### Examples
 
 ```js
-const { setThreadPriority, getThreadPriority, isWin, THREAD_PRIORITY_TIME_CRITICAL } = require('rdtsc');
+
+const { runInRealtimePriority, getThreadPriority, getProcessPriority } = require('rdtsc');
+
+runInRealtimePriority(() => {
+	console.log("getThreadPriority = ", getThreadPriority()); // === THREAD_PRIORITY_REALTIME
+	console.log("getProcessPriority = ", getProcessPriority()); // === PROCESS_PRIORITY_REALTIME
+});
+
+```
+
+
+```js
+const { setThreadPriority, getThreadPriority, isWin, THREAD_PRIORITY_REALTIME } = require('rdtsc');
 
 if (isWin) {
 	console.log(getThreadPriority()); // === THREAD_PRIORITY_NORMAL
@@ -70,7 +82,7 @@ if (isWin) {
 	console.log(getThreadPriority()); // === undefined
 }
 
-var previousPriority = setThreadPriority(THREAD_PRIORITY_TIME_CRITICAL);
+var previousPriority = setThreadPriority(THREAD_PRIORITY_REALTIME);
 
 try {
 	<your code>
@@ -87,7 +99,7 @@ const THREAD_PRIORITY_BELOW_NORMAL = -1;
 const THREAD_PRIORITY_NORMAL = 0;
 const THREAD_PRIORITY_ABOVE_NORMAL = 1;
 const THREAD_PRIORITY_HIGHEST = 2;
-const THREAD_PRIORITY_REALTIME = 15; // THREAD_PRIORITY_TIME_CRITICAL
+const THREAD_PRIORITY_REALTIME = 15; // THREAD_PRIORITY_REALTIME
 ```
 
 ## Process Priority
