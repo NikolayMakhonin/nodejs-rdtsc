@@ -22,7 +22,7 @@ npm i rdtsc -S
 ```js
 var { rdtsc } = require('rdtsc');
 console.log(rdtsc()); // 3864063236708616 cycles
-console.log(rdtsc() - rdtsc()); // -2971 cycles
+console.log(rdtsc() - rdtsc()); // -2971 cycles, minimum = -130 cycles
 ```
 
 ## Calc Performance
