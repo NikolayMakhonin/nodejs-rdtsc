@@ -30,13 +30,13 @@ console.log(rdtsc() - rdtsc()); // -2971 cycles
 ### Syntax
 ```js
 calcPerformance(func0, func1, testTimeMilliseconds);
-// result = <min time of func1> - <min time of func0>;
+// result = <min cycles of func1> - <min cycles of func0>;
 
 calcPerformance(null, func1, testTimeMilliseconds);
-// result = <min time of func1>;
+// result = <min cycles of func1>;
 
 calcPerformance(func0, null, testTimeMilliseconds);
-// result = <min time of func0>
+// result = <min cycles of func0>
 ```
 
 ### Example
