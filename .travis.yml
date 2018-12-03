@@ -24,9 +24,6 @@ matrix:
       env: CXX=g++-4.8
       node_js:
         - "10.9.0"
-  exclude:
-    - os: osx
-    - os: windows
 
 sudo: false
 dist: precise
