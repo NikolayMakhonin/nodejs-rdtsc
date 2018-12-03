@@ -15,6 +15,8 @@ const {
 	runInRealtimePriority	
 } = require('../');
 
+console.log('isWin =', isWin);
+
 describe('All tests', function() {
     it('Base tests', function () {
         assert.ok(rdtsc() > 0);
@@ -37,13 +39,13 @@ describe('All tests', function() {
         assert.ok(runInRealtimePriority(() => rdtsc() - rdtsc()));
         console.log('rdtsc() - rdtsc() =', runInRealtimePriority(() => rdtsc() - rdtsc()));
 
-        console.log("previous ThreadPriority = ", getThreadPriority());
-        console.log("previous ProcessPriority = ", getProcessPriority());
+        console.log('previous ThreadPriority =', getThreadPriority());
+        console.log('previous ProcessPriority =', getProcessPriority());
 
         runInRealtimePriority(() => {
             let threadPriority, processPriority;
-            console.log("ThreadPriority = ", threadPriority = getThreadPriority()); // === THREAD_PRIORITY_REALTIME
-            console.log("ProcessPriority = ", processPriority = getProcessPriority()); // === PROCESS_PRIORITY_REALTIME
+            console.log('ThreadPriority =', threadPriority = getThreadPriority()); // === THREAD_PRIORITY_REALTIME
+            console.log('ProcessPriority =', processPriority = getProcessPriority()); // === PROCESS_PRIORITY_REALTIME
             if (isWin) {
                 assert.strictEqual(threadPriority, THREAD_PRIORITY_REALTIME);
                 assert.strictEqual(processPriority, PROCESS_PRIORITY_REALTIME);
@@ -56,7 +58,7 @@ describe('All tests', function() {
 
     it('Thread priority', function () {
         var previousPriority = setThreadPriority(THREAD_PRIORITY_HIGHEST);
-        console.log("previousPriority = ", previousPriority);
+        console.log('previousPriority =', previousPriority);
         if (isWin) {
             assert.notEqual(previousPriority, undefined);
         } else {
@@ -64,7 +66,7 @@ describe('All tests', function() {
         }
 
         var priority = getThreadPriority();
-        console.log("priority = ", priority);
+        console.log('priority =', priority);
         if (isWin) {
             assert.equal(priority, THREAD_PRIORITY_HIGHEST);
         } else {
@@ -75,14 +77,14 @@ describe('All tests', function() {
             var testPriority = setThreadPriority(previousPriority);
             assert.equal(testPriority, THREAD_PRIORITY_HIGHEST);
             priority = getThreadPriority();
-            console.log("priority = ", priority);
+            console.log('priority =', priority);
             assert.equal(priority, previousPriority);
         }
     });
 
     it('Process priority', function () {
         var previousPriority = setProcessPriority(PROCESS_PRIORITY_HIGHEST);
-        console.log("previousPriority = ", previousPriority);
+        console.log('previousPriority =', previousPriority);
         if (isWin) {
             assert.notEqual(previousPriority, undefined);
         } else {
@@ -90,7 +92,7 @@ describe('All tests', function() {
         }
 
         var priority = getProcessPriority();
-        console.log("priority = ", priority);
+        console.log('priority =', priority);
         if (isWin) {
             assert.equal(priority, PROCESS_PRIORITY_HIGHEST);
         } else {
@@ -101,14 +103,14 @@ describe('All tests', function() {
             var testPriority = setProcessPriority(previousPriority);
             assert.equal(testPriority, PROCESS_PRIORITY_HIGHEST);
             priority = getProcessPriority();
-            console.log("priority = ", priority);
+            console.log('priority =', priority);
             assert.equal(priority, previousPriority);
         }
     });
 
     it('throw catch', function () {
         function testErrorFunc() {
-            throw new Error("test error");
+            throw new Error('test error');
         }
 
         var exception;
@@ -125,7 +127,7 @@ describe('All tests', function() {
             exception = ex;
         }
 
-        //console.log("Test exeption:");
+        //console.log('Test exeption:');
         //console.log(JSON.stringify(exception), exception.stack);
 
         assert.ok(exception);

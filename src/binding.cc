@@ -141,7 +141,16 @@ NODE_MODULE_INITIALIZER(Local<Object> exports,
   NODE_SET_METHOD(exports, "getThreadPriority", getThreadPriority);
   NODE_SET_METHOD(exports, "setProcessPriority", setProcessPriority);
   NODE_SET_METHOD(exports, "getProcessPriority", getProcessPriority);
-  NODE_SET_METHOD(exports, "isWin", isWin);
+  
+  Isolate *isolate = exports->GetIsolate();
+
+  #ifdef _WIN32
+  bool isWin = true;
+  #else
+  bool isWin = false;
+  #endif
+  
+  exports->Set(String::NewFromUtf8(isolate,"isWin"), Boolean::New(isolate,isWin));
 }
 
 static void FakeInit(Local<Object> exports,
