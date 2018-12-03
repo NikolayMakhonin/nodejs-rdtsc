@@ -1,8 +1,14 @@
 language: node_js
-node_js:
-  - "10.9.0"
-  - "11.0.0"
-  - "11.3.0"
+
+# Node versions: https://node.green/
+matrix:
+  include:
+    - os: windows
+      env: CXX=g++-4.8
+      node_js: "10.9.0"
+    - os: linux
+      env: CXX=g++-4.8
+      node_js: "10.9.0"
 
 os:
   - osx
@@ -10,22 +16,17 @@ os:
 env:
   - CXX=clang
 
+node_js:
+  - "10.9.0"
+  - "11.0.0"
+  - "11.3.0"
+
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-
-# Node versions: https://node.green/
-matrix:
-  include:
-    - os: linux
-      env: CXX=g++-4.8
-      node_js: "10.9.0"
-    - os: windows
-      env: CXX=g++-4.8
-      node_js: "10.9.0"
 
 sudo: false
 dist: precise
