@@ -5,7 +5,7 @@
   "engines": {
     "node": ">= 10.4.0"
   },
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "lint": "eslint --plugin markdown --ext js,md .",
     "build": "node-gyp configure && node-gyp build",

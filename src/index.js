@@ -1,4 +1,11 @@
-const { rdtsc, rdtsc0, rdtsc1, setThreadPriority, getThreadPriority, setProcessPriority, getProcessPriority, isWin=isWin() } = require('./build/Release/binding');
+const { 
+	rdtsc, rdtsc0, rdtsc1, 
+	setThreadPriority, 
+	getThreadPriority, 
+	setProcessPriority, 
+	getProcessPriority, 
+	isWin=isWin() 
+} = require('../build/Release/binding');
 
 const THREAD_PRIORITY_IDLE = -15;
 const THREAD_PRIORITY_LOWEST = -2;

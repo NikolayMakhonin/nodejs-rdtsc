@@ -13,23 +13,33 @@
 //#include <chrono>
 #include <node.h>
 #include <v8.h>
+#include "cycleclock.h"
 
 using namespace v8;
+using namespace benchmark::cycleclock;
+
+//__rdtsc() equivalent
+//inline uint64_t RDTSC() {
+	//__asm {
+	//	rdtsc;
+	//}
+	//return __asm('rdtsc;');
+//}
 
 void rdtsc(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
-  args.GetReturnValue().Set(BigInt::New(isolate, __rdtsc()));
+  args.GetReturnValue().Set(BigInt::New(isolate, Now()));
 }
 
 static uint64_t cycles0;
 
 void rdtsc0(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
-  cycles0 = __rdtsc();
+  cycles0 = Now();
 }
 
 void rdtsc1(const FunctionCallbackInfo<Value>& args) {
-  uint64_t cycles = __rdtsc() - cycles0;
+  uint64_t cycles = Now() - cycles0;
   Isolate* isolate = args.GetIsolate();
   args.GetReturnValue().Set(BigInt::New(isolate, cycles));
 }
