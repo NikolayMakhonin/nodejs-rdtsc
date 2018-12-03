@@ -32,14 +32,13 @@ const runInRealtimePriority = function(func) {
 		setProcessPriority(previousProcessPriority);
 		setThreadPriority(previousThreadPriority);
 	}
-}
+};
 
 const calcPerformance = function (func0, func1, testTimeMilliseconds) {
     let startTime = process.hrtime.bigint();
     let testTime = testTimeMilliseconds * 1000000; //to nano time
 	
 	return runInRealtimePriority(() => {
-		let lastResult;
 		let minCycles0 = null;
 		let minCycles1 = null;
 
@@ -51,9 +50,7 @@ const calcPerformance = function (func0, func1, testTimeMilliseconds) {
 			
 			let i = 0;
 			do {
-				let cycles0;
-				
-				rdtsc0();lastResult=func0();cycles0=rdtsc1();
+                let cycles0=(rdtsc0(),func0(),rdtsc1());
 				
 				if (minCycles0 == null || cycles0 < minCycles0) {
 					minCycles0 = cycles0;
@@ -68,11 +65,11 @@ const calcPerformance = function (func0, func1, testTimeMilliseconds) {
 			let cycles0, cycles1;
 
 			if (i % 2) {
-				rdtsc0();lastResult=func0();cycles0=rdtsc1();
-				rdtsc0();lastResult=func1();cycles1=rdtsc1();
+                cycles0=(rdtsc0(),func0(),rdtsc1());
+                cycles1=(rdtsc0(),func1(),rdtsc1());
 			} else {
-				rdtsc0();lastResult=func1();cycles1=rdtsc1();
-				rdtsc0();lastResult=func0();cycles0=rdtsc1();
+                cycles1=(rdtsc0(),func1(),rdtsc1());
+                cycles0=(rdtsc0(),func0(),rdtsc1());
 			}
 
 			if (minCycles0 == null || cycles0 < minCycles0) {

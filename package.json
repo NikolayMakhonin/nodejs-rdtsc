@@ -1,26 +1,22 @@
 {
   "name": "rdtsc",
   "version": "1.1.2",
-  "description": "The most high resolution timing in NodeJs that use processor command RDTSC",
+  "description": "The most high resolution timing in NodeJs that use processor command RDTSC. Calculate performance with accuracy +/- 4 processor cycles.",
+  "engines": {
+    "node": ">= 10.4.0"
+  },
   "main": "index.js",
-  "files": [
-    "LICENSE",
-    "HISTORY.md",
-	"binding.cc",
-	"binding.gyp",
-    "index.js",
-    "test.js"
-  ],
   "scripts": {
+    "lint": "eslint --plugin markdown --ext js,md .",
     "build": "node-gyp configure && node-gyp build",
-    "test": "node test.js"
+    "test": "mocha"
   },
   "keywords": [
-	"native",
-	"high-resolution",
+    "native",
+    "high-resolution",
     "performance",
     "timing",
-	"rdtsc",
+    "rdtsc",
     "benchmark",
     "processor-cycles",
     "tick",
@@ -42,6 +38,14 @@
   },
   "license": "CC0-1.0",
   "devDependencies": {
+    "eslint": "^5.9.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-markdown": "^1.0.0-rc.0",
+    "eslint-plugin-node": "^8.0.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "mocha": "^5.2.0",
     "node-gyp": "^3.8.0"
   }
 }
