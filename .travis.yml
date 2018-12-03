@@ -5,9 +5,7 @@ node_js:
   - "11.3.0"
 
 os:
-  - windows
   - linux
-  - osx
 
 env:
   - CXX=g++-4.8
