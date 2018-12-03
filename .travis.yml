@@ -6,8 +6,8 @@ node_js:
   # - "11.0.0"
   - "11.3.0"
   
-# env:
-#  - CXX=g++-4.8
+env:
+  - CXX=g++-4.8
 
 addons:
   apt:
@@ -15,7 +15,6 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-	  
 sudo: false
 dist: precise
 cache:
