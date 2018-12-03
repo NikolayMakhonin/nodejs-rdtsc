@@ -19,6 +19,15 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
+
+matrix:
+  include:
+    - os: osx
+      env: CXX=clang
+  exclude:
+    - os: osx
+      env: CXX=g++-4.8
+
 sudo: false
 dist: precise
 cache:
