@@ -8,13 +8,11 @@
 
 **The most high resolution timing in NodeJs**
 
-This module provide function rdtsc() that call C++ function __rdtsc() that call processor command [RDTSC (Read Time Stamp Counter)](https://en.wikipedia.org/wiki/Time_Stamp_Counter)
-
+This module provide cross platform function rdtsc().
 rdtsc() return counts the number of cycles since computer start
+If you run in on Windows it will call C++ function __rdtsc() that call processor command [RDTSC (Read Time Stamp Counter)](https://en.wikipedia.org/wiki/Time_Stamp_Counter)
 
 (rdtsc() - rdtsc()) is always < 0
-
-Tested on Windows
 
 Notice: you should not use parallel threads since you calc performance
 
