@@ -1,7 +1,7 @@
-1.1.5 / 2018-12-03
+1.1.6 / 2018-12-03
 ===================
 
-  * Changed minimal node version to 10.5.0
+  * Changed minimal node version to 10.6.0
 
 1.1.4 / 2018-12-03
 ===================
