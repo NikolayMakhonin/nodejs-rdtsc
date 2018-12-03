@@ -4,7 +4,7 @@ const {
 	getThreadPriority, 
 	setProcessPriority, 
 	getProcessPriority, 
-	isWin=isWin() 
+	isWin
 } = require('../build/Release/binding');
 
 const THREAD_PRIORITY_IDLE = -15;

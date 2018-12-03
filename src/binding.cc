@@ -44,18 +44,6 @@ void rdtsc1(const FunctionCallbackInfo<Value>& args) {
   args.GetReturnValue().Set(BigInt::New(isolate, cycles));
 }
 
-void isWin(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
-
-  bool isWin = false;
-  
-  #ifdef _WIN32
-  isWin = true;
-  #endif
-  
-  args.GetReturnValue().Set(Boolean::New(isolate, isWin));
-}
-
 void setThreadPriority(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
 
