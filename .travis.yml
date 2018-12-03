@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  #Node versions: https://node.green/
+  # Node versions: https://node.green/
   - "10.9.0"
   - "11.0.0"
   - "11.3.0"
@@ -24,6 +24,9 @@ matrix:
   include:
     - os: osx
       env: CXX=clang
+      node_js: "10.9.0"
+    - os: windows
+      node_js: "10.9.0"
   exclude:
     - os: osx
       env: CXX=g++-4.8
