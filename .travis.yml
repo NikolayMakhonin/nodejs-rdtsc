@@ -1,17 +1,4 @@
 language: node_js
-node_js:
-  # Node versions: https://node.green/
-  - "10.9.0"
-  - "11.0.0"
-  - "11.3.0"
-
-os:
-  - windows
-  - linux
-  - osx
-
-env:
-  - CXX=g++-4.8
 
 addons:
   apt:
@@ -20,16 +7,26 @@ addons:
     packages:
       - g++-4.8
 
+# Node versions: https://node.green/
 matrix:
   include:
+    - os: linux
+      env: CXX=clang
+      node_js:
+        - "10.9.0"
+        - "11.0.0"
+        - "11.3.0"
     - os: osx
       env: CXX=clang
-      node_js: "10.9.0"
+      node_js:
+        - "10.9.0"
     - os: windows
-      node_js: "10.9.0"
+      env: CXX=g++-4.8
+      node_js:
+        - "10.9.0"
   exclude:
     - os: osx
-      env: CXX=g++-4.8
+    - os: windows
 
 sudo: false
 dist: precise
