@@ -28,20 +28,22 @@ npm i rdtsc -S
 ## RDTSC
 
 ```js
-var { rdtsc } = require('rdtsc');
-console.log(rdtsc()); // 3864063236708616 cycles
-console.log(rdtsc() - rdtsc()); // -2971 cycles, minimum = -130 cycles
+var { rdtsc } = require('rdtsc')
+console.log(rdtsc()) // 3864063236708616 cycles
+console.log(rdtsc() - rdtsc()) // -2971 cycles, minimum = -130 cycles
 ```
 for calc performance you can use functions **rdtsc0** and **rdtsc1**:
 
 ```js
-var { rdtsc0, rdtsc1 } = require('rdtsc');
+var { rdtsc0, rdtsc1 } = require('rdtsc')
 
-var cycles;
+var cycles
 
-rdtsc0();
-yourFunc();
-cycles = rdtsc1(); // minimum = 31
+rdtsc0()
+// yourFunc()
+cycles = rdtsc1() // minimum = 31
+
+console.log(cycles)
 
 ```
 
@@ -51,30 +53,35 @@ Accuracy: +/- 4 cycles
 
 ### Syntax
 ```js
-calcPerformance(func0, func1, testTimeMilliseconds);
-// result = <min cycles of func1> - <min cycles of func0>;
+/*
 
-calcPerformance(null, func1, testTimeMilliseconds);
-// result = <min cycles of func1>;
+calcPerformance(func0, func1, testTimeMilliseconds)
+result = <min cycles of func1> - <min cycles of func0>
 
-calcPerformance(func0, null, testTimeMilliseconds);
-// result = <min cycles of func0>
+calcPerformance(null, func1, testTimeMilliseconds)
+result = <min cycles of func1>
+
+calcPerformance(func0, null, testTimeMilliseconds)
+result = <min cycles of func0>
+
+*/
 ```
 
 ### Example
 ```js
-var { calcPerformance } = require('rdtsc');
+var { calcPerformance } = require('rdtsc')
 
 var result = calcPerformance(
-() => {
+  () => {
 
-},
-() => {
-	Object.keys(Math);
-},
-1000);
+  },
+  () => {
+    Object.keys(Math)
+  },
+  1000
+)
 
-console.log('"Object.keys(Math)" min cycles =', result); //about 20-40 cycles
+console.log('"Object.keys(Math)" min cycles =', result) // about 20-40 cycles
 ```
 
 ## Thread Priority
@@ -85,43 +92,47 @@ Implemented only for Windows platform
 
 ```js
 
-const { runInRealtimePriority, getThreadPriority, getProcessPriority } = require('rdtsc');
+const { runInRealtimePriority, getThreadPriority, getProcessPriority } = require('rdtsc')
 
 runInRealtimePriority(() => {
-	console.log("getThreadPriority = ", getThreadPriority()); // === THREAD_PRIORITY_REALTIME
-	console.log("getProcessPriority = ", getProcessPriority()); // === PROCESS_PRIORITY_REALTIME
-});
+  console.log('getThreadPriority = ', getThreadPriority()) // === THREAD_PRIORITY_REALTIME
+  console.log('getProcessPriority = ', getProcessPriority()) // === PROCESS_PRIORITY_REALTIME
+})
 
 ```
 
 
 ```js
-const { setThreadPriority, getThreadPriority, isWin, THREAD_PRIORITY_REALTIME } = require('rdtsc');
+const { setThreadPriority, getThreadPriority, isWin, THREAD_PRIORITY_REALTIME } = require('rdtsc')
 
 if (isWin) {
-	console.log(getThreadPriority()); // === THREAD_PRIORITY_NORMAL
+  console.log(getThreadPriority()) // === THREAD_PRIORITY_NORMAL
 } else {
-	console.log(getThreadPriority()); // === undefined
+  console.log(getThreadPriority()) // === undefined
 }
 
-var previousPriority = setThreadPriority(THREAD_PRIORITY_REALTIME);
+var previousPriority = setThreadPriority(THREAD_PRIORITY_REALTIME)
 
 try {
-	<your code>
+  // <your code>
 } finally {
-	setThreadPriority(previousPriority);
+  setThreadPriority(previousPriority)
 }
 ```
 
 ### Priorities list
 ```js
-const THREAD_PRIORITY_IDLE = -15;
-const THREAD_PRIORITY_LOWEST = -2;
-const THREAD_PRIORITY_BELOW_NORMAL = -1;
-const THREAD_PRIORITY_NORMAL = 0;
-const THREAD_PRIORITY_ABOVE_NORMAL = 1;
-const THREAD_PRIORITY_HIGHEST = 2;
-const THREAD_PRIORITY_REALTIME = 15; // THREAD_PRIORITY_REALTIME
+/*
+
+const THREAD_PRIORITY_IDLE = -15
+const THREAD_PRIORITY_LOWEST = -2
+const THREAD_PRIORITY_BELOW_NORMAL = -1
+const THREAD_PRIORITY_NORMAL = 0
+const THREAD_PRIORITY_ABOVE_NORMAL = 1
+const THREAD_PRIORITY_HIGHEST = 2
+const THREAD_PRIORITY_REALTIME = 15 // THREAD_PRIORITY_REALTIME
+
+*/
 ```
 
 ## Process Priority
@@ -131,31 +142,35 @@ Implemented only for Windows platform
 ### Example
 
 ```js
-const { setProcessPriority, getProcessPriority, isWin, PROCESS_PRIORITY_REALTIME } = require('rdtsc');
+const { setProcessPriority, getProcessPriority, isWin, PROCESS_PRIORITY_REALTIME } = require('rdtsc')
 
 if (isWin) {
-	console.log(getProcessPriority()); // === PROCESS_PRIORITY_NORMAL
+  console.log(getProcessPriority()) // === PROCESS_PRIORITY_NORMAL
 } else {
-	console.log(getProcessPriority()); // === undefined
+  console.log(getProcessPriority()) // === undefined
 }
 
-var previousPriority = setProcessPriority(PROCESS_PRIORITY_REALTIME);
+var previousPriority = setProcessPriority(PROCESS_PRIORITY_REALTIME)
 
 try {
-	<your code>
+  // <your code>
 } finally {
-	setProcessPriority(previousPriority);
+  setProcessPriority(previousPriority)
 }
 ```
 
 ### Priorities list
 ```js
-const PROCESS_PRIORITY_IDLE = 0x00000040; // IDLE_PRIORITY_CLASS
-const PROCESS_PRIORITY_BELOW_NORMAL = 0x00004000; // BELOW_NORMAL_PRIORITY_CLASS
-const PROCESS_PRIORITY_NORMAL = 0x00000020; // NORMAL_PRIORITY_CLASS
-const PROCESS_PRIORITY_ABOVE_NORMAL = 0x00008000; // ABOVE_NORMAL_PRIORITY_CLASS
-const PROCESS_PRIORITY_HIGHEST = 0x00000080; // HIGH_PRIORITY_CLASS
-const PROCESS_PRIORITY_REALTIME = 0x00000100; // REALTIME_PRIORITY_CLASS
+/*
+
+const PROCESS_PRIORITY_IDLE = 0x00000040 // IDLE_PRIORITY_CLASS
+const PROCESS_PRIORITY_BELOW_NORMAL = 0x00004000 // BELOW_NORMAL_PRIORITY_CLASS
+const PROCESS_PRIORITY_NORMAL = 0x00000020 // NORMAL_PRIORITY_CLASS
+const PROCESS_PRIORITY_ABOVE_NORMAL = 0x00008000 // ABOVE_NORMAL_PRIORITY_CLASS
+const PROCESS_PRIORITY_HIGHEST = 0x00000080 // HIGH_PRIORITY_CLASS
+const PROCESS_PRIORITY_REALTIME = 0x00000100 // REALTIME_PRIORITY_CLASS
+
+*/
 ```
 
 # License
