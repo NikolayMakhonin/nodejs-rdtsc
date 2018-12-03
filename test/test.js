@@ -219,6 +219,6 @@ describe('All tests', function () {
       1000
     )
     console.log('Object.keys({ 1 item }) =', result)
-    assert.ok(result > 10)
+    assert.ok(result > 5)
   })
 })
