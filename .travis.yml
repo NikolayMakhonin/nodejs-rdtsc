@@ -1,9 +1,9 @@
 language: node_js
 node_js:
   #Node versions: https://node.green/
-  # - "10.4.0"
-  # - "10.9.0"
-  # - "11.0.0"
+  - "10.4.0"
+  - "10.9.0"
+  - "11.0.0"
   - "11.3.0"
   
 env:
