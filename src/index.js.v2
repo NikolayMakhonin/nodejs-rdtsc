@@ -1,0 +1,230 @@
+const { rdtsc, setThreadPriority, getThreadPriority, setProcessPriority, getProcessPriority, isWin=isWin() } = require('./build/Release/binding');
+
+const THREAD_PRIORITY_IDLE = -15;
+const THREAD_PRIORITY_LOWEST = -2;
+const THREAD_PRIORITY_BELOW_NORMAL = -1;
+const THREAD_PRIORITY_NORMAL = 0;
+const THREAD_PRIORITY_ABOVE_NORMAL = 1;
+const THREAD_PRIORITY_HIGHEST = 2;
+const THREAD_PRIORITY_REALTIME = 15; // THREAD_PRIORITY_TIME_CRITICAL
+
+const PROCESS_PRIORITY_IDLE = 0x00000040; // IDLE_PRIORITY_CLASS
+const PROCESS_PRIORITY_BELOW_NORMAL = 0x00004000; // BELOW_NORMAL_PRIORITY_CLASS
+const PROCESS_PRIORITY_NORMAL = 0x00000020; // NORMAL_PRIORITY_CLASS
+const PROCESS_PRIORITY_ABOVE_NORMAL = 0x00008000; // ABOVE_NORMAL_PRIORITY_CLASS
+const PROCESS_PRIORITY_HIGHEST = 0x00000080; // HIGH_PRIORITY_CLASS
+const PROCESS_PRIORITY_REALTIME = 0x00000100; // REALTIME_PRIORITY_CLASS
+
+const runInRealtimePriority = function(func) {
+	if (!isWin) {
+		return func();
+	}
+	
+	let previousThreadPriority = getThreadPriority();
+	let previousProcessPriority = getProcessPriority();
+	
+	try {
+		setProcessPriority(PROCESS_PRIORITY_REALTIME);
+		setThreadPriority(THREAD_PRIORITY_REALTIME);
+
+		return func();
+	} finally {
+		setProcessPriority(previousProcessPriority);
+		setThreadPriority(previousThreadPriority);
+	}
+}
+
+const MIN_COUNT = 10;
+const MAX_DELTA_MIN_COUNT = 0.1; 
+
+/*
+const calcPerformance0 = function (func, testTimeMilliseconds) {
+	if (!func) {
+		return undefined;
+	}
+	
+    let startTime = process.hrtime.bigint();
+    let testTime = testTimeMilliseconds * 1000000; //to nano time
+	let lastResult;
+	let minCycles = BigInt(Number.MAX_SAFE_INTEGER);
+	let minCount = 0;
+	let noChangesTime = startTime;
+		
+	do {
+		let cycles;
+		
+		cycles=rdtsc();lastResult=func();cycles=rdtsc()-cycles;
+		
+		if (process.hrtime.bigint() - noChangesTime > testTime) {
+			console.log('minCount = ', minCount, " - ", minCycles);
+			minCycles = BigInt(Number.MAX_SAFE_INTEGER);
+		}
+
+		if (minCycles == null || cycles < minCycles) {
+			minCycles = cycles;
+			startTime = process.hrtime.bigint();
+			minCount = 1;
+			noChangesTime = startTime;
+		} else if (cycles === minCycles) {
+			minCount++;
+			noChangesTime = process.hrtime.bigint();
+		}
+	} while (
+		minCount < MIN_COUNT || 
+		process.hrtime.bigint() - startTime < testTime
+	);
+		
+	console.log('minCount = ', minCount, " - ", minCycles);
+
+	return minCycles;
+};
+
+const calcPerformance = function (func0, func1, testTimeMilliseconds) {
+	if (!func0 && !func1) {
+		return undefined;
+	}
+		
+	return runInRealtimePriority(() => {
+		if (!func0 || !func1) {
+			return calcPerformance0(func0 || func1, testTimeMilliseconds);
+		}
+		
+		return Number(calcPerformance0(func1, testTimeMilliseconds) - calcPerformance0(func0, testTimeMilliseconds));
+	});
+}
+*/
+
+const calcPerformance = function (func0, func1, testTimeMilliseconds) {
+    let startTime = process.hrtime.bigint();
+    let testTime = testTimeMilliseconds * 1000000; //to nano time
+	
+	return runInRealtimePriority(() => {
+		let lastResult;
+		let minCycles0 = BigInt(Number.MAX_SAFE_INTEGER);
+		let minCycles1 = BigInt(Number.MAX_SAFE_INTEGER);
+		let minCount0 = 0;
+		let minCount1 = 0;
+		let noChangesTime0 = startTime;
+		let noChangesTime1 = startTime;
+
+		if (!func0 || !func1) {
+			func0 = func0 || func1;
+			if (!func0) {
+				return undefined;
+			}
+			
+			let i = 0;
+			do {
+				let cycles0;
+				
+				cycles0=rdtsc();lastResult=func0();cycles0=rdtsc()-cycles0;
+				
+				if (process.hrtime.bigint() - noChangesTime0 > testTime) {
+					minCycles0 = BigInt(Number.MAX_SAFE_INTEGER);
+					console.log('minCount0 = ', minCount0, " - ", minCycles0);
+				}
+
+				if (cycles0 < minCycles0) {
+					minCycles0 = cycles0;
+					startTime = process.hrtime.bigint();
+					minCount0 = 1;
+					noChangesTime0 = startTime;
+				} else if (cycles0 === minCycles0) {
+					minCount0++;
+					noChangesTime0 = process.hrtime.bigint();
+				}
+			} while (
+				//minCount0 < MIN_COUNT || 
+				process.hrtime.bigint() - startTime < testTime
+			);
+
+			console.log('minCount0 = ', minCount0, " - ", minCycles0);
+
+			return minCycles0;		
+		}
+		
+		let i = 0;
+		do {
+			let cycles0, cycles1;
+
+			if (i % 2) {
+				cycles0=rdtsc();lastResult=func0();cycles0=rdtsc()-cycles0;
+				cycles1=rdtsc();lastResult=func1();cycles1=rdtsc()-cycles1;
+			} else {
+				cycles1=rdtsc();lastResult=func1();cycles1=rdtsc()-cycles1;
+				cycles0=rdtsc();lastResult=func0();cycles0=rdtsc()-cycles0;
+			}
+
+			if (process.hrtime.bigint() - noChangesTime0 > testTime) {
+				console.log('minCount0 = ', minCount0, " - ", minCycles0);
+				minCycles0 = BigInt(Number.MAX_SAFE_INTEGER);
+			}
+
+			if (process.hrtime.bigint() - noChangesTime1 > testTime) {
+				console.log('minCount1 = ', minCount1, " - ", minCycles1);
+				minCycles1 = BigInt(Number.MAX_SAFE_INTEGER);
+			}
+
+			if (cycles0 < minCycles0) {
+				minCycles0 = cycles0;
+				startTime = process.hrtime.bigint();
+				minCount0 = 1;
+				noChangesTime0 = startTime;
+			} else if (cycles0 === minCycles0) {
+				minCount0++;
+				noChangesTime0 = process.hrtime.bigint();
+			}
+			
+			if (cycles1 < minCycles1) {
+				minCycles1 = cycles1;
+				startTime = process.hrtime.bigint();
+				minCount1 = 1;
+				noChangesTime1 = startTime;
+			} else if (cycles1 === minCycles1) {
+				minCount1++;
+				noChangesTime1 = process.hrtime.bigint();
+			}
+			
+			i++;
+		} while (
+			minCount0 < MIN_COUNT ||
+			minCount1 < MIN_COUNT ||
+			//1 - Math.min(minCount0, minCount1) / Math.max(minCount0, minCount1) > MAX_DELTA_MIN_COUNT ||
+			process.hrtime.bigint() - startTime < testTime
+		);
+		
+		console.log('minCount0 = ', minCount0, " - ", minCycles0);
+		console.log('minCount1 = ', minCount1, " - ", minCycles1);
+		
+		return Number(minCycles1 - minCycles0);
+	});
+};
+
+module.exports = {
+	rdtsc,
+	calcPerformance,
+	isWin,
+	
+	setThreadPriority, //since only for Windows
+	getThreadPriority, //since only for Windows
+	
+	THREAD_PRIORITY_IDLE,
+	THREAD_PRIORITY_LOWEST,
+	THREAD_PRIORITY_BELOW_NORMAL,
+	THREAD_PRIORITY_NORMAL,
+	THREAD_PRIORITY_ABOVE_NORMAL,
+	THREAD_PRIORITY_HIGHEST,
+	THREAD_PRIORITY_REALTIME,
+	
+	setProcessPriority, //since only for Windows
+	getProcessPriority, //since only for Windows
+	
+	PROCESS_PRIORITY_IDLE,
+	PROCESS_PRIORITY_BELOW_NORMAL,
+	PROCESS_PRIORITY_NORMAL,
+	PROCESS_PRIORITY_ABOVE_NORMAL,
+	PROCESS_PRIORITY_HIGHEST,
+	PROCESS_PRIORITY_REALTIME,
+	
+	runInRealtimePriority, //since only for Windows
+};
