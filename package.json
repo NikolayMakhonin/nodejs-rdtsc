@@ -50,6 +50,7 @@
     "eslint-plugin-standard": "^4.0.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
-    "node-gyp": "^3.8.0"
+    "node-gyp": "^3.8.0",
+    "wavefile": "^8.4.4"
   }
 }

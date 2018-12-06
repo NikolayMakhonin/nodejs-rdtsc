@@ -7,7 +7,8 @@ const {
     isWin
 } = require('../build/Release/binding')
 
-const wav = require('wavefile')
+const fs = require('fs');
+const WaveFile = require('wavefile')
 
 const THREAD_PRIORITY_IDLE = -15
 const THREAD_PRIORITY_LOWEST = -2
@@ -57,14 +58,22 @@ const calcPerformance = function (func0, func1, testTimeMilliseconds) {
                 return undefined
             }
 
+            //let data = []
+
             do {
                 let cycles0 = (rdtsc0(), func0(), rdtsc1())
+
+                //let n = Number(cycles0) / 100000
+                //data.push(n > 0x7fff ? 0x7fff : n)
 
                 if (minCycles0 == null || cycles0 < minCycles0) {
                     minCycles0 = cycles0
                 }
             } while (process.hrtime.bigint() - startTime < testTime)
 
+            // let wav = new WaveFile();
+            // wav.fromScratch(1, 44100, '16', data);
+            // fs.writeFileSync('./data.wav', wav.toBuffer());
 
             return minCycles0
         }

@@ -41,18 +41,25 @@ const runInRealtimePriority = function (func) {
     }
 }
 
-const PerfAnalyser = function (window, invertErfMin, invertErfMax) {
-    if (window <= 0) {
-        throw  new Error("window <= 0")
+const WINDOW_MIN = 1000
+const WINDOW_MAX = 100000
+
+const PerfAnalyser = function (windowTimeNanoseconds, invertErfMin, invertErfMax) {
+    if (windowTimeNanoseconds <= 0) {
+        throw  new Error("windowTime <= 0")
     }
 
     let data_i = 0
-    let data = new Array(window)
-    let data_sqr = new Array(window)
+    let data = new Array(WINDOW_MAX)
+    let data_sqr = new Array(WINDOW_MAX)
+    let window
     let sum
     let sum_sqr
     let min
+    let no_noise_min
     let isWindowFilled = false
+    let startTime
+    let totalCount = 0
 
     let emitValue = function (value) {
         if (isWindowFilled) {
@@ -63,19 +70,22 @@ const PerfAnalyser = function (window, invertErfMin, invertErfMax) {
         let sqr = value * value
         data[data_i] = value
         data_sqr[data_i] = sqr
+        totalCount++
 
         if(!isWindowFilled && data_i === 0) {
             sum = value
             sum_sqr = sqr
             min = value
+            startTime = process.hrtime.bigint()
         } else {
             sum += value
             sum_sqr += sqr
 
             if (isWindowFilled) {
-                let no_noise_average = calcNoNoiseAverage()
-                if (no_noise_average < min) {
-                    min = no_noise_average
+                let average = getAverage()
+                if (average < min) {
+                    min = average
+                    no_noise_min = calcNoNoiseAverage()
                 }
             } else if (value < min) {
                 min = value
@@ -83,11 +93,34 @@ const PerfAnalyser = function (window, invertErfMin, invertErfMax) {
         }
 
         data_i++
-        if (data_i >= window) {
+
+        if (startTime && process.hrtime.bigint() - startTime >= windowTimeNanoseconds) {
+            startTime = null
+            window = data_i
+            if (window < WINDOW_MIN) {
+                window = WINDOW_MIN
+            }
+            if (window > WINDOW_MAX) {
+                window = WINDOW_MAX
+            }
+        }
+
+        if (window && data_i >= window) {
             data_i = 0
             isWindowFilled = true
-            min = calcNoNoiseAverage()
+            min = getAverage()
+            no_noise_min = calcNoNoiseAverage()
         }
+
+        if (!isWindowFilled && data_i === 50) {
+            startTime = process.hrtime.bigint()
+        }
+    }
+
+    let getAverage = function () {
+        let N = isWindowFilled ? window : data_i
+        if (N === 0) return Number.NaN
+        return sum / N
     }
 
     let getDispersion = function () {
@@ -126,7 +159,9 @@ const PerfAnalyser = function (window, invertErfMin, invertErfMax) {
 
     return {
         emitValue,
-        getMin: () => min
+        getMin: () => {
+            return min
+        }
     }
 }
 
@@ -134,14 +169,14 @@ const PerfAnalyser = function (window, invertErfMin, invertErfMax) {
 //excel function: erfinv(p) = Sqrt(GammInv(p,0.5,1))
 const CALC_PERF_INV_ERF_MIN = 0.476936276 //(p=0.5) inverse erf of confidence probability for exclude noise
 const CALC_PERF_INV_ERF_MAX = 0.088855990 //(p=0.1) inverse erf of confidence probability for exclude noise
-const CALC_PERF_WINDOW = 1000
 
-const calcPerformance = function (func0, func1, testTimeMilliseconds) {
+const calcPerformance = function (func0, func1, testTimeMilliseconds, windowMilliseconds = 10) {
     let startTime = process.hrtime.bigint()
     let testTime = testTimeMilliseconds * 1000000 // to nano time
+    window = windowMilliseconds * 1000000
 
     return runInRealtimePriority(() => {
-        let data0 = new PerfAnalyser(CALC_PERF_WINDOW, CALC_PERF_INV_ERF_MIN, CALC_PERF_INV_ERF_MAX);
+        let data0 = new PerfAnalyser(window, CALC_PERF_INV_ERF_MIN, CALC_PERF_INV_ERF_MAX);
 
         if (!func0 || !func1) {
             func0 = func0 || func1
@@ -158,7 +193,7 @@ const calcPerformance = function (func0, func1, testTimeMilliseconds) {
             return data0.getMin()
         }
 
-        let data1 = new PerfAnalyser(CALC_PERF_WINDOW, CALC_PERF_INV_ERF_MIN, CALC_PERF_INV_ERF_MAX);
+        let data1 = new PerfAnalyser(window, CALC_PERF_INV_ERF_MIN, CALC_PERF_INV_ERF_MAX);
 
         let i = 0
         do {
