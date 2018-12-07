@@ -173,7 +173,7 @@ describe('All tests', function () {
         )
 
         console.log('rdtsc() self =', minCycles)
-        assert.ok(minCycles > 50)
+        assert.ok(minCycles > 5)
     })
 
     it('rdtsc self cycles 2', function () {
@@ -187,7 +187,7 @@ describe('All tests', function () {
         )
 
         console.log('rdtsc() self 2 =', result)
-        assert.ok(result > 50)
+        assert.ok(result > 5)
     })
 
     it('rdtsc0/rdtsc1 self cycles', function () {
