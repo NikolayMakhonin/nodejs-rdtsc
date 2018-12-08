@@ -58,13 +58,13 @@ result = <min cycles of func0>
 var { calcPerformance } = require('rdtsc')
 
 var result = calcPerformance(
-  () => {
+	() => {
 
-  },
-  () => {
-    Object.keys(Math)
-  },
-  1000
+	},
+	() => {
+		Object.keys(Math)
+	},
+	1000
 )
 
 console.log('"Object.keys(Math)" min cycles =', result) // about 20-40 cycles
@@ -81,8 +81,8 @@ Implemented only for Windows platform
 const { runInRealtimePriority, getThreadPriority, getProcessPriority } = require('rdtsc')
 
 runInRealtimePriority(() => {
-  console.log('getThreadPriority = ', getThreadPriority()) // === THREAD_PRIORITY_REALTIME
-  console.log('getProcessPriority = ', getProcessPriority()) // === PROCESS_PRIORITY_REALTIME
+	console.log('getThreadPriority = ', getThreadPriority()) // === THREAD_PRIORITY_REALTIME
+	console.log('getProcessPriority = ', getProcessPriority()) // === PROCESS_PRIORITY_REALTIME
 })
 
 ```
@@ -92,17 +92,17 @@ runInRealtimePriority(() => {
 const { setThreadPriority, getThreadPriority, isWin, THREAD_PRIORITY_REALTIME } = require('rdtsc')
 
 if (isWin) {
-  console.log(getThreadPriority()) // === THREAD_PRIORITY_NORMAL
+	console.log(getThreadPriority()) // === THREAD_PRIORITY_NORMAL
 } else {
-  console.log(getThreadPriority()) // === undefined
+	console.log(getThreadPriority()) // === undefined
 }
 
 var previousPriority = setThreadPriority(THREAD_PRIORITY_REALTIME)
 
 try {
-  // <your code>
+	// <your code>
 } finally {
-  setThreadPriority(previousPriority)
+	setThreadPriority(previousPriority)
 }
 ```
 
@@ -131,17 +131,17 @@ Implemented only for Windows platform
 const { setProcessPriority, getProcessPriority, isWin, PROCESS_PRIORITY_REALTIME } = require('rdtsc')
 
 if (isWin) {
-  console.log(getProcessPriority()) // === PROCESS_PRIORITY_NORMAL
+	console.log(getProcessPriority()) // === PROCESS_PRIORITY_NORMAL
 } else {
-  console.log(getProcessPriority()) // === undefined
+	console.log(getProcessPriority()) // === undefined
 }
 
 var previousPriority = setProcessPriority(PROCESS_PRIORITY_REALTIME)
 
 try {
-  // <your code>
+	// <your code>
 } finally {
-  setProcessPriority(previousPriority)
+	setProcessPriority(previousPriority)
 }
 ```
 

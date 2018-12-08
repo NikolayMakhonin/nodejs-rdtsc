@@ -200,26 +200,4 @@ describe('All tests', function () {
 		console.log('Object.keys({ 1 item }) =', result)
 		assert.ok(result.cycles > 5)
 	})
-
-	// function sleep (sleepDuration) {
-	//   let now = new Date().getTime()
-	//   while (new Date().getTime() < now + sleepDuration) { /* do nothing */ }
-	// }
-
-	it('calc (x+y) performance', function () {
-		this.timeout(60000)
-		// sleep(10000);
-		// console.log('start');
-		let x = 1; let y = 2; let z = 0
-		let result = calcPerformance(
-			() => {
-				z += x
-			},
-			() => {
-				z += x + y + y + 5
-			},
-			1000
-		)
-		console.log('(x+y) cycles =', result)
-	})
 })
