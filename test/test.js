@@ -154,7 +154,7 @@ describe('All tests', function () {
 		)
 
 		console.log('calcPerformance() self =', result)
-		assert.ok(result.cycles > 10)
+		assert.ok(result.cycles > 1)
 	})
 
 	it('rdtsc self cycles', function () {
@@ -169,7 +169,7 @@ describe('All tests', function () {
 		)
 
 		console.log('rdtsc() self =', result)
-		assert.ok(result.cycles > 5)
+		assert.ok(result.cycles > 1)
 	})
 
 	it('rdtsc self cycles 2', function () {
@@ -198,6 +198,6 @@ describe('All tests', function () {
 			1000
 		)
 		console.log('Object.keys({ 1 item }) =', result)
-		assert.ok(result.cycles > 5)
+		assert.ok(result.cycles > 1)
 	})
 })
