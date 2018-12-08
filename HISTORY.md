@@ -1,3 +1,9 @@
+1.2.1 / 2018-12-03
+===================
+
+  * Removed rdtsc0, rdtsc1 functions
+  * Improved calcPerformance function
+
 1.1.7 / 2018-12-03
 ===================
 

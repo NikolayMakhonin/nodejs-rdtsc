@@ -32,20 +32,6 @@ var { rdtsc } = require('rdtsc')
 console.log(rdtsc()) // 3864063236708616 cycles
 console.log(rdtsc() - rdtsc()) // -2971 cycles, minimum = -130 cycles
 ```
-for calc performance you can use functions **rdtsc0** and **rdtsc1**:
-
-```js
-var { rdtsc0, rdtsc1 } = require('rdtsc')
-
-var cycles
-
-rdtsc0()
-// yourFunc()
-cycles = rdtsc1() // minimum = 31
-
-console.log(cycles)
-
-```
 
 ## Calc Performance
 

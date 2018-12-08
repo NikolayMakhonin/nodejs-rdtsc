@@ -1,0 +1,260 @@
+'use strict'
+const assert = require('assert')
+const {
+    rdtsc, rdtsc0, rdtsc1,
+    calcPerformance,
+    setThreadPriority,
+    getThreadPriority,
+    setProcessPriority,
+    getProcessPriority,
+    isWin,
+    THREAD_PRIORITY_HIGHEST,
+    PROCESS_PRIORITY_HIGHEST,
+    THREAD_PRIORITY_REALTIME,
+    PROCESS_PRIORITY_REALTIME,
+    runInRealtimePriority
+} = require('../')
+
+console.log('isWin =', isWin)
+
+describe('All tests', function () {
+    it('Calc dispersion', function () {
+        console.log('rdtsc dispersion =', calcPerformance(null, ()=>{}, 100))
+    })
+
+    it('empty', function () {
+        console.log('rdtsc dispersion =', calcPerformance(()=>{}, ()=>{}, 100))
+    })
+
+    it('Base tests', function () {
+        assert.ok(rdtsc() > 0)
+        assert.ok(rdtsc() - rdtsc() < 0)
+        console.log('rdtsc() =', rdtsc())
+        console.log('rdtsc() - rdtsc() =', rdtsc() - rdtsc())
+        console.log('rdtsc0(); rdtsc1() =', rdtsc0() || rdtsc1())
+    })
+
+    it('Test multiple loading of the same module', function () {
+        const bindingPath = require.resolve('../build/Release/binding')
+        delete require.cache[bindingPath]
+        const { rerdtsc } = require('../')
+        assert.ok(rdtsc() > 0)
+        assert.ok(rdtsc() - rdtsc() < 0)
+        assert.notStrictEqual(rdtsc, rerdtsc)
+    })
+
+    it('runInRealtimePriority', function () {
+        assert.ok(runInRealtimePriority(() => rdtsc() - rdtsc()))
+        console.log('rdtsc() - rdtsc() =', runInRealtimePriority(() => rdtsc() - rdtsc()))
+
+        console.log('previous ThreadPriority =', getThreadPriority())
+        console.log('previous ProcessPriority =', getProcessPriority())
+
+        runInRealtimePriority(() => {
+            let threadPriority, processPriority
+            console.log('ThreadPriority =', threadPriority = getThreadPriority()) // === THREAD_PRIORITY_REALTIME
+            console.log('ProcessPriority =', processPriority = getProcessPriority()) // === PROCESS_PRIORITY_REALTIME
+            if (isWin) {
+                assert.strictEqual(threadPriority, THREAD_PRIORITY_REALTIME)
+                assert.strictEqual(processPriority, PROCESS_PRIORITY_REALTIME)
+            } else {
+                assert.strictEqual(threadPriority, undefined)
+                assert.strictEqual(processPriority, undefined)
+            }
+        })
+    })
+
+    it('Thread priority', function () {
+        var previousPriority = setThreadPriority(THREAD_PRIORITY_HIGHEST)
+        console.log('previousPriority =', previousPriority)
+        if (isWin) {
+            assert.notStrictEqual(previousPriority, undefined)
+        } else {
+            assert.strictEqual(previousPriority, undefined)
+        }
+
+        var priority = getThreadPriority()
+        console.log('priority =', priority)
+        if (isWin) {
+            assert.strictEqual(priority, THREAD_PRIORITY_HIGHEST)
+        } else {
+            assert.strictEqual(priority, undefined)
+        }
+
+        if (isWin) {
+            var testPriority = setThreadPriority(previousPriority)
+            assert.strictEqual(testPriority, THREAD_PRIORITY_HIGHEST)
+            priority = getThreadPriority()
+            console.log('priority =', priority)
+            assert.strictEqual(priority, previousPriority)
+        }
+    })
+
+    it('Process priority', function () {
+        var previousPriority = setProcessPriority(PROCESS_PRIORITY_HIGHEST)
+        console.log('previousPriority =', previousPriority)
+        if (isWin) {
+            assert.notStrictEqual(previousPriority, undefined)
+        } else {
+            assert.strictEqual(previousPriority, undefined)
+        }
+
+        var priority = getProcessPriority()
+        console.log('priority =', priority)
+        if (isWin) {
+            assert.strictEqual(priority, PROCESS_PRIORITY_HIGHEST)
+        } else {
+            assert.strictEqual(priority, undefined)
+        }
+
+        if (isWin) {
+            var testPriority = setProcessPriority(previousPriority)
+            assert.strictEqual(testPriority, PROCESS_PRIORITY_HIGHEST)
+            priority = getProcessPriority()
+            console.log('priority =', priority)
+            assert.strictEqual(priority, previousPriority)
+        }
+    })
+
+    it('throw catch', function () {
+        function testErrorFunc () {
+            throw new Error('test error')
+        }
+
+        var exception
+        try {
+            calcPerformance(
+                () => {
+                    testErrorFunc()
+                },
+                () => {
+
+                },
+                100)
+        } catch (ex) {
+            exception = ex
+        }
+
+        // console.log('Test exeption:');
+        // console.log(JSON.stringify(exception), exception.stack);
+
+        assert.ok(exception)
+        assert.ok(exception.stack)
+        assert.ok(exception.stack.indexOf('calcPerformance') > 0)
+    })
+
+    it('calcPerformance both funcs is null', function () {
+        var result = calcPerformance(
+            null,
+            null,
+            1000
+        )
+
+        console.log('calcPerformance both funcs is null =', result)
+        assert.strictEqual(result, undefined)
+    })
+
+    it('calcPerformance self cycles', function () {
+        var result = calcPerformance(
+            null,
+            () => {
+            },
+            1000
+        )
+
+        console.log('calcPerformance() self =', result)
+        assert.ok(result.cycles > 10)
+    })
+
+    it('rdtsc self cycles', function () {
+        var minCycles
+
+        calcPerformance(
+            null,
+            () => {
+                var cycles = -(rdtsc() - rdtsc())
+                if (minCycles == null || cycles < minCycles) {
+                    minCycles = cycles
+                }
+            },
+            1000
+        )
+
+        console.log('rdtsc() self =', minCycles)
+        assert.ok(minCycles > 5)
+    })
+
+    it('rdtsc self cycles 2', function () {
+        var result = calcPerformance(
+            () => {
+            },
+            () => {
+                rdtsc()
+            },
+            1000
+        )
+
+        console.log('rdtsc() self 2 =', result)
+        assert.ok(result.cycles > 5)
+    })
+
+    it('rdtsc0/rdtsc1 self cycles', function () {
+        var minCycles
+
+        calcPerformance(
+            null,
+            () => {
+                var cycles = (rdtsc0(), rdtsc1())
+                if (minCycles == null || cycles < minCycles) {
+                    minCycles = cycles
+                }
+            },
+            1000
+        )
+
+        console.log('rdtsc0/rdtsc1 self =', minCycles)
+        assert.ok(minCycles > 10)
+    })
+
+    it('calc Object.keys performance', function () {
+        var object = { x: 1 }
+        var result = calcPerformance(
+            () => {
+            },
+            () => {
+                return Object.keys(object)
+            },
+            1000
+        )
+        console.log('Object.keys({ 1 item }) =', result)
+        assert.ok(result.cycles > 5)
+    })
+
+    function sleep( sleepDuration ){
+        var now = new Date().getTime();
+        while(new Date().getTime() < now + sleepDuration){ /* do nothing */ }
+    }
+
+    it('calc (x+y) performance', function () {
+        this.timeout(60000)
+        //sleep(10000);
+        //console.log('start');
+        let x = 1, y = 2, z = 0;
+        let result = calcPerformance(
+            null,
+            // () => {
+            //     return x// + y + y
+            //     eval();
+            // },
+            () => {
+                return x + y + y + 5
+                //for (let i = 0; i < 1000; i++) {
+                    eval();
+                //}
+            },
+            1000
+        )
+        console.log('(x+y) cycles =', result)
+        //assert.ok(result.cycles > 0.1)
+    })
+})
