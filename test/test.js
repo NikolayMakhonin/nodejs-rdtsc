@@ -183,7 +183,7 @@ describe('All tests', function () {
 		)
 
 		console.log('rdtsc() self 2 =', result)
-		assert.ok(result.cycles > 5)
+		assert.ok(result.cycles > 1)
 	})
 
 	it('calc Object.keys performance', function () {
