@@ -1,6 +1,6 @@
 {
   "name": "rdtsc",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "The most high resolution cross platform timing in NodeJs that use processor command RDTSC. Calculate performance with accuracy +/- 4 processor cycles.",
   "engines": {
     "node": ">= 10.9.0"
@@ -54,7 +54,5 @@
     "node-gyp": "^3.8.0",
     "wavefile": "^8.4.4"
   },
-  "dependencies": {
-    "ps-list": "^6.0.0"
-  }
+  "dependencies": {}
 }

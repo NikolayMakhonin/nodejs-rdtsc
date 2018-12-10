@@ -47,18 +47,24 @@ const runInRealtimePriority = function (func) {
 }
 
 const calcPerformance = function (func0, func1, testTimeMilliseconds) {
-	let calcCount = (time, count) => {
-		return ~~Math.ceil(count * testTimeMilliseconds / (testTimeMilliseconds + time[0] * 1000 + time[1] / 1000000))
-	}
-
 	return runInRealtimePriority(() => {
-		let endTime = process.hrtime()
-		endTime[0] += ~~(testTimeMilliseconds / 1000)
-		endTime[1] += testTimeMilliseconds % 1000
+		let testTime = testTimeMilliseconds
+		let calcCount = (time, count) => {
+			return ~~Math.ceil(count * testTime / (testTime + time[0] * 1000 + time[1] / 1000000))
+		}
 
-		if (!func0 || !func1) {
-			func0 = func0 || func1
-			if (!func0) {
+		let f0 = func0
+		let f1 = func1
+		let m0 = mark0
+		let m1 = mark1
+		let m2 = mark2
+		let endTime = process.hrtime()
+		endTime[0] += ~~(testTime / 1000)
+		endTime[1] += testTime % 1000
+
+		if (!f0 || !f1) {
+			f0 = f0 || f1
+			if (!f0) {
 				return undefined
 			}
 
@@ -67,9 +73,9 @@ const calcPerformance = function (func0, func1, testTimeMilliseconds) {
 			init()
 			let startCycles = rdtsc()
 			do {
-				mark0()
-				func0()
-				mark1()
+				m0()
+				f0()
+				m1()
 
 				i++
 				if (i >= count) {
@@ -95,11 +101,11 @@ const calcPerformance = function (func0, func1, testTimeMilliseconds) {
 		init()
 		let startCycles = rdtsc()
 		do {
-			mark0()
-			func0()
-			mark1()
-			func1()
-			mark2()
+			m0()
+			f0()
+			m1()
+			f1()
+			m2()
 
 			i++
 			if (i >= count) {

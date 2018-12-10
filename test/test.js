@@ -126,7 +126,7 @@ describe('All tests', function () {
 			exception = ex
 		}
 
-		// console.log('Test exeption:');
+		// console.log('Test exception:');
 		// console.log(JSON.stringify(exception), exception.stack);
 
 		assert.ok(exception)
