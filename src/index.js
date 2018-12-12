@@ -2,7 +2,7 @@ const {
 	rdtsc,
 	init,
 	mark0,
-	markNext,
+	mark1,
 	minCycles,
 	setThreadPriority,
 	getThreadPriority,
@@ -52,10 +52,6 @@ const calcPerformance = function (testTimeMilliseconds, ...funcs) {
 			throw new Error(`testTime ${testTime} <= 0`)
 		}
 
-		const calcCount = (time, count) => {
-			return ~~Math.ceil(count * testTime / (testTime + time[0] * 1000 + time[1] / 1000000))
-		}
-
 		// https://stackoverflow.com/a/39838385/5221762
 		const flatMap = (arr, callbackfn) =>
 			arr.reduce((result, item) =>
@@ -78,7 +74,6 @@ const calcPerformance = function (testTimeMilliseconds, ...funcs) {
 				}
 				return true
 			})
-			.reverse()
 
 		const funcsCount = f.length
 
@@ -87,22 +82,20 @@ const calcPerformance = function (testTimeMilliseconds, ...funcs) {
 		}
 
 		const m0 = mark0
-		const mn = markNext
+		const m1 = mark1
 		const endTime = process.hrtime()
 		endTime[0] += ~~(testTime / 1000)
 		endTime[1] += testTime % 1000
 
 		let i = 0
-		let count = 0
+		let count = funcsCount
 		init(funcsCount)
 		const startCycles = rdtsc()
 		do {
-			let j = funcsCount
+			const fn = f[i % funcsCount]
 			m0()
-			while (--j >= 0) {
-				f[j]()
-				mn()
-			}
+			fn()
+			m1()
 
 			i++
 			if (i >= count) {
@@ -110,7 +103,8 @@ const calcPerformance = function (testTimeMilliseconds, ...funcs) {
 				if (time[0] >= 0) {
 					break
 				}
-				count = calcCount(time, i)
+				count = ~~Math.ceil(i * testTime / (testTime + time[0] * 1000 + time[1] / 1000000))
+				count = (~~(count / funcsCount)) * funcsCount
 			}
 		} while (true)
 

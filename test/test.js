@@ -153,8 +153,9 @@ describe('All tests', function () {
 			}
 		)
 
-		console.log('calcPerformance() self =', result)
+		console.log(result)
 		assert.ok(result.cycles[0] > 1)
+		assert.strictEqual(result.absoluteDiff, undefined)
 	})
 
 	it('rdtsc self cycles', function () {
@@ -168,8 +169,9 @@ describe('All tests', function () {
 			}
 		)
 
-		console.log('rdtsc() self =', result)
+		console.log('rdtsc() self =', result.absoluteDiff[0])
 		assert.ok(result.absoluteDiff[0] > 1)
+		assert.strictEqual(result.relativeDiff, undefined)
 	})
 
 	it('rdtsc self cycles 2', function () {
@@ -182,8 +184,9 @@ describe('All tests', function () {
 			}
 		)
 
-		console.log('rdtsc() self 2 =', result)
+		console.log('rdtsc() self 2 =', result.absoluteDiff[0])
 		assert.ok(result.absoluteDiff[0] > 1)
+		assert.strictEqual(result.relativeDiff, undefined)
 	})
 
 	it('calc Object.keys performance', function () {
@@ -199,7 +202,7 @@ describe('All tests', function () {
 				Object.keys(Math)
 			}
 		)
-		console.log('Object.keys(Math) =', result)
+		console.log(result)
 		assert.ok(result.absoluteDiff[0] > 1)
 		assert.ok(result.relativeDiff[0])
 	})
@@ -222,11 +225,11 @@ describe('All tests', function () {
 
 				}
 			)
-		} while (result.absoluteDiff[0] > 0 && --count >= 0)
+		} while ((result.absoluteDiff[0] !== 0 || result.absoluteDiff[0] !== 0) && --count >= 0)
 
 		assert.ok(result.absoluteDiff[0] <= 0)
-		console.log('Object.keys({ 1 item }) =', result)
+		console.log(result)
 		assert.strictEqual(result.absoluteDiff.length, 2)
-		assert.ok(!result.relativeDiff)
+		assert.strictEqual(result.relativeDiff, undefined)
 	})
 })

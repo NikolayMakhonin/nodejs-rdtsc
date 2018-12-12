@@ -35,24 +35,26 @@ namespace nodejsRdtsc{
 		}
 
 		count = args[0].As<Number>()->Value();
+		index = 0;
 
 		minCycles = new uint64_t[count];
 		std::fill(minCycles, minCycles + count, maxNumber);
 	}
 
 	inline void mark0(const FunctionCallbackInfo<Value>& args) {
-		index = 0;
 		cycles0 = Now();
 	}
 
-	inline void markNext(const FunctionCallbackInfo<Value>& args) {
+	inline void mark1(const FunctionCallbackInfo<Value>& args) {
 		uint64_t cycles = Now() - cycles0;
 		uint64_t min = *(minCycles + index);
 		if (cycles < min) {
 			*(minCycles + index) = cycles;
 		}
 		index++;
-		cycles0 = Now();
+		if (index >= count) {
+			index = 0;
+		}
 	}
 
 	void _minCycles(const FunctionCallbackInfo<Value>& args) {
@@ -147,7 +149,7 @@ namespace nodejsRdtsc{
 		NODE_SET_METHOD(exports, "rdtsc", rdtsc);
 		NODE_SET_METHOD(exports, "init", init);
 		NODE_SET_METHOD(exports, "mark0", mark0);
-		NODE_SET_METHOD(exports, "markNext", markNext);
+		NODE_SET_METHOD(exports, "mark1", mark1);
 		NODE_SET_METHOD(exports, "minCycles", _minCycles);
 		NODE_SET_METHOD(exports, "setThreadPriority", setThreadPriority);
 		NODE_SET_METHOD(exports, "getThreadPriority", getThreadPriority);
