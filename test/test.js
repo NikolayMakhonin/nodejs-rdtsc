@@ -187,20 +187,19 @@ describe('All tests', function () {
 	})
 
 	it('calc Object.keys performance', function () {
-		let object = { x: 1 }
 		let result = calcPerformance(
 			1000,
 			() => {
 
 			},
 			() => {
-				Object.keys(object)
+				Object.keys(Math)
 			},
 			() => {
-				Object.keys(object)
+				Object.keys(Math)
 			}
 		)
-		console.log('Object.keys({ 1 item }) =', result)
+		console.log('Object.keys(Math) =', result)
 		assert.ok(result.absoluteDiff[0] > 1)
 		assert.ok(result.relativeDiff[0])
 	})
@@ -223,9 +222,9 @@ describe('All tests', function () {
 
 				}
 			)
-		} while (result.absoluteDiff[0] !== 0 && --count >= 0)
+		} while (result.absoluteDiff[0] > 0 && --count >= 0)
 
-		assert.strictEqual(result.absoluteDiff[0], 0)
+		assert.ok(result.absoluteDiff[0] <= 0)
 		console.log('Object.keys({ 1 item }) =', result)
 		assert.strictEqual(result.absoluteDiff.length, 2)
 		assert.ok(!result.relativeDiff)
