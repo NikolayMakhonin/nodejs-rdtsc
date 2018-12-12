@@ -13,39 +13,58 @@ void rdtsc(const FunctionCallbackInfo<Value>& args) {
 	args.GetReturnValue().Set(BigInt::New(args.GetIsolate(), Now()));
 }
 
-uint64_t cycles_;
-uint64_t minCycles0;
-uint64_t minCycles1;
-uint64_t maxNumber = 0xffffffffffffffff;
+const uint64_t maxNumber = 0xffffffffffffffff;
+
+uint64_t cycles0;
+uint64_t *minCycles;
+int index;
+int count;
 
 inline void init(const FunctionCallbackInfo<Value>& args) {
-	minCycles0 = maxNumber;
-	minCycles1 = maxNumber;
+	Isolate* isolate = args.GetIsolate();
+
+	// Check the number of arguments passed.
+	if (args.Length() < 1) {
+		// Throw an Error that is passed back to JavaScript
+		isolate->ThrowException(Exception::TypeError(
+			String::NewFromUtf8(isolate,
+				"You must provide count arguments: init(int count)",
+				NewStringType::kNormal).ToLocalChecked()));
+		return;
+	}
+
+	count = args[0].As<Number>()->Value();
+
+	minCycles = new uint64_t[count];
+	std::fill(minCycles, minCycles + count, maxNumber);
 }
 
 inline void mark0(const FunctionCallbackInfo<Value>& args) {
-	cycles_ = Now();
+	index = 0;
+	cycles0 = Now();
 }
 
-inline void mark1(const FunctionCallbackInfo<Value>& args) {
-	uint64_t cycles0 = Now() - cycles_;
-	if (cycles0 < minCycles0) {
-		minCycles0 = cycles0;
+inline void markNext(const FunctionCallbackInfo<Value>& args) {
+	uint64_t cycles = Now() - cycles0;
+	uint64_t min = *(minCycles + index);
+	if (cycles < min) {
+		*(minCycles + index) = cycles;
 	}
-	cycles_ = Now();
+	index++;
+	cycles0 = Now();
 }
 
-inline void mark2(const FunctionCallbackInfo<Value>& args) {
-	uint64_t cycles1 = Now() - cycles_;
-	if (cycles1 < minCycles1) {
-		minCycles1 = cycles1;
+void _minCycles(const FunctionCallbackInfo<Value>& args) {
+	Isolate* isolate = args.GetIsolate();
+
+	Handle<Array> result = Array::New(isolate, count);
+
+	int i = 0;
+	for (int i = 0; i < count; i++){
+		result->Set(i, BigInt::New(isolate, *(minCycles + i)));
 	}
-	cycles_ = Now();
-}
 
-void minCycles(const FunctionCallbackInfo<Value>& args) {
-	int64_t cycles = minCycles1 == maxNumber ? minCycles0 : minCycles1 - minCycles0;
-	args.GetReturnValue().Set(Number::New(args.GetIsolate(), cycles));
+	args.GetReturnValue().Set(result);
 }
 
 void setThreadPriority(const FunctionCallbackInfo<Value>& args) {
@@ -127,9 +146,8 @@ NODE_MODULE_INITIALIZER(
 	NODE_SET_METHOD(exports, "rdtsc", rdtsc);
 	NODE_SET_METHOD(exports, "init", init);
 	NODE_SET_METHOD(exports, "mark0", mark0);
-	NODE_SET_METHOD(exports, "mark1", mark1);
-	NODE_SET_METHOD(exports, "mark2", mark2);
-	NODE_SET_METHOD(exports, "minCycles", minCycles);
+	NODE_SET_METHOD(exports, "markNext", markNext);
+	NODE_SET_METHOD(exports, "minCycles", _minCycles);
 	NODE_SET_METHOD(exports, "setThreadPriority", setThreadPriority);
 	NODE_SET_METHOD(exports, "getThreadPriority", getThreadPriority);
 	NODE_SET_METHOD(exports, "setProcessPriority", setProcessPriority);

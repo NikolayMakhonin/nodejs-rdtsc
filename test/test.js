@@ -134,70 +134,100 @@ describe('All tests', function () {
 		assert.ok(exception.stack.indexOf('calcPerformance') > 0)
 	})
 
-	it('calcPerformance both funcs is null', function () {
-		let result = calcPerformance(
-			null,
-			null,
-			1000
-		)
-
-		console.log('calcPerformance both funcs is null =', result)
-		assert.strictEqual(result, undefined)
+	it('calcPerformance throws', function () {
+		assert.throws(() => { calcPerformance(1000, null, null) }, Error)
+		assert.throws(() => { calcPerformance(1000, null) }, Error)
+		assert.throws(() => { calcPerformance(1000) }, Error)
+		assert.throws(() => { calcPerformance(1000, []) }, Error)
+		assert.throws(() => { calcPerformance(1000, null, []) }, Error)
+		assert.throws(() => { calcPerformance(0, () => {}) }, Error)
+		assert.throws(() => { calcPerformance(null, () => {}) }, Error)
 	})
 
 	it('calcPerformance self cycles', function () {
+		this.timeout(15000)
+
 		let result = calcPerformance(
-			null,
+			1000,
 			() => {
-			},
-			1000
+			}
 		)
 
 		console.log('calcPerformance() self =', result)
-		assert.ok(result.cycles > 1)
+		assert.ok(result.cycles[0] > 1)
 	})
 
 	it('rdtsc self cycles', function () {
 		let result = calcPerformance(
+			1000,
 			() => {
 
 			},
 			() => {
 				rdtsc()
-			},
-			1000
+			}
 		)
 
 		console.log('rdtsc() self =', result)
-		assert.ok(result.cycles > 1)
+		assert.ok(result.absoluteDiff[0] > 1)
 	})
 
 	it('rdtsc self cycles 2', function () {
 		let result = calcPerformance(
+			1000,
 			() => {
 			},
 			() => {
 				rdtsc()
-			},
-			1000
+			}
 		)
 
 		console.log('rdtsc() self 2 =', result)
-		assert.ok(result.cycles > 1)
+		assert.ok(result.absoluteDiff[0] > 1)
 	})
 
 	it('calc Object.keys performance', function () {
 		let object = { x: 1 }
 		let result = calcPerformance(
+			1000,
 			() => {
 
 			},
 			() => {
 				Object.keys(object)
 			},
-			1000
+			() => {
+				Object.keys(object)
+			}
 		)
 		console.log('Object.keys({ 1 item }) =', result)
-		assert.ok(result.cycles > 1)
+		assert.ok(result.absoluteDiff[0] > 1)
+		assert.ok(result.relativeDiff[0])
+	})
+
+	it('calc performance relativeDiff', function () {
+		this.timeout(1000 * 100 + 5000)
+
+		let count = 100
+		let result
+		do {
+			result = calcPerformance(
+				1000,
+				() => {
+
+				},
+				() => {
+
+				},
+				() => {
+
+				}
+			)
+		} while (result.absoluteDiff[0] !== 0 && --count >= 0)
+
+		assert.strictEqual(result.absoluteDiff[0], 0)
+		console.log('Object.keys({ 1 item }) =', result)
+		assert.strictEqual(result.absoluteDiff.length, 2)
+		assert.ok(!result.relativeDiff)
 	})
 })

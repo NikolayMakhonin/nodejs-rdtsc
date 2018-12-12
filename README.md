@@ -41,33 +41,101 @@ Accuracy: +/- 4 cycles
 ```js
 /*
 
-calcPerformance(func0, func1, testTimeMilliseconds)
-result = <min cycles of func1> - <min cycles of func0>
+calcPerformance(testTimeMilliseconds, ...funcs)
 
-calcPerformance(null, func1, testTimeMilliseconds)
-result = <min cycles of func1>
-
-calcPerformance(func0, null, testTimeMilliseconds)
-result = <min cycles of func0>
+result = {
+    calcInfo: { 
+        iterationCycles: 413.22476287663505,
+        iterations: 5622917,
+        funcsCount: 3,
+        testTime: 1000 // milliseconds
+    },
+    cycles: [ 54n, 54n, 55n ], // is BigInt
+    absoluteDiff: [ 0, 0 ], // cycles[i] - cycles[0]
+    relativeDiff: undefined, // absoluteDiff[i] / absoluteDiff[0]
+}
 
 */
 ```
 
-### Example
+### Examples
+
+```js
+let { calcPerformance } = require('rdtsc')
+
+calcPerformance(1000, () => {}, () => {}, () => {})
+
+/*
+result = {
+    calcInfo: { 
+        iterationCycles: 413.22476287663505,
+        iterations: 5622917,
+        funcsCount: 3,
+        testTime: 1000 // milliseconds
+    },
+    cycles: [ 54n, 54n, 54n ],
+    absoluteDiff: [ 0, 0 ],
+    relativeDiff: undefined,
+}
+
+OR
+
+result = {
+    ...
+    cycles: [ 54n, 55n, 54n ],
+    absoluteDiff: [ 1, 0 ],
+    relativeDiff: [ 0 ],
+}
+
+OR
+
+result = {
+    ...
+    cycles: [ 54n, 58n, 52n ],
+    absoluteDiff: [ 4, -2 ],
+    relativeDiff: [ -0.5 ],
+}
+*/
+
+calcPerformance(1000, () => {}, () => {})
+
+/*
+result = {
+    ...
+    cycles: [ 54n, 54n ],
+    absoluteDiff: [ 0 ],
+    relativeDiff: undefined,
+}
+*/
+
+calcPerformance(1000, () => {})
+
+/*
+result = {
+    ...
+    cycles: [ 54n ],
+    absoluteDiff: undefined,
+    relativeDiff: undefined,
+}
+*/
+
+```
+
+<!-- eslint-disable indent -->
 ```js
 var { calcPerformance } = require('rdtsc')
 
 var result = calcPerformance(
-	() => {
+    1000,
+    () => {
 
-	},
-	() => {
-		Object.keys(Math)
-	},
-	1000
+    },
+    () => {
+        Object.keys(Math)
+    }
 )
 
-console.log('"Object.keys(Math)" min cycles =', result) // about 20-40 cycles
+console.log('"Object.keys(Math)" min cycles =', result.absoluteDiff[0]) // about 20-40 cycles
 ```
 
 ## Thread Priority
@@ -76,33 +144,35 @@ Implemented only for Windows platform
 
 ### Examples
 
+<!-- eslint-disable indent -->
 ```js
 
 const { runInRealtimePriority, getThreadPriority, getProcessPriority } = require('rdtsc')
 
 runInRealtimePriority(() => {
-	console.log('getThreadPriority = ', getThreadPriority()) // === THREAD_PRIORITY_REALTIME
-	console.log('getProcessPriority = ', getProcessPriority()) // === PROCESS_PRIORITY_REALTIME
+    console.log('getThreadPriority = ', getThreadPriority()) // === THREAD_PRIORITY_REALTIME
+    console.log('getProcessPriority = ', getProcessPriority()) // === PROCESS_PRIORITY_REALTIME
 })
 
 ```
 
 
+<!-- eslint-disable indent -->
 ```js
 const { setThreadPriority, getThreadPriority, isWin, THREAD_PRIORITY_REALTIME } = require('rdtsc')
 
 if (isWin) {
-	console.log(getThreadPriority()) // === THREAD_PRIORITY_NORMAL
+    console.log(getThreadPriority()) // === THREAD_PRIORITY_NORMAL
 } else {
-	console.log(getThreadPriority()) // === undefined
+    console.log(getThreadPriority()) // === undefined
 }
 
 var previousPriority = setThreadPriority(THREAD_PRIORITY_REALTIME)
 
 try {
-	// <your code>
+    // <your code>
 } finally {
-	setThreadPriority(previousPriority)
+    setThreadPriority(previousPriority)
 }
 ```
 
@@ -127,21 +197,22 @@ Implemented only for Windows platform
 
 ### Example
 
+<!-- eslint-disable indent -->
 ```js
 const { setProcessPriority, getProcessPriority, isWin, PROCESS_PRIORITY_REALTIME } = require('rdtsc')
 
 if (isWin) {
-	console.log(getProcessPriority()) // === PROCESS_PRIORITY_NORMAL
+    console.log(getProcessPriority()) // === PROCESS_PRIORITY_NORMAL
 } else {
-	console.log(getProcessPriority()) // === undefined
+    console.log(getProcessPriority()) // === undefined
 }
 
 var previousPriority = setProcessPriority(PROCESS_PRIORITY_REALTIME)
 
 try {
-	// <your code>
+    // <your code>
 } finally {
-	setProcessPriority(previousPriority)
+    setProcessPriority(previousPriority)
 }
 ```
 

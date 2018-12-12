@@ -2,8 +2,7 @@ const {
 	rdtsc,
 	init,
 	mark0,
-	mark1,
-	mark2,
+	markNext,
 	minCycles,
 	setThreadPriority,
 	getThreadPriority,
@@ -32,8 +31,8 @@ const runInRealtimePriority = function (func) {
 		return func()
 	}
 
-	let previousThreadPriority = getThreadPriority()
-	let previousProcessPriority = getProcessPriority()
+	const previousThreadPriority = getThreadPriority()
+	const previousProcessPriority = getProcessPriority()
 
 	try {
 		setProcessPriority(PROCESS_PRIORITY_REALTIME)
@@ -46,70 +45,68 @@ const runInRealtimePriority = function (func) {
 	}
 }
 
-const calcPerformance = function (func0, func1, testTimeMilliseconds) {
+const calcPerformance = function (testTimeMilliseconds, ...funcs) {
 	return runInRealtimePriority(() => {
-		let testTime = testTimeMilliseconds
-		let calcCount = (time, count) => {
+		const testTime = testTimeMilliseconds
+		if (!testTime || testTime <= 0) {
+			throw new Error(`testTime ${testTime} <= 0`)
+		}
+
+		const calcCount = (time, count) => {
 			return ~~Math.ceil(count * testTime / (testTime + time[0] * 1000 + time[1] / 1000000))
 		}
 
-		let f0 = func0
-		let f1 = func1
-		let m0 = mark0
-		let m1 = mark1
-		let m2 = mark2
-		let endTime = process.hrtime()
+		// https://stackoverflow.com/a/39838385/5221762
+		const flatMap = (arr, callbackfn) =>
+			arr.reduce((result, item) =>
+				result.concat(callbackfn(item)), [])
+
+		const f = flatMap(
+			funcs,
+			o => {
+				if (o == null) {
+					return []
+				}
+				if (Array.isArray(o)) {
+					return o
+				}
+				return [o]
+			})
+			.filter(o => {
+				if (typeof o !== 'function') {
+					throw new Error(`argument (${o}) is not a function`)
+				}
+				return true
+			})
+			.reverse()
+
+		const funcsCount = f.length
+
+		if (!funcsCount) {
+			throw new Error('functions count == 0')
+		}
+
+		const m0 = mark0
+		const mn = markNext
+		const endTime = process.hrtime()
 		endTime[0] += ~~(testTime / 1000)
 		endTime[1] += testTime % 1000
 
-		if (!f0 || !f1) {
-			f0 = f0 || f1
-			if (!f0) {
-				return undefined
-			}
-
-			let i = 0
-			let count = 0
-			init()
-			let startCycles = rdtsc()
-			do {
-				m0()
-				f0()
-				m1()
-
-				i++
-				if (i >= count) {
-					let time = process.hrtime(endTime)
-					if (time[0] >= 0) {
-						break
-					}
-					count = calcCount(time, i)
-				}
-			} while (true)
-
-			return {
-				calcInfo: {
-					averageIterateCycles: Number(rdtsc() - startCycles) / i,
-					count: i
-				},
-				cycles: minCycles()
-			}
-		}
-
 		let i = 0
 		let count = 0
-		init()
-		let startCycles = rdtsc()
+		init(funcsCount)
+		const startCycles = rdtsc()
 		do {
+			let j = funcsCount
 			m0()
-			f0()
-			m1()
-			f1()
-			m2()
+			while (--j >= 0) {
+				f[j]()
+				mn()
+			}
 
 			i++
 			if (i >= count) {
-				let time = process.hrtime(endTime)
+				const time = process.hrtime(endTime)
 				if (time[0] >= 0) {
 					break
 				}
@@ -117,12 +114,26 @@ const calcPerformance = function (func0, func1, testTimeMilliseconds) {
 			}
 		} while (true)
 
+		const cycles = minCycles()
+
+		const absoluteDiff = funcsCount > 1
+			? cycles.filter((o, i) => i).map(o => Number(o - cycles[0]))
+			: undefined
+
+		const relativeDiff = funcsCount > 2 && absoluteDiff[0] > 0
+			? absoluteDiff.filter((o, i) => i).map(o => o / absoluteDiff[0])
+			: undefined
+
 		return {
 			calcInfo: {
-				averageIterateCycles: Number(rdtsc() - startCycles) / i,
-				count: i
+				iterationCycles: Number(rdtsc() - startCycles) / i,
+				iterations: i,
+				funcsCount,
+				testTime
 			},
-			cycles: minCycles()
+			cycles,
+			absoluteDiff,
+			relativeDiff
 		}
 	})
 }

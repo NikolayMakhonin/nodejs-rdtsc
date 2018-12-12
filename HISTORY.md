@@ -1,3 +1,8 @@
+1.3.1 / 2018-12-12
+===================
+
+  * calcPerformance function can evaluate performance of many functions
+
 1.2.2 / 2018-12-03
 ===================
 
