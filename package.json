@@ -8,6 +8,7 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint --plugin markdown --ext js,md .",
+    "prepublish": "npm run precommit",
     "precommit": "npm run lint && npm run build && npm run test",
     "build": "node-gyp configure && node-gyp build",
     "test": "mocha",
