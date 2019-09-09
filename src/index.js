@@ -45,17 +45,17 @@ const runInRealtimePriority = function (func) {
 	}
 }
 
+// https://stackoverflow.com/a/39838385/5221762
+const flatMap = (arr, callbackfn) =>
+	arr.reduce((result, item) =>
+		result.concat(callbackfn(item)), [])
+
 const calcPerformance = function (testTimeMilliseconds, ...funcs) {
 	return runInRealtimePriority(() => {
 		const testTime = testTimeMilliseconds
 		if (!testTime || testTime <= 0) {
 			throw new Error(`testTime ${testTime} <= 0`)
 		}
-
-		// https://stackoverflow.com/a/39838385/5221762
-		const flatMap = (arr, callbackfn) =>
-			arr.reduce((result, item) =>
-				result.concat(callbackfn(item)), [])
 
 		const f = flatMap(
 			funcs,

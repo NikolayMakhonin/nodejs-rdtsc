@@ -238,9 +238,9 @@ const PROCESS_PRIORITY_REALTIME = 0x00000100 // REALTIME_PRIORITY_CLASS
 [npm-url]: https://npmjs.org/package/rdtsc
 [node-version-image]: https://img.shields.io/node/v/rdtsc.svg
 [node-version-url]: https://nodejs.org/en/download/
-[travis-image]: https://travis-ci.org/NikolayMakhonin/nodejs-rdtsc.svg?branch=master
+[travis-image]: https://travis-ci.org/NikolayMakhonin/nodejs-rdtsc.svg
 [travis-url]: https://travis-ci.org/NikolayMakhonin/nodejs-rdtsc
-[coveralls-image]: https://coveralls.io/repos/github/NikolayMakhonin/nodejs-rdtsc/badge.svg?branch=master
-[coveralls-url]: https://coveralls.io/github/NikolayMakhonin/nodejs-rdtsc?branch=master
+[coveralls-image]: https://coveralls.io/repos/github/NikolayMakhonin/nodejs-rdtsc/badge.svg
+[coveralls-url]: https://coveralls.io/github/NikolayMakhonin/nodejs-rdtsc
 [downloads-image]: https://img.shields.io/npm/dm/rdtsc.svg
 [downloads-url]: https://npmjs.org/package/rdtsc

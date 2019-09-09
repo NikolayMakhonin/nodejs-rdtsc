@@ -59,12 +59,13 @@ namespace nodejsRdtsc{
 
 	void _minCycles(const FunctionCallbackInfo<Value>& args) {
 		Isolate* isolate = args.GetIsolate();
+		Local<Context> context = isolate->GetCurrentContext();
 
-		Handle<Array> result = Array::New(isolate, count);
+		Local<Array> result = Array::New(isolate, count);
 
 		int i = 0;
 		for (int i = 0; i < count; i++){
-			result->Set(i, BigInt::New(isolate, *(minCycles + i)));
+			result->Set(context, i, BigInt::New(isolate, *(minCycles + i)));
 		}
 
 		args.GetReturnValue().Set(result);
@@ -164,7 +165,7 @@ namespace nodejsRdtsc{
 			bool isWin = false;
 		#endif
 
-		exports->Set(String::NewFromUtf8(isolate,"isWin"), Boolean::New(isolate,isWin));
+		exports->Set(context, String::NewFromUtf8(isolate, "isWin", NewStringType::kNormal).ToLocalChecked(), Boolean::New(isolate, isWin));
 	}
 
 	static void FakeInit(
