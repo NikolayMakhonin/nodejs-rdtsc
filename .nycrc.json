@@ -3,7 +3,7 @@
         "src/**/*.js"
     ],
     "reporter": [
-        "lcov"
+        "lcovonly"
     ],
     "temp-dir": "./tmp/coverage/nyc/tmp",
     "report-dir": "./tmp/coverage/nyc/lcov"
