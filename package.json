@@ -13,7 +13,7 @@
     "build": "node-gyp configure && node-gyp build",
     "test": "mocha",
     "watch": "mocha --watch --watch-extensions .*",
-    "ci": "npm run lint && nyc npm run test && ncat tmp/coverage/all/lcov/**/lcov.info --banner \"\" | coveralls"
+    "ci": "npm run lint && nyc npm run test && ncat tmp/coverage/nyc/lcov/lcov.info --banner \"\" | coveralls"
   },
   "keywords": [
     "native",
