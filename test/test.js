@@ -56,7 +56,7 @@ describe('All tests', function () {
 	})
 
 	it('Thread priority', function () {
-		let previousPriority = setThreadPriority(THREAD_PRIORITY_HIGHEST)
+		const previousPriority = setThreadPriority(THREAD_PRIORITY_HIGHEST)
 		console.log('previousPriority =', previousPriority)
 		if (isWin) {
 			assert.notStrictEqual(previousPriority, undefined)
@@ -73,7 +73,7 @@ describe('All tests', function () {
 		}
 
 		if (isWin) {
-			let testPriority = setThreadPriority(previousPriority)
+			const testPriority = setThreadPriority(previousPriority)
 			assert.strictEqual(testPriority, THREAD_PRIORITY_HIGHEST)
 			priority = getThreadPriority()
 			console.log('priority =', priority)
@@ -82,7 +82,7 @@ describe('All tests', function () {
 	})
 
 	it('Process priority', function () {
-		let previousPriority = setProcessPriority(PROCESS_PRIORITY_HIGHEST)
+		const previousPriority = setProcessPriority(PROCESS_PRIORITY_HIGHEST)
 		console.log('previousPriority =', previousPriority)
 		if (isWin) {
 			assert.notStrictEqual(previousPriority, undefined)
@@ -99,7 +99,7 @@ describe('All tests', function () {
 		}
 
 		if (isWin) {
-			let testPriority = setProcessPriority(previousPriority)
+			const testPriority = setProcessPriority(previousPriority)
 			assert.strictEqual(testPriority, PROCESS_PRIORITY_HIGHEST)
 			priority = getProcessPriority()
 			console.log('priority =', priority)
@@ -147,7 +147,7 @@ describe('All tests', function () {
 	it('calcPerformance self cycles', function () {
 		this.timeout(15000)
 
-		let result = calcPerformance(
+		const result = calcPerformance(
 			1000,
 			() => {
 			}
@@ -159,7 +159,7 @@ describe('All tests', function () {
 	})
 
 	it('rdtsc self cycles', function () {
-		let result = calcPerformance(
+		const result = calcPerformance(
 			1000,
 			() => {
 
@@ -175,7 +175,7 @@ describe('All tests', function () {
 	})
 
 	it('rdtsc self cycles 2', function () {
-		let result = calcPerformance(
+		const result = calcPerformance(
 			1000,
 			() => {
 			},
@@ -190,7 +190,7 @@ describe('All tests', function () {
 	})
 
 	it('calc Object.keys performance', function () {
-		let result = calcPerformance(
+		const result = calcPerformance(
 			1000,
 			() => {
 

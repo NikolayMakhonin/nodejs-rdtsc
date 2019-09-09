@@ -61,7 +61,7 @@ result = {
 ### Examples
 
 ```js
-let { calcPerformance } = require('rdtsc')
+const { calcPerformance } = require('rdtsc')
 
 calcPerformance(1000, () => {}, () => {}, () => {})
 
