@@ -63,7 +63,6 @@ namespace nodejsRdtsc{
 
 		Local<Array> result = Array::New(isolate, count);
 
-		int i = 0;
 		for (int i = 0; i < count; i++){
 			result->Set(context, i, BigInt::New(isolate, *(minCycles + i)));
 		}
@@ -84,10 +83,8 @@ namespace nodejsRdtsc{
 			return;
 		}
 
-		Local<Context> context = isolate->GetCurrentContext();
-		int priority = args[0].As<Number>()->Value();
-
 		#ifdef _WIN32
+			int priority = args[0].As<Number>()->Value();
 			int previousPriority = GetThreadPriority(GetCurrentThread());
 			SetThreadPriority(GetCurrentThread(), priority);
 			args.GetReturnValue().Set(Number::New(isolate, previousPriority));
@@ -96,8 +93,6 @@ namespace nodejsRdtsc{
 
 	void getThreadPriority(const FunctionCallbackInfo<Value>& args) {
 		Isolate* isolate = args.GetIsolate();
-
-		Local<Context> context = isolate->GetCurrentContext();
 
 		#ifdef _WIN32
 			int priority = GetThreadPriority(GetCurrentThread());
@@ -118,10 +113,8 @@ namespace nodejsRdtsc{
 			return;
 		}
 
-		Local<Context> context = isolate->GetCurrentContext();
-		int priority = args[0].As<Number>()->Value();
-
 		#ifdef _WIN32
+			int priority = args[0].As<Number>()->Value();
 			int previousPriority = GetPriorityClass(GetCurrentProcess());
 			SetPriorityClass(GetCurrentProcess(), priority);
 			args.GetReturnValue().Set(Number::New(isolate, previousPriority));
@@ -130,8 +123,6 @@ namespace nodejsRdtsc{
 
 	void getProcessPriority(const FunctionCallbackInfo<Value>& args) {
 		Isolate* isolate = args.GetIsolate();
-
-		Local<Context> context = isolate->GetCurrentContext();
 
 		#ifdef _WIN32
 			int priority = GetPriorityClass(GetCurrentProcess());
