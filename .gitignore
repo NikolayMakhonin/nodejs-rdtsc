@@ -4,3 +4,4 @@ node_modules
 *.bak
 *.cmd
 /package-lock.json
+tmp
