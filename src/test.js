@@ -13,7 +13,7 @@ const {
 	THREAD_PRIORITY_REALTIME,
 	PROCESS_PRIORITY_REALTIME,
 	runInRealtimePriority
-} = require('../')
+} = require('./.')
 
 console.log('isWin =', isWin)
 
@@ -28,7 +28,7 @@ describe('All tests', function () {
 	it('Test multiple loading of the same module', function () {
 		const bindingPath = require.resolve('../build/Release/binding')
 		delete require.cache[bindingPath]
-		const { rerdtsc } = require('../')
+		const { rerdtsc } = require('./.')
 		assert.ok(rdtsc() > 0)
 		assert.ok(rdtsc() - rdtsc() < 0)
 		assert.notStrictEqual(rdtsc, rerdtsc)
