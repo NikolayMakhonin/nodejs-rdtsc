@@ -46,7 +46,7 @@ describe('All tests', function () {
       console.log('ProcessPriority =', processPriority = getProcessPriority()) // === PROCESS_PRIORITY_REALTIME
       if (isWin) {
         assert.strictEqual(threadPriority, ThreadPriority.Realtime)
-        assert.strictEqual(processPriority, ThreadPriority.Realtime)
+        assert.strictEqual(processPriority, ProcessPriority.Realtime)
       }
       else {
         assert.strictEqual(threadPriority, void 0)
