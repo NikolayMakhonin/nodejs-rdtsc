@@ -22,15 +22,17 @@ describe('All tests', function () {
     console.log('rdtsc() - rdtsc() =', rdtsc() - rdtsc())
   })
 
-  it('Test multiple loading of the same module', function () {
-    const bindingPath = require.resolve('../build/Release/binding')
-    delete require.cache[bindingPath]
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { rerdtsc } = require('.')
-    assert.ok(rdtsc() > 0)
-    assert.ok(rdtsc() - rdtsc() < 0)
-    assert.notStrictEqual(rdtsc, rerdtsc)
-  })
+  if (typeof require !== 'undefined') {
+    it('Test multiple loading of the same module', function () {
+      const bindingPath = require.resolve('../build/Release/binding')
+      delete require.cache[bindingPath]
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const {rerdtsc} = require('.')
+      assert.ok(rdtsc() > 0)
+      assert.ok(rdtsc() - rdtsc() < 0)
+      assert.notStrictEqual(rdtsc, rerdtsc)
+    })
+  }
 
   it('runInRealtimePriority', function () {
     assert.ok(runInRealtimePriority(() => rdtsc() - rdtsc()))
@@ -210,19 +212,19 @@ describe('All tests', function () {
 
       },
       () => {
-        Object.keys(Math)
+        return Object.keys(Math)
       },
       () => {
-        Object.keys(Math)
+        return Object.keys(Math)
       },
     )
     console.log(result)
-    assert.ok(result.absoluteDiff[0] > 1)
-    assert.ok(result.relativeDiff[0])
+    assert.ok(result.absoluteDiff[0] > 1, Number(result.absoluteDiff[0]) + '')
+    assert.ok(result.relativeDiff[0], Number(result.relativeDiff[0]) + '')
   })
 
   it('calc performance relativeDiff', function () {
-    this.timeout(1000 * 100 + 5000)
+    this.timeout(1000 * 100 + 15000)
 
     let count = 100
     let result

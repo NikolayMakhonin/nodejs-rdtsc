@@ -6,13 +6,20 @@ import alias from '@rollup/plugin-alias'
 import replace from '@rollup/plugin-replace'
 import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
-import istanbul from 'rollup-plugin-istanbul'
 import tsTransformPaths from '@zerollup/ts-transform-paths'
-import nycrc from './nyc.config.mjs'
 import path from 'path'
 import pkg from './package.json'
+import { createFilter } from '@rollup/pluginutils'
 
 const dev = !!process.env.ROLLUP_WATCH
+
+const external = createFilter([
+  'prop-types',
+  'react',
+  'prettier/**',
+  'react-syntax-highlighter/**',
+  'react-element-to-string',
+], null, {resolve: false})
 
 const onwarnRollup = (warning, onwarn) => {
   // prevent warn: (!) `this` has been rewritten to `undefined`
@@ -108,10 +115,12 @@ const nodeConfig = ({
     }),
   ],
   onwarn  : onwarnRollup,
-  external: [/\.node$/]
-    .concat(Object.keys(pkg.dependencies))
-    .concat(Object.keys(pkg.devDependencies))
-    .concat(require('module').builtinModules || Object.keys(process.binding('natives'))),
+  external: createFilter([
+    'src/**/*.{js,cjs,mjs}',
+    ...Object.keys(pkg.dependencies),
+    ...Object.keys(pkg.devDependencies),
+    ...require('module').builtinModules || Object.keys(process.binding('natives')),
+  ]),
 })
 
 export default [

@@ -20,7 +20,3 @@ export {
 export {
   runInRealtimePriority,
 } from './runInRealtimePriority'
-
-export {
-  runInRealtimePriorityAsync,
-} from './runInRealtimePriorityAsync'

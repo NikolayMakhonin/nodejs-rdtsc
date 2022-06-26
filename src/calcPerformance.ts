@@ -15,13 +15,11 @@ export function calcPerformance(testTimeMilliseconds: number, ...funcs: (() => a
     }
 
     const f = funcs
-      .filter(o => {
-        if (typeof o !== 'function') {
-          throw new Error(`argument (${o}) is not a function`)
-        }
-        return true
-      })
-
+    f.forEach(o => {
+      if (typeof o !== 'function') {
+        throw new Error(`argument (${o}) is not a function`)
+      }
+    })
     const funcsCount = f.length
 
     if (!funcsCount) {
@@ -30,10 +28,7 @@ export function calcPerformance(testTimeMilliseconds: number, ...funcs: (() => a
 
     const m0 = mark0
     const m1 = mark1
-    const endTime = process.hrtime()
-    endTime[0] += ~~(testTime / 1000)
-    endTime[1] += testTime % 1000
-
+    const endTime = process.hrtime.bigint() + BigInt(testTime) * BigInt(1000000)
     let i = 0
     let count = funcsCount
     init(funcsCount)
@@ -46,11 +41,11 @@ export function calcPerformance(testTimeMilliseconds: number, ...funcs: (() => a
 
       i++
       if (i >= count) {
-        const time = process.hrtime(endTime)
-        if (time[0] >= 0) {
+        const remainingTime = endTime - process.hrtime.bigint()
+        if (remainingTime <= 0) {
           break
         }
-        count = ~~Math.ceil(i * testTime / (testTime + time[0] * 1000 + time[1] / 1000000))
+        count = ~~Math.ceil(i * testTime / (testTime + Number(remainingTime) / 1000000))
         count = (~~(count / funcsCount)) * funcsCount
       }
     } while (true)
