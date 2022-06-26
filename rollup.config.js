@@ -1,19 +1,14 @@
 import resolve from '@rollup/plugin-node-resolve'
 import multiInput from 'rollup-plugin-multi-input'
-import multiEntry from '@rollup/plugin-multi-entry'
-import del from 'rollup-plugin-delete'
+// import del from 'rollup-plugin-delete'
 import typescript from '@rollup/plugin-typescript'
 import alias from '@rollup/plugin-alias'
 import replace from '@rollup/plugin-replace'
 import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
-import polyfills from 'rollup-plugin-node-polyfills'
-import inject from '@rollup/plugin-inject'
-import babel from '@rollup/plugin-babel'
 import istanbul from 'rollup-plugin-istanbul'
 import tsTransformPaths from '@zerollup/ts-transform-paths'
 import nycrc from './nyc.config.mjs'
-import { terser } from 'rollup-plugin-terser'
 import path from 'path'
 import pkg from './package.json'
 
@@ -111,134 +106,19 @@ const nodeConfig = ({
     .concat(require('module').builtinModules || Object.keys(process.binding('natives'))),
 })
 
-const browserConfig = ({input, outputDir, outputFile}) => ({
-  cache : true,
-  input,
-  output: {
-    dir           : outputDir,
-    format        : 'iife',
-    exports       : 'named',
-    entryFileNames: outputFile,
-    chunkFileNames: outputFile,
-    sourcemap     : dev && 'inline',
-  },
-  plugins: [
-    del({ targets: path.join(outputDir, outputFile) }),
-    alias(aliasOptions),
-    json(),
-    replace({
-      preventAssignment: true,
-    }),
-    resolve({
-      browser: true,
-    }),
-    commonjs({
-      transformMixedEsModules: true,
-    }),
-    typescript({
-      sourceMap      : dev,
-      compilerOptions: {
-        target: 'es5',
-      },
-    }),
-    // babel({
-    //   extensions  : ['.ts', '.js', '.cjs', '.mjs'],
-    //   babelHelpers: 'runtime',
-    //   exclude     : [
-    //     'node_modules/rollup*/**',
-    //     'node_modules/tslib/**',
-    //     'node_modules/@babel/**',
-    //     'node_modules/core-js*/**',
-    //   ],
-    // }),
-    terser({
-      mangle: true,
-      module: false,
-      ecma  : 5,
-      output: {
-        max_line_len: 50,
-      },
-    }),
-  ],
-  onwarn: onwarnRollup,
-})
-
-const browserTestsConfig = {
-  cache: true,
-  input: [
-    'node_modules/@flemist/test-utils/dist/lib/register/show-useragent.mjs',
-    'node_modules/@flemist/test-utils/dist/lib/register/register.mjs',
-    'src/**/*.test.ts',
-  ],
-  output: {
-    dir      : 'dist/bundle',
-    format   : 'iife',
-    exports  : 'named',
-    sourcemap: 'inline',
-  },
-  plugins: [
-    del({ targets: 'dist/bundle/browser.test.js' }),
-    multiEntry({
-      entryFileName: 'browser.test.js',
-    }),
-    alias(aliasOptions),
-    json(),
-    replace({
-      preventAssignment: true,
-    }),
-    resolve({
-      browser       : true,
-      preferBuiltins: false,
-    }),
-    commonjs({
-      transformMixedEsModules: true,
-    }),
-    inject({
-      global: require.resolve('rollup-plugin-node-polyfills/polyfills/global.js'),
-    }),
-    polyfills(),
-    typescript({
-      sourceMap      : true,
-      compilerOptions: {
-        target: 'es5',
-      },
-    }),
-    istanbul({
-      ...nycrc,
-    }),
-    babel({
-      configFile  : path.resolve(__dirname, '.babelrc.cjs'), // enable babel for node_modules
-      extensions  : ['.ts', '.js', '.cjs', '.mjs'],
-      babelHelpers: 'runtime',
-      exclude     : [
-        '**/node_modules/rollup*/**',
-        '**/node_modules/@babel/**',
-        '**/node_modules/core-js*/**',
-      ],
-    }),
-  ],
-  onwarn: onwarnRollup,
-}
-
 export default [
   nodeConfig({
     input    : ['src/**/*.ts'],
-    outputDir: 'dist/lib',
+    outputDir: 'dist',
     relative : 'src',
     format   : 'es',
     extension: 'mjs',
   }),
   nodeConfig({
     input    : ['src/**/*.ts'],
-    outputDir: 'dist/lib',
+    outputDir: 'dist',
     relative : 'src',
     format   : 'cjs',
     extension: 'cjs',
   }),
-  browserConfig({
-    input     : ['src/index.ts'],
-    outputDir : 'dist/bundle',
-    outputFile: 'browser.js',
-  }),
-  browserTestsConfig,
 ]

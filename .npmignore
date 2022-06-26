@@ -2,4 +2,3 @@
 !/dist
 /dist/**/test/**
 /dist/**/*.test.*
-**/-deprecated/**
