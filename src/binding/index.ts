@@ -1,9 +1,7 @@
-import _default from './binding'
-
-export {
+import binding, {
   ThreadPriority,
   ProcessPriority,
-} from './enums'
+} from 'src/binding/binding'
 
 const {
   init,
@@ -16,9 +14,7 @@ const {
   setProcessPriority,
   getProcessPriority,
   isWin,
-} = _default
-
-console.log(isWin)
+} = binding
 
 export {
   init,
@@ -26,6 +22,8 @@ export {
   mark1,
   minCycles,
   rdtsc,
+  ThreadPriority,
+  ProcessPriority,
   setThreadPriority,
   getThreadPriority,
   setProcessPriority,

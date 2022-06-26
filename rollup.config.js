@@ -88,6 +88,14 @@ const nodeConfig = ({
       declarationDir: outputDir,
       declaration   : true,
       transformers  : {
+        before: [
+          {
+            type   : 'program',
+            factory: (program) => {
+              return tsTransformPaths(program).before
+            },
+          },
+        ],
         afterDeclarations: [
           {
             type   : 'program',
@@ -100,7 +108,7 @@ const nodeConfig = ({
     }),
   ],
   onwarn  : onwarnRollup,
-  external: []
+  external: [/\.node$/]
     .concat(Object.keys(pkg.dependencies))
     .concat(Object.keys(pkg.devDependencies))
     .concat(require('module').builtinModules || Object.keys(process.binding('natives'))),
