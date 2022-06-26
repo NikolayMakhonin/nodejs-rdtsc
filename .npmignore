@@ -2,3 +2,8 @@
 !/dist
 /dist/**/test/**
 /dist/**/*.test.*
+!/binding.gyp
+!/src
+!/src/binding
+!/src/binding/*.cc
+!/src/binding/*.h
