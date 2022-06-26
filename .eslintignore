@@ -1,2 +1,11 @@
-coverage
-node_modules
+# copy of .gitignore
+/dist/**/test/**
+/dist/**/*.test.*
+/tmp/
+/node_modules/
+
+# additional rules
+/.idea/
+/.github/
+/dist/
+/docs/

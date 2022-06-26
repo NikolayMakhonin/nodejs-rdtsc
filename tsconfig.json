@@ -1,0 +1,45 @@
+{
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    },
+  },
+  "include": [
+    "@types/**/*",
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules/**/*",
+    "dist/**/*"
+  ],
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "isolatedModules": false,
+    "declaration": false,
+    "emitDeclarationOnly": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
+    "newLine": "LF",
+    "typeRoots": [
+      "node_modules/@types",
+      "@types"
+    ],
+    "lib": [
+      "DOM",
+      "ESNext"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "src/*": [
+        "src/*"
+      ],
+      "~/*": [
+        "./*"
+      ]
+    }
+  }
+}

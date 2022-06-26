@@ -1,7 +1,11 @@
-/build
-node_modules
-/.idea
-*.bak
-*.cmd
+/dist/**/test/**
+/dist/**/*.test.*
+/tmp/
+/node_modules/
+/*.log
+
+/.eslintcache
 /package-lock.json
-tmp
+/yarn.lock
+/yarn-error.log
+/.pnpm-debug.log

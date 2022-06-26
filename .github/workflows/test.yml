@@ -1,0 +1,100 @@
+name: Test
+'on':
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    branches:
+      - 'master'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 14.x]
+
+    steps:
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Check secrets
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        run: |
+          node -e "o=['COVERALLS_REPO_TOKEN'].filter(o=>!process.env[o]);o.length&&(console.log('You should set env variables: '+o.join(', ')),process.exit(1))"
+
+      - uses: actions/checkout@v2
+
+      # from: https://github.com/pnpm/action-setup
+      - name: Install pnpm
+        id: pnpm-install
+        uses: pnpm/action-setup@v2.1.0
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: |
+          pnpm install --frozen-lockfile
+
+      - name: Lint
+        shell: bash
+        run: |
+          pnpm run audit
+          pnpm run lint
+
+      - name: Build
+        shell: bash
+        run: |
+          pnpm run build
+
+      - name: Mocha tests
+        shell: bash
+        run: |
+          pnpm run test:mocha:ci
+
+      - name: Install chromium dependencies
+        if: ${{ matrix.node-version == '18.x' }}
+        run: |
+          sudo apt install libudev-dev libgtk2.0-0
+          sudo ln -sf /lib/$(arch)-linux-gnu/libudev.so.1 /lib/$(arch)-linux-gnu/libudev.so.0
+
+      - name: Install chromium
+        if: ${{ matrix.node-version == '18.x' }}
+        uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: 297097 # Chromium 39.0.2171.99 (Android - 5.1.0)
+
+      - name: Karma tests
+        if: ${{ matrix.node-version == '18.x' }}
+        uses: GabrielBB/xvfb-action@v1
+        env:
+          CHROMIUM_BIN: /opt/hostedtoolcache/chromium/297097/x64/chrome
+        with:
+          run: |
+            pnpm run test:karma
+
+      - name: Coveralls
+        if: ${{ matrix.node-version == '18.x' }}
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        shell: bash
+        run: |
+          pnpm add coveralls -D
+          pnpm run coveralls

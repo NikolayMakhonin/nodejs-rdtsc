@@ -1,19 +1,17 @@
 {
   "name": "rdtsc",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "The most high resolution cross platform timing in NodeJs that use processor command RDTSC. Calculate performance with accuracy +/- 4 processor cycles.",
+  "main": "dist/lib/index.cjs",
+  "module": "dist/lib/index.mjs",
+  "types": "dist/lib/index.d.ts",
   "engines": {
-    "node": ">= 12.4.0"
+    "node": ">=12.4.0",
+    "pnpm": "^7.1.6"
   },
-  "main": "src/index.js",
-  "scripts": {
-    "lint": "eslint --plugin markdown --ext js,md .",
-    "prepublish": "npm run precommit",
-    "precommit": "npm run lint && npm run build && npm run test",
-    "build": "node-gyp configure && node-gyp build",
-    "test": "mocha",
-    "watch": "mocha --watch --watch-extensions .*",
-    "ci": "npm run lint && nyc npm run test && ncat tmp/coverage/nyc/lcov/lcov.info --banner \"\" | coveralls"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NikolayMakhonin/nodejs-rdtsc.git"
   },
   "keywords": [
     "native",
@@ -30,31 +28,88 @@
     "process-priority",
     "cross-platform"
   ],
-  "bugs": {
-    "url": "https://github.com/NikolayMakhonin/nodejs-rdtsc/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com:NikolayMakhonin/nodejs-rdtsc.git"
-  },
   "author": {
     "name": "Nikolay Makhonin",
     "url": "https://github.com/NikolayMakhonin/"
   },
-  "license": "CC0-1.0",
-  "devDependencies": {
-    "eslint": "^6.3.0",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-markdown": "^1.0.0",
-    "eslint-plugin-node": "^10.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "mocha": "^5.2.0",
-    "ncat": "^2.0.7",
-    "node-gyp": "^5.0.3",
-    "nyc": "^14.1.1",
-    "wavefile": "^8.4.5"
+  "license": "Unlimited Free",
+  "bugs": {
+    "url": "https://github.com/NikolayMakhonin/nodejs-rdtsc/issues"
   },
-  "dependencies": {}
+  "homepage": "https://github.com/NikolayMakhonin/nodejs-rdtsc",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "prepublishOnly": "pnpm run audit && pnpm run lint && pnpm run build && pnpm run test:mocha:ci && pnpm run test:karma",
+    "audit": "pnpm audit --prod",
+    "lint": "eslint ./**/*.{js,cjs,mjs,ts,tsx}",
+    "lint:fix": "eslint --fix ./**/*.{js,cjs,mjs,ts,tsx}",
+    "lint:wizard": "eslint-nibble --cache --multi ./**/*.{js,cjs,mjs,ts,tsx}",
+    "build:js": "rimraf dist/lib && cpy \"**/assets/**\" \"../dist/lib/\" --parents --cwd=src && rollup -c",
+    "build:gyp": "node-gyp configure && node-gyp dist",
+    "build": "rimraf dist && pnpm run build:gyp && pnpm run build:js",
+    "coverage:merge": "rimraf tmp/coverage/{all,merge} && cp-flat \"tmp/coverage/*/json/**/*.json\" \"tmp/coverage/merge\" && nyc report -r lcov --report-dir tmp/coverage/all/lcov --temp-dir \"tmp/coverage/merge/\"",
+    "coverage:check": "pnpm run coverage:merge && nyc check-coverage --report-dir tmp/coverage/all/lcov --lines 50 --functions 50 --branches 50 --statements 50",
+    "test:mocha": "mocha ./src/**/*.test.*",
+    "test:mocha:coverage": "rimraf tmp/coverage/mocha && nyc --all mocha ./src/**/*.test.*",
+    "test:mocha:watch": "mocha --watch ./src/**/*.test.*",
+    "test:karma": "rimraf tmp/coverage/karma && karma start --single-run --log-level debug",
+    "test:mocha:ci": "rimraf tmp/coverage/mocha && nyc --all mocha ./{src,dist/lib}/**/*.test.*",
+    "coveralls": "pnpm run coverage:check && nyc report --reporter=text-lcov --temp-dir \"tmp/coverage/merge/\" | coveralls"
+  },
+  "devDependencies": {
+    "@babel/core": "7.18.5",
+    "@babel/plugin-syntax-dynamic-import": "7.8.3",
+    "@babel/plugin-transform-classes": "7.18.4",
+    "@babel/plugin-transform-runtime": "7.18.5",
+    "@babel/preset-env": "7.18.2",
+    "@babel/runtime-corejs3": "7.18.3",
+    "@flemist/copy-glob-flat": "0.0.5",
+    "@flemist/karma-custom-launcher": "0.0.0",
+    "@flemist/test-utils": "0.0.7",
+    "@flemist/test-variants": "0.0.14",
+    "@rollup/plugin-alias": "3.1.9",
+    "@rollup/plugin-babel": "5.3.1",
+    "@rollup/plugin-commonjs": "=21.1.0",
+    "@rollup/plugin-inject": "4.0.4",
+    "@rollup/plugin-json": "4.1.0",
+    "@rollup/plugin-multi-entry": "4.1.0",
+    "@rollup/plugin-node-resolve": "13.3.0",
+    "@rollup/plugin-replace": "4.0.0",
+    "@rollup/plugin-typescript": "8.3.3",
+    "@types/assert": "1.5.6",
+    "@types/fs-extra": "9.0.13",
+    "@types/mocha": "9.1.1",
+    "@types/node": "18.0.0",
+    "@zerollup/ts-transform-paths": "1.7.18",
+    "cpy-cli": "=3.1.1",
+    "eslint": "8.18.0",
+    "eslint-config-pro": "3.0.14",
+    "fs-extra": "10.1.0",
+    "globby": "=11.1.0",
+    "karma": "6.4.0",
+    "karma-chrome-launcher": "3.1.1",
+    "karma-coverage": "2.2.0",
+    "karma-firefox-launcher": "2.1.2",
+    "karma-mocha": "2.0.1",
+    "karma-safari-launcher": "1.0.0",
+    "mocha": "9.2.2",
+    "nodemon": "2.0.16",
+    "nyc": "15.1.0",
+    "rdtsc": "2.0.0",
+    "rimraf": "3.0.2",
+    "rollup": "2.75.7",
+    "rollup-plugin-delete": "2.0.0",
+    "rollup-plugin-istanbul": "3.0.0",
+    "rollup-plugin-multi-input": "1.3.1",
+    "rollup-plugin-node-polyfills": "0.2.1",
+    "rollup-plugin-terser": "7.0.2",
+    "ts-node": "=10.8.0",
+    "tsconfig-paths": "4.0.0",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "tslib": "^2.4.0"
+  }
 }
