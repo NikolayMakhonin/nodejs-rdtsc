@@ -113,7 +113,7 @@ const nodeConfig = ({
       ...Object.keys(pkg.dependencies),
       ...Object.keys(pkg.devDependencies),
       ...require('module').builtinModules || Object.keys(process.binding('natives')),
-    ].map(o => 'node_modules/' + o),
+    ].map(o => `node_modules/${o}/**`),
   ]),
 })
 
