@@ -1,4 +1,4 @@
 'use strict'
 
-// eslint-disable-next-line node/no-missing-require
+// eslint-disable-next-line node/no-unpublished-require
 module.exports = require('../../build/Release/binding.node')

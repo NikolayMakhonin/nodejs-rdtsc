@@ -24,7 +24,7 @@ describe('All tests', function () {
 
   if (typeof require !== 'undefined') {
     it('Test multiple loading of the same module', function () {
-      const bindingPath = require.resolve('../build/Release/binding')
+      const bindingPath = require.resolve('../build/Release/binding.node')
       delete require.cache[bindingPath]
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const {rerdtsc} = require('.')
