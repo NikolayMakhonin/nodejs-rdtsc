@@ -4,6 +4,8 @@
 /dist/**/*.test.*
 !/binding.gyp
 !/src
+/src/*
 !/src/binding
+/src/binding/*
 !/src/binding/*.cc
 !/src/binding/*.h
