@@ -18,7 +18,7 @@ specifiers:
   '@zerollup/ts-transform-paths': 1.7.18
   cpy-cli: '=3.1.1'
   eslint: 8.18.0
-  eslint-config-pro: 3.0.14
+  eslint-config-pro: 3.0.15
   fs-extra: 10.1.0
   globby: '=11.1.0'
   mocha: 9.2.2
@@ -54,7 +54,7 @@ devDependencies:
   '@zerollup/ts-transform-paths': 1.7.18_typescript@4.7.4
   cpy-cli: 3.1.1
   eslint: 8.18.0
-  eslint-config-pro: 3.0.14_b5e7v2qnwxfo6hmiq56u52mz3e
+  eslint-config-pro: 3.0.15_b5e7v2qnwxfo6hmiq56u52mz3e
   fs-extra: 10.1.0
   globby: 11.1.0
   mocha: 9.2.2
@@ -1611,8 +1611,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /eslint-config-pro/3.0.14_b5e7v2qnwxfo6hmiq56u52mz3e:
-    resolution: {integrity: sha512-kLY4/+5EkzxXbkA9jn7OWw4TgErEcql8zdd5EzHvdhJVUav7+VloR5sdpA8LcAEkM2rDrYm9MJO60Dwa4K9dcw==}
+  /eslint-config-pro/3.0.15_b5e7v2qnwxfo6hmiq56u52mz3e:
+    resolution: {integrity: sha512-yZCZRcbDOw99GsUublCMbcrLPucutr7xrAuXG1VlwD5OJn7amb+bOeXhEeaWfokoUsOmaRlZC5t2GK0QvvpkLw==}
     engines: {node: '>=10.4.0', pnpm: ^7.1.6}
     peerDependencies:
       eslint: '>=7.4.0'
