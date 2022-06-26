@@ -53,16 +53,16 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
 
+      - name: Build
+        shell: bash
+        run: |
+          pnpm run build
+
       - name: Lint
         shell: bash
         run: |
           pnpm run audit
           pnpm run lint
-
-      - name: Build
-        shell: bash
-        run: |
-          pnpm run build
 
       - name: Mocha tests
         shell: bash
