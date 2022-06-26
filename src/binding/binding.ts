@@ -37,9 +37,11 @@ export enum ProcessPriority {
   Realtime = 0x00000100, // REALTIME_PRIORITY_CLASS
 }
 
-declare function setThreadPriority(priority: ThreadPriority): void
+/** return previous priority */
+declare function setThreadPriority(priority: ThreadPriority): ThreadPriority
 declare function getThreadPriority(): ThreadPriority
-declare function setProcessPriority(priority: ProcessPriority): void
+/** return previous priority */
+declare function setProcessPriority(priority: ProcessPriority): ProcessPriority
 declare function getProcessPriority(): ProcessPriority
 declare function isWin(): boolean
 

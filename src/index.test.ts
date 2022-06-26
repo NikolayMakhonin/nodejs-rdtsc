@@ -1,19 +1,16 @@
-'use strict'
-const assert = require('assert')
-const {
-  rdtsc,
+import assert from 'assert'
+import {
   calcPerformance,
-  setThreadPriority,
-  getThreadPriority,
-  setProcessPriority,
   getProcessPriority,
+  getThreadPriority,
   isWin,
-  THREAD_PRIORITY_HIGHEST,
-  PROCESS_PRIORITY_HIGHEST,
-  THREAD_PRIORITY_REALTIME,
-  PROCESS_PRIORITY_REALTIME,
+  ProcessPriority,
+  rdtsc,
   runInRealtimePriority,
-} = require('./.')
+  setProcessPriority,
+  setThreadPriority,
+  ThreadPriority,
+} from '.'
 
 console.log('isWin =', isWin)
 
@@ -28,7 +25,8 @@ describe('All tests', function () {
   it('Test multiple loading of the same module', function () {
     const bindingPath = require.resolve('../build/Release/binding')
     delete require.cache[bindingPath]
-    const { rerdtsc } = require('./.')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { rerdtsc } = require('.')
     assert.ok(rdtsc() > 0)
     assert.ok(rdtsc() - rdtsc() < 0)
     assert.notStrictEqual(rdtsc, rerdtsc)
@@ -47,38 +45,38 @@ describe('All tests', function () {
       console.log('ThreadPriority =', threadPriority = getThreadPriority()) // === THREAD_PRIORITY_REALTIME
       console.log('ProcessPriority =', processPriority = getProcessPriority()) // === PROCESS_PRIORITY_REALTIME
       if (isWin) {
-        assert.strictEqual(threadPriority, THREAD_PRIORITY_REALTIME)
-        assert.strictEqual(processPriority, PROCESS_PRIORITY_REALTIME)
+        assert.strictEqual(threadPriority, ThreadPriority.Realtime)
+        assert.strictEqual(processPriority, ThreadPriority.Realtime)
       }
       else {
-        assert.strictEqual(threadPriority, undefined)
-        assert.strictEqual(processPriority, undefined)
+        assert.strictEqual(threadPriority, void 0)
+        assert.strictEqual(processPriority, void 0)
       }
     })
   })
 
   it('Thread priority', function () {
-    const previousPriority = setThreadPriority(THREAD_PRIORITY_HIGHEST)
+    const previousPriority = setThreadPriority(ThreadPriority.Highest)
     console.log('previousPriority =', previousPriority)
     if (isWin) {
-      assert.notStrictEqual(previousPriority, undefined)
+      assert.notStrictEqual(previousPriority, void 0)
     }
     else {
-      assert.strictEqual(previousPriority, undefined)
+      assert.strictEqual(previousPriority, void 0)
     }
 
     let priority = getThreadPriority()
     console.log('priority =', priority)
     if (isWin) {
-      assert.strictEqual(priority, THREAD_PRIORITY_HIGHEST)
+      assert.strictEqual(priority, ThreadPriority.Highest)
     }
     else {
-      assert.strictEqual(priority, undefined)
+      assert.strictEqual(priority, void 0)
     }
 
     if (isWin) {
       const testPriority = setThreadPriority(previousPriority)
-      assert.strictEqual(testPriority, THREAD_PRIORITY_HIGHEST)
+      assert.strictEqual(testPriority, ThreadPriority.Highest)
       priority = getThreadPriority()
       console.log('priority =', priority)
       assert.strictEqual(priority, previousPriority)
@@ -86,27 +84,27 @@ describe('All tests', function () {
   })
 
   it('Process priority', function () {
-    const previousPriority = setProcessPriority(PROCESS_PRIORITY_HIGHEST)
+    const previousPriority = setProcessPriority(ProcessPriority.Highest)
     console.log('previousPriority =', previousPriority)
     if (isWin) {
-      assert.notStrictEqual(previousPriority, undefined)
+      assert.notStrictEqual(previousPriority, void 0)
     }
     else {
-      assert.strictEqual(previousPriority, undefined)
+      assert.strictEqual(previousPriority, void 0)
     }
 
     let priority = getProcessPriority()
     console.log('priority =', priority)
     if (isWin) {
-      assert.strictEqual(priority, PROCESS_PRIORITY_HIGHEST)
+      assert.strictEqual(priority, ProcessPriority.Highest)
     }
     else {
-      assert.strictEqual(priority, undefined)
+      assert.strictEqual(priority, void 0)
     }
 
     if (isWin) {
       const testPriority = setProcessPriority(previousPriority)
-      assert.strictEqual(testPriority, PROCESS_PRIORITY_HIGHEST)
+      assert.strictEqual(testPriority, ProcessPriority.Highest)
       priority = getProcessPriority()
       console.log('priority =', priority)
       assert.strictEqual(priority, previousPriority)
@@ -121,13 +119,13 @@ describe('All tests', function () {
     let exception
     try {
       calcPerformance(
+        100,
         () => {
           testErrorFunc()
         },
         () => {
 
         },
-        100,
       )
     }
     catch (ex) {
@@ -153,12 +151,6 @@ describe('All tests', function () {
       calcPerformance(1000)
     }, Error)
     assert.throws(() => {
-      calcPerformance(1000, [])
-    }, Error)
-    assert.throws(() => {
-      calcPerformance(1000, null, [])
-    }, Error)
-    assert.throws(() => {
       calcPerformance(0, () => {})
     }, Error)
     assert.throws(() => {
@@ -177,7 +169,7 @@ describe('All tests', function () {
 
     console.log(result)
     assert.ok(result.cycles[0] > 1)
-    assert.strictEqual(result.absoluteDiff, undefined)
+    assert.strictEqual(result.absoluteDiff, void 0)
   })
 
   it('rdtsc self cycles', function () {
@@ -193,7 +185,7 @@ describe('All tests', function () {
 
     console.log('rdtsc() self =', result.absoluteDiff[0])
     assert.ok(result.absoluteDiff[0] > 1)
-    assert.strictEqual(result.relativeDiff, undefined)
+    assert.strictEqual(result.relativeDiff, void 0)
   })
 
   it('rdtsc self cycles 2', function () {
@@ -208,7 +200,7 @@ describe('All tests', function () {
 
     console.log('rdtsc() self 2 =', result.absoluteDiff[0])
     assert.ok(result.absoluteDiff[0] > 1)
-    assert.strictEqual(result.relativeDiff, undefined)
+    assert.strictEqual(result.relativeDiff, void 0)
   })
 
   it('calc Object.keys performance', function () {
@@ -252,6 +244,6 @@ describe('All tests', function () {
     assert.ok(result.absoluteDiff[0] <= 0)
     console.log(result)
     assert.strictEqual(result.absoluteDiff.length, 2)
-    assert.strictEqual(result.relativeDiff, undefined)
+    assert.strictEqual(result.relativeDiff, void 0)
   })
 })
