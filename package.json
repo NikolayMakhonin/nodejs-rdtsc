@@ -47,7 +47,7 @@
     "lint:fix": "eslint --fix ./**/*.{js,cjs,mjs,ts,tsx}",
     "lint:wizard": "eslint-nibble --cache --multi ./**/*.{js,cjs,mjs,ts,tsx}",
     "build:js": "cpy \"**/assets/**\" \"../dist/\" --parents --cwd=src && rollup -c",
-    "build:gyp": "node-gyp configure && node-gyp dist",
+    "build:gyp": "node-gyp configure && node-gyp build",
     "build": "rimraf dist && pnpm run build:gyp && pnpm run build:js",
     "coverage:merge": "rimraf tmp/coverage/{all,merge} && cp-flat \"tmp/coverage/*/json/**/*.json\" \"tmp/coverage/merge\" && nyc report -r lcov --report-dir tmp/coverage/all/lcov --temp-dir \"tmp/coverage/merge/\"",
     "coverage:check": "pnpm run coverage:merge && nyc check-coverage --report-dir tmp/coverage/all/lcov --lines 50 --functions 50 --branches 50 --statements 50",

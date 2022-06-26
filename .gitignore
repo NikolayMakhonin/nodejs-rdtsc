@@ -3,6 +3,7 @@
 /tmp/
 /node_modules/
 /*.log
+/build/
 
 /.eslintcache
 /package-lock.json

@@ -1,3 +1,10 @@
-export type {ITimeLimit} from './contracts'
-export {TimeLimit} from './TimeLimit'
-export {TimeLimits} from './TimeLimits'
+export {
+  rdtsc,
+  ThreadPriority,
+  ProcessPriority,
+  getThreadPriority,
+  setThreadPriority,
+  getProcessPriority,
+  setProcessPriority,
+  isWin,
+} from './binding'
