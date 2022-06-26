@@ -6,7 +6,7 @@ import {runInRealtimePriority} from 'src/runInRealtimePriority'
 describe('rdtsc > calcPerformance', function () {
   this.timeout(600000)
 
-  const MAX_TIME_ERROR = 20
+  const MAX_TIME_ERROR = 25
 
   const testVariants = createTestVariants(async ({
     async,
@@ -69,7 +69,7 @@ describe('rdtsc > calcPerformance', function () {
 
     const elapsedTime = Number(process.hrtime.bigint() - startTime) / 1e6
     if (elapsedTime < time || elapsedTime > time + MAX_TIME_ERROR) {
-      assert.fail(`elapsedTime = ${elapsedTime}`)
+      assert.fail(`elapsedTime = ${elapsedTime}; ${time}`)
     }
 
     // calcInfo
@@ -111,7 +111,7 @@ describe('rdtsc > calcPerformance', function () {
     await runInRealtimePriority(() => {
       return testVariants({
         async     : [false, true],
-        time      : [1, 40, 80],
+        time      : [1, 50, 100],
         funcsSize1: [0, 1, 2, 3],
         funcsSize2: ({funcsSize1}) => funcsSize1 == null ? [null] : [null, 0, 2, 3],
         funcsSize3: ({funcsSize2}) => funcsSize2 == null ? [null] : [null, 0, 1, 3],
