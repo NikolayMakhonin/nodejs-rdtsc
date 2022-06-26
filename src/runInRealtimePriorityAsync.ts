@@ -5,7 +5,7 @@ import {
   ProcessPriority,
   setProcessPriority, setThreadPriority,
   ThreadPriority,
-} from 'src/binding'
+} from 'src/binding/binding'
 
 export async function runInRealtimePriorityAsync<T>(func: () => Promise<T>|T): Promise<T> {
   if (!isWin()) {

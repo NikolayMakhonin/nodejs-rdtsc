@@ -5,7 +5,7 @@ import {
   ProcessPriority,
   setProcessPriority, setThreadPriority,
   ThreadPriority,
-} from 'src/binding'
+} from 'src/binding/binding'
 
 export function runInRealtimePriority<T>(func: () => T): T {
   if (!isWin()) {

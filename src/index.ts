@@ -7,4 +7,4 @@ export {
   getProcessPriority,
   setProcessPriority,
   isWin,
-} from './binding'
+} from './binding/binding'

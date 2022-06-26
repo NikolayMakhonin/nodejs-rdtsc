@@ -5,10 +5,10 @@ import {
   minCycles,
   rdtsc,
 } from 'src/binding/binding'
-import {runInRealtimePriority} from 'src/runInRealtimePriority'
+import {runInRealtimePriorityAsync} from 'src/runInRealtimePriorityAsync'
 
-export function calcPerformance(testTimeMilliseconds: number, ...funcs: (() => any)[]) {
-  return runInRealtimePriority(() => {
+export function calcPerformanceAsync(testTimeMilliseconds: number, ...funcs: (() => any)[]) {
+  return runInRealtimePriorityAsync(async () => {
     const testTime = testTimeMilliseconds
     if (!testTime || testTime <= 0) {
       throw new Error(`testTime ${testTime} <= 0`)
@@ -41,7 +41,7 @@ export function calcPerformance(testTimeMilliseconds: number, ...funcs: (() => a
     do {
       const fn = f[i % funcsCount]
       m0()
-      fn()
+      await fn()
       m1()
 
       i++
