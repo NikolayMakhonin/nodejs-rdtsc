@@ -1,8 +1,16 @@
+3.0.0 / 2022-06-26
+===================
+
+* Big refactoring
+* Added TypeScript definitions
+* Added async functions
+* Improved tests
+
 2.0.0 / 2018-12-12
 ===================
 
-  * Support node v12.4.0
-  * Tested on node v10.9.0 - v12.10.0
+* Support node v12.4.0
+* Tested on node v10.9.0 - v12.10.0
 
 1.3.1 / 2018-12-12
 ===================

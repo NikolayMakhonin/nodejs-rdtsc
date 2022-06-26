@@ -1,7 +1,6 @@
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
-[![Node.js Version][node-version-image]][node-version-url]
-[![Build Status][travis-image]][travis-url]
+[![Build Status][github-image]][github-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
 
 # Description
@@ -232,15 +231,13 @@ const PROCESS_PRIORITY_REALTIME = 0x00000100 // REALTIME_PRIORITY_CLASS
 
 # License
 
-[CC0-1.0](LICENSE)
+[Unlimited Free](LICENSE)
 
 [npm-image]: https://img.shields.io/npm/v/rdtsc.svg
 [npm-url]: https://npmjs.org/package/rdtsc
-[node-version-image]: https://img.shields.io/node/v/rdtsc.svg
-[node-version-url]: https://nodejs.org/en/download/
-[travis-image]: https://travis-ci.org/NikolayMakhonin/nodejs-rdtsc.svg
-[travis-url]: https://travis-ci.org/NikolayMakhonin/nodejs-rdtsc
-[coveralls-image]: https://coveralls.io/repos/github/NikolayMakhonin/nodejs-rdtsc/badge.svg
-[coveralls-url]: https://coveralls.io/github/NikolayMakhonin/nodejs-rdtsc
 [downloads-image]: https://img.shields.io/npm/dm/rdtsc.svg
 [downloads-url]: https://npmjs.org/package/rdtsc
+[github-image]: https://github.com/NikolayMakhonin/nodejs-rdtsc/actions/workflows/test.yml/badge.svg
+[github-url]: https://github.com/NikolayMakhonin/nodejs-rdtsc/actions
+[coveralls-image]: https://coveralls.io/repos/github/NikolayMakhonin/nodejs-rdtsc/badge.svg
+[coveralls-url]: https://coveralls.io/github/NikolayMakhonin/nodejs-rdtsc
