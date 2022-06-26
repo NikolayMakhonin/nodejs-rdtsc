@@ -4,7 +4,7 @@ import {
   mark1,
   minCycles,
   rdtsc,
-} from 'src/binding/binding'
+} from 'src/binding'
 import {runInRealtimePriority} from 'src/runInRealtimePriority'
 
 export function calcPerformance(testTimeMilliseconds: number, ...funcs: (() => any)[]) {

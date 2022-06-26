@@ -1,51 +1,23 @@
-import {
-  init,
-  mark0,
-  mark1,
-  minCycles,
-  rdtsc,
-  setThreadPriority,
-  getThreadPriority,
-  setProcessPriority,
-  getProcessPriority,
-  isWin,
-// @ts-expect-error
-} from '~/build/Release/binding.node'
+/* eslint-disable @typescript-eslint/no-var-requires */
+import {ProcessPriority, ThreadPriority} from './enums'
 
-declare function init(funcsCount: number): void
-declare function rdtsc(): bigint
-declare function mark0(): void
-declare function mark1(): void
-declare function minCycles(): bigint[]
+const binding = require('../../build/Release/binding.node')
 
-export enum ThreadPriority {
-  Idle = -15,
-  Lowest = -2,
-  BelowNormal = -1,
-  Normal = 0,
-  AboveNormal = 1,
-  Highest = 2,
-  Realtime = 15, // THREAD_PRIORITY_TIME_CRITICAL
-}
-
-export enum ProcessPriority {
-  Idle = 0x00000040, // IDLE_PRIORITY_CLASS
-  BelowNormal = 0x00004000, // BELOW_NORMAL_PRIORITY_CLASS
-  Normal = 0x00000020, // NORMAL_PRIORITY_CLASS
-  AboveNormal = 0x00008000, // ABOVE_NORMAL_PRIORITY_CLASS
-  Highest = 0x00000080, // HIGH_PRIORITY_CLASS
-  Realtime = 0x00000100, // REALTIME_PRIORITY_CLASS
-}
+export declare function init(funcsCount: number): void
+export declare function rdtsc(): bigint
+export declare function mark0(): void
+export declare function mark1(): void
+export declare function minCycles(): bigint[]
 
 /** return previous priority */
-declare function setThreadPriority(priority: ThreadPriority): ThreadPriority
-declare function getThreadPriority(): ThreadPriority
+export declare function setThreadPriority(priority: ThreadPriority): ThreadPriority
+export declare function getThreadPriority(): ThreadPriority
 /** return previous priority */
-declare function setProcessPriority(priority: ProcessPriority): ProcessPriority
-declare function getProcessPriority(): ProcessPriority
-declare function isWin(): boolean
+export declare function setProcessPriority(priority: ProcessPriority): ProcessPriority
+export declare function getProcessPriority(): ProcessPriority
+export declare const isWin: boolean
 
-export {
+export default binding as {
   init,
   mark0,
   mark1,
