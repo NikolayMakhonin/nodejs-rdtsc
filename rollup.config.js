@@ -13,14 +13,6 @@ import { createFilter } from '@rollup/pluginutils'
 
 const dev = !!process.env.ROLLUP_WATCH
 
-const external = createFilter([
-  'prop-types',
-  'react',
-  'prettier/**',
-  'react-syntax-highlighter/**',
-  'react-element-to-string',
-], null, {resolve: false})
-
 const onwarnRollup = (warning, onwarn) => {
   // prevent warn: (!) `this` has been rewritten to `undefined`
   // if ( warning.code === 'THIS_IS_UNDEFINED' ) {
