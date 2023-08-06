@@ -69,11 +69,11 @@ jobs:
         run: |
           pnpm run test:mocha:ci
 
-      - name: Coveralls
-        if: ${{ matrix.node-version == '18.x' }}
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        shell: bash
-        run: |
-          pnpm add coveralls -D
-          pnpm run coveralls
+#      - name: Coveralls
+#        if: ${{ matrix.node-version == '18.x' }}
+#        env:
+#          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+#        shell: bash
+#        run: |
+#          pnpm add coveralls -D
+#          pnpm run coveralls
