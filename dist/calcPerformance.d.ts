@@ -6,6 +6,6 @@ export declare function calcPerformance(testTimeMilliseconds: number, ...funcs: 
         testTime: number;
     };
     cycles: bigint[];
-    absoluteDiff: number[];
-    relativeDiff: number[];
+    absoluteDiff: number[] | undefined;
+    relativeDiff: number[] | undefined;
 };
