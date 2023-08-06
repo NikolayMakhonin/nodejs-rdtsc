@@ -54,7 +54,7 @@
     "test:mocha": "mocha ./src/**/*.test.*",
     "test:mocha:coverage": "rimraf tmp/coverage/mocha && nyc --all mocha ./src/**/*.test.*",
     "test:mocha:watch": "mocha --watch ./src/**/*.test.*",
-    "test:mocha:ci": "rimraf tmp/coverage/mocha && nyc --all mocha ./{src,dist}/**/*.test.*",
+    "test:mocha:ci": "rimraf tmp/coverage/mocha && mocha ./{src,dist}/**/*.test.*",
     "coveralls": "pnpm run coverage:check && nyc report --reporter=text-lcov --temp-dir \"tmp/coverage/merge/\" | coveralls"
   },
   "devDependencies": {
