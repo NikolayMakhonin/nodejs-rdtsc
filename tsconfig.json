@@ -23,6 +23,7 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
+    "strictNullChecks": true,
     "newLine": "LF",
     "typeRoots": [
       "node_modules/@types",

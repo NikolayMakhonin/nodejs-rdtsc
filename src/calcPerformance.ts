@@ -7,7 +7,10 @@ import {
 } from 'src/binding'
 import {runInRealtimePriority} from 'src/runInRealtimePriority'
 
-export function calcPerformance(testTimeMilliseconds: number, ...funcs: (() => any)[]) {
+export function calcPerformance(
+  testTimeMilliseconds: number,
+  ...funcs: (() => any)[]
+) {
   return runInRealtimePriority(() => {
     const testTime = testTimeMilliseconds
     if (!testTime || testTime <= 0) {
@@ -56,8 +59,8 @@ export function calcPerformance(testTimeMilliseconds: number, ...funcs: (() => a
       ? cycles.filter((o, i) => i).map(o => Number(o - cycles[0]))
       : void 0
 
-    const relativeDiff = funcsCount > 2 && absoluteDiff[0] > 0
-      ? absoluteDiff.filter((o, i) => i).map(o => o / absoluteDiff[0])
+    const relativeDiff = funcsCount > 2 && absoluteDiff![0] > 0
+      ? absoluteDiff!.filter((o, i) => i).map(o => o / absoluteDiff![0])
       : void 0
 
     return {

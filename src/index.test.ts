@@ -144,10 +144,10 @@ describe('All tests', function () {
 
   it('calcPerformance throws', function () {
     assert.throws(() => {
-      calcPerformance(1000, null, null)
+      calcPerformance(1000, null!, null!)
     }, Error)
     assert.throws(() => {
-      calcPerformance(1000, null)
+      calcPerformance(1000, null!)
     }, Error)
     assert.throws(() => {
       calcPerformance(1000)
@@ -156,7 +156,7 @@ describe('All tests', function () {
       calcPerformance(0, () => {})
     }, Error)
     assert.throws(() => {
-      calcPerformance(null, () => {})
+      calcPerformance(null!, () => {})
     }, Error)
   })
 
@@ -185,8 +185,8 @@ describe('All tests', function () {
       },
     )
 
-    console.log('rdtsc() self =', result.absoluteDiff[0])
-    assert.ok(result.absoluteDiff[0] > 1)
+    console.log('rdtsc() self =', result.absoluteDiff![0])
+    assert.ok(result.absoluteDiff![0] > 1)
     assert.strictEqual(result.relativeDiff, void 0)
   })
 
@@ -200,8 +200,8 @@ describe('All tests', function () {
       },
     )
 
-    console.log('rdtsc() self 2 =', result.absoluteDiff[0])
-    assert.ok(result.absoluteDiff[0] > 1)
+    console.log('rdtsc() self 2 =', result.absoluteDiff![0])
+    assert.ok(result.absoluteDiff![0] > 1)
     assert.strictEqual(result.relativeDiff, void 0)
   })
 
@@ -219,8 +219,8 @@ describe('All tests', function () {
       },
     )
     console.log(result)
-    assert.ok(result.absoluteDiff[0] > 1, Number(result.absoluteDiff[0]) + '')
-    assert.ok(result.relativeDiff[0], Number(result.relativeDiff[0]) + '')
+    assert.ok(result.absoluteDiff![0] > 1, Number(result.absoluteDiff![0]) + '')
+    assert.ok(result.relativeDiff![0], Number(result.relativeDiff![0]) + '')
   })
 
   it('calc performance relativeDiff', function () {

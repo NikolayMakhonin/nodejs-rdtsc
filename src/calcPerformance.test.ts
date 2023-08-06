@@ -19,13 +19,13 @@ describe('rdtsc > calcPerformance', function () {
     async: boolean,
     time: number,
     funcsSize1: number,
-    funcsSize2: number,
-    funcsSize3: number,
-    funcsSize4: number,
+    funcsSize2: number|undefined|null,
+    funcsSize3: number|undefined|null,
+    funcsSize4: number|undefined|null,
   }) => {
     const startTime = process.hrtime.bigint()
 
-    const funcsSizes = []
+    const funcsSizes: any[] = []
     if (funcsSize1 != null) {
       funcsSizes.push(funcsSize1)
     }
@@ -87,26 +87,26 @@ describe('rdtsc > calcPerformance', function () {
     }
 
     if (funcsSizes.length > 1) {
-      assert.strictEqual(result.absoluteDiff.length, funcsSizes.length - 1)
+      assert.strictEqual(result.absoluteDiff!.length, funcsSizes.length - 1)
       for (let i = 0; i < funcsSizes.length - 1; i++) {
-        assert.strictEqual(result.cycles[0] + BigInt(result.absoluteDiff[i]), result.cycles[i + 1])
+        assert.strictEqual(result.cycles[0] + BigInt(result.absoluteDiff![i]), result.cycles[i + 1])
       }
     }
     else {
       assert.strictEqual(result.absoluteDiff, void 0)
     }
 
-    if (funcsSizes.length > 2 && result.absoluteDiff[0] > 0) {
-      assert.strictEqual(result.relativeDiff.length, funcsSizes.length - 2)
+    if (funcsSizes.length > 2 && result.absoluteDiff![0] > 0) {
+      assert.strictEqual(result.relativeDiff!.length, funcsSizes.length - 2)
       for (let i = 0; i < funcsSizes.length - 2; i++) {
-        assert.ok(Math.abs(result.absoluteDiff[0] * result.relativeDiff[i] - result.absoluteDiff[i + 1]) < 0.000001)
+        assert.ok(Math.abs(result.absoluteDiff![0] * result.relativeDiff![i] - result.absoluteDiff![i + 1]) < 0.000001)
       }
     }
     else {
       assert.strictEqual(result.relativeDiff, void 0)
     }
   })
-  
+
   it('variants', async function () {
     await runInRealtimePriority(() => {
       return testVariants({

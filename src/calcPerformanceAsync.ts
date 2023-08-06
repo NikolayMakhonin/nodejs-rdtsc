@@ -56,8 +56,8 @@ export function calcPerformanceAsync(testTimeMilliseconds: number, ...funcs: (()
       ? cycles.filter((o, i) => i).map(o => Number(o - cycles[0]))
       : void 0
 
-    const relativeDiff = funcsCount > 2 && absoluteDiff[0] > 0
-      ? absoluteDiff.filter((o, i) => i).map(o => o / absoluteDiff[0])
+    const relativeDiff = funcsCount > 2 && absoluteDiff![0] > 0
+      ? absoluteDiff!.filter((o, i) => i).map(o => o / absoluteDiff![0])
       : void 0
 
     return {
