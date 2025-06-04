@@ -83,7 +83,7 @@ describe('rdtsc > calcPerformance', function () {
     assert.strictEqual(result.cycles.length, funcsSizes.length)
     for (let i = 0; i < funcsSizes.length; i++) {
       assert.ok(result.cycles[i] > 0)
-      assert.ok(result.cycles[i] <= result.calcInfo.iterationCycles)
+      assert.ok(result.cycles[i] <= result.calcInfo.iterationCycles, JSON.stringify(result))
     }
 
     if (funcsSizes.length > 1) {
