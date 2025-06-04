@@ -11,6 +11,7 @@ import {
   setThreadPriority,
   ThreadPriority,
 } from '.'
+import {objectToString} from "src/-test/helpers/objectToString";
 
 console.log('isWin =', isWin)
 
@@ -219,8 +220,8 @@ describe('All tests', function () {
       },
     )
     console.log(result)
-    assert.ok(result.absoluteDiff![0] > 1, Number(result.absoluteDiff![0]) + '')
-    assert.ok(result.relativeDiff![0], Number(result.relativeDiff![0]) + '')
+    assert.ok(result.absoluteDiff![0] > 1, objectToString(result))
+    assert.ok(result.relativeDiff![0], objectToString(result))
   })
 
   it('calc performance relativeDiff', function () {

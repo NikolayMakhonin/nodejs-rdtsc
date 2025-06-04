@@ -2,15 +2,7 @@ import {createTestVariants} from '@flemist/test-variants'
 import {calcPerformance} from 'src/calcPerformance'
 import {calcPerformanceAsync} from 'src/calcPerformanceAsync'
 import {runInRealtimePriority} from 'src/runInRealtimePriority'
-
-function objectToString(obj: any): string {
-  return JSON.stringify(obj, (key, value) => {
-    if (typeof value === 'bigint') {
-      return value + 'n'
-    }
-    return value
-  })
-}
+import {objectToString} from "src/-test/helpers/objectToString";
 
 describe('rdtsc > calcPerformance', function () {
   this.timeout(600000)
