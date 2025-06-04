@@ -3,6 +3,15 @@ import {calcPerformance} from 'src/calcPerformance'
 import {calcPerformanceAsync} from 'src/calcPerformanceAsync'
 import {runInRealtimePriority} from 'src/runInRealtimePriority'
 
+function objectToString(obj: any): string {
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'bigint') {
+      return value + 'n'
+    }
+    return value
+  })
+}
+
 describe('rdtsc > calcPerformance', function () {
   this.timeout(600000)
 
@@ -83,7 +92,7 @@ describe('rdtsc > calcPerformance', function () {
     assert.strictEqual(result.cycles.length, funcsSizes.length)
     for (let i = 0; i < funcsSizes.length; i++) {
       assert.ok(result.cycles[i] > 0)
-      assert.ok(result.cycles[i] <= result.calcInfo.iterationCycles, JSON.stringify(result))
+      assert.ok(result.cycles[i] <= result.calcInfo.iterationCycles, objectToString(result))
     }
 
     if (funcsSizes.length > 1) {
