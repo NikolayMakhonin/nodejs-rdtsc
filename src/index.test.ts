@@ -220,6 +220,7 @@ describe('All tests', function () {
         values.push(Math.random() + '')
       },
     )
+    console.log(values)
     console.log(result)
     assert.ok(result.absoluteDiff![0] > 1, objectToString(result))
     assert.ok(result.relativeDiff![0], objectToString(result))
