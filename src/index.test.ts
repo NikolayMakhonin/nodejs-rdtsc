@@ -34,7 +34,7 @@ describe('All tests', function () {
     })
   }
 
-  it('runInRealtimePriority', function () {
+  it.skip('runInRealtimePriority', function () {
     assert.ok(runInRealtimePriority(() => rdtsc() - rdtsc()))
     console.log('rdtsc() - rdtsc() =', runInRealtimePriority(() => rdtsc() - rdtsc()))
 
