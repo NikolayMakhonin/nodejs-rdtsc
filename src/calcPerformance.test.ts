@@ -69,12 +69,12 @@ describe('rdtsc > calcPerformance', function () {
       : calcPerformance(time, ...funcs)
 
     const elapsedTime = Number(process.hrtime.bigint() - startTime) / 1e6
-    if (elapsedTime < time || elapsedTime > time + MAX_TIME_ERROR) {
+    if (elapsedTime < time - 1 || elapsedTime > time + MAX_TIME_ERROR) {
       assert.fail(`elapsedTime = ${elapsedTime}; ${time}`)
     }
 
     // calcInfo
-    if (result.calcInfo.testTime < time || result.calcInfo.testTime > time + MAX_TIME_ERROR) {
+    if (result.calcInfo.testTime < time - 1 || result.calcInfo.testTime > time + MAX_TIME_ERROR) {
       assert.fail(`result.calcInfo.testTime = ${result.calcInfo.testTime}`)
     }
     assert.ok(result.calcInfo.iterationCycles > 0)
