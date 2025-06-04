@@ -207,16 +207,17 @@ describe('All tests', function () {
   })
 
   it('calc Object.keys performance', function () {
+    const values: string[] = []
     const result = calcPerformance(
       1000,
       () => {
 
       },
       () => {
-        return Object.keys(Math)
+        values.push(Math.random() + '')
       },
       () => {
-        return Object.keys(Math)
+        values.push(Math.random() + '')
       },
     )
     console.log(result)
