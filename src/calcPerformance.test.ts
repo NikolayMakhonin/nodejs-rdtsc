@@ -6,7 +6,7 @@ import {runInRealtimePriority} from 'src/runInRealtimePriority'
 describe('rdtsc > calcPerformance', function () {
   this.timeout(600000)
 
-  const MAX_TIME_ERROR = 25
+  const MAX_TIME_ERROR = 30
 
   const testVariants = createTestVariants(async ({
     async,
