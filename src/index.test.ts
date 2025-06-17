@@ -123,7 +123,7 @@ describe('All tests', function () {
     let exception: Error | undefined
     try {
       calcPerformance({rdtsc               : rdtscNative,
-        testTimeMilliseconds:
+        time:
         100,
         funcs: [
           () => {
@@ -148,19 +148,19 @@ describe('All tests', function () {
 
   it('calcPerformance throws', function () {
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, testTimeMilliseconds: 1000, funcs: [null!, null!]})
+      calcPerformance({rdtsc: rdtscNative, time: 1000, funcs: [null!, null!]})
     }, Error)
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, testTimeMilliseconds: 1000, funcs: [null!]})
+      calcPerformance({rdtsc: rdtscNative, time: 1000, funcs: [null!]})
     }, Error)
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, testTimeMilliseconds: 1000, funcs: null! })
+      calcPerformance({rdtsc: rdtscNative, time: 1000, funcs: null! })
     }, Error)
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, testTimeMilliseconds: 0, funcs: [() => {}]})
+      calcPerformance({rdtsc: rdtscNative, time: 0, funcs: [() => {}]})
     }, Error)
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, testTimeMilliseconds: null!, funcs: [() => {}]})
+      calcPerformance({rdtsc: rdtscNative, time: null!, funcs: [() => {}]})
     }, Error)
   })
 
@@ -169,7 +169,7 @@ describe('All tests', function () {
 
     const result = calcPerformance({
       rdtsc               : rdtscNative,
-      testTimeMilliseconds: 1000,
+      time: 1000,
       funcs               : [() => {
       }],
     })
@@ -182,7 +182,7 @@ describe('All tests', function () {
   it('rdtsc self cycles', function () {
     const result = calcPerformance({
       rdtsc               : rdtscNative,
-      testTimeMilliseconds: 1000,
+      time: 1000,
       funcs               : [
         () => {
 
@@ -201,7 +201,7 @@ describe('All tests', function () {
   it('rdtsc self cycles 2', function () {
     const result = calcPerformance({
       rdtsc               : rdtscNative,
-      testTimeMilliseconds: 1000,
+      time: 1000,
       funcs               : [
         () => {
         },
@@ -220,7 +220,7 @@ describe('All tests', function () {
     const values: string[] = []
     const result = calcPerformance({
       rdtsc               : rdtscNative,
-      testTimeMilliseconds: 1000,
+      time: 1000,
       funcs               : [
         () => {
 
@@ -247,7 +247,7 @@ describe('All tests', function () {
     do {
       result = calcPerformance({
         rdtsc               : rdtscNative,
-        testTimeMilliseconds: 1000,
+        time: 1000,
         funcs               : [
           () => {
 

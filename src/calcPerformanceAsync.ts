@@ -1,15 +1,10 @@
-import {CalcPerformanceResult, Rdtsc} from 'src/types'
+import {CalcPerformanceArgs, CalcPerformanceResult} from 'src/types'
 
 export function calcPerformanceAsync({
   rdtsc: _rdtsc,
-  testTimeMilliseconds,
+  time,
   funcs,
-}: {
-  rdtsc: Rdtsc,
-  /** Test time in milliseconds */
-  testTimeMilliseconds: number,
-  funcs: (() => any)[]
-}): Promise<CalcPerformanceResult> {
+}: CalcPerformanceArgs): Promise<CalcPerformanceResult> {
   const {
     init,
     mark0,
@@ -19,7 +14,7 @@ export function calcPerformanceAsync({
     runInRealtimePriority,
   } = _rdtsc
   return runInRealtimePriority(async () => {
-    const testTime = testTimeMilliseconds
+    const testTime = time
     if (!testTime || testTime <= 0) {
       throw new Error(`testTime ${testTime} <= 0`)
     }

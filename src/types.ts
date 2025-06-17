@@ -13,6 +13,13 @@ export type Rdtsc = {
   runInRealtimePriority: RunInRealtimePriority;
 }
 
+export type CalcPerformanceArgs = {
+  rdtsc: Rdtsc,
+  /** Test time in milliseconds */
+  time: number,
+  funcs: (() => any)[]
+}
+
 export type CalcPerformanceResult = {
   calcInfo: {
     /** Average cycles per iteration */

@@ -65,8 +65,8 @@ describe('rdtsc > calcPerformance', function () {
     })
 
     const result = async
-      ? await calcPerformanceAsync({rdtsc: rdtscNative, testTimeMilliseconds: time, funcs })
-      : calcPerformance({rdtsc: rdtscNative, testTimeMilliseconds: time, funcs })
+      ? await calcPerformanceAsync({rdtsc: rdtscNative, time: time, funcs })
+      : calcPerformance({rdtsc: rdtscNative, time: time, funcs })
 
     const elapsedTime = Number(process.hrtime.bigint() - startTime) / 1e6
     if (elapsedTime < time - 1 || elapsedTime > time + MAX_TIME_ERROR) {
