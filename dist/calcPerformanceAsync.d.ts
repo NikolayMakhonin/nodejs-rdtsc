@@ -1,7 +1,2 @@
-import { CalcPerformanceResult, Rdtsc } from "./types";
-export declare function calcPerformanceAsync({ rdtsc: _rdtsc, testTimeMilliseconds, funcs, }: {
-    rdtsc: Rdtsc;
-    /** Test time in milliseconds */
-    testTimeMilliseconds: number;
-    funcs: (() => any)[];
-}): Promise<CalcPerformanceResult>;
+import { CalcPerformanceArgs, CalcPerformanceResult } from "./types";
+export declare function calcPerformanceAsync({ rdtsc: _rdtsc, time, funcs, }: CalcPerformanceArgs): Promise<CalcPerformanceResult>;

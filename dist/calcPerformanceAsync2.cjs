@@ -25,10 +25,10 @@ function __awaiter(thisArg, _arguments, P, generator) {
     });
 }
 
-function calcPerformanceAsync({ rdtsc: _rdtsc, testTimeMilliseconds, funcs, }) {
+function calcPerformanceAsync({ rdtsc: _rdtsc, time, funcs, }) {
     const { init, mark0, mark1, minCycles, rdtsc, runInRealtimePriority, } = _rdtsc;
     return runInRealtimePriority(() => __awaiter(this, void 0, void 0, function* () {
-        const testTime = testTimeMilliseconds;
+        const testTime = time;
         if (!testTime || testTime <= 0) {
             throw new Error(`testTime ${testTime} <= 0`);
         }

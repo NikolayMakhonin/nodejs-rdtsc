@@ -1,7 +1,7 @@
-function calcPerformance({ rdtsc: _rdtsc, testTimeMilliseconds, funcs, }) {
+function calcPerformance({ rdtsc: _rdtsc, time, funcs, }) {
     const { init, mark0, mark1, minCycles, rdtsc, runInRealtimePriority, } = _rdtsc;
     return runInRealtimePriority(() => {
-        const testTime = testTimeMilliseconds;
+        const testTime = time;
         if (!testTime || testTime <= 0) {
             throw new Error(`testTime ${testTime} <= 0`);
         }

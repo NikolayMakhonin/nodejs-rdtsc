@@ -11,6 +11,12 @@ export declare type Rdtsc = {
     mark0: () => void;
     runInRealtimePriority: RunInRealtimePriority;
 };
+export declare type CalcPerformanceArgs = {
+    rdtsc: Rdtsc;
+    /** Test time in milliseconds */
+    time: number;
+    funcs: (() => any)[];
+};
 export declare type CalcPerformanceResult = {
     calcInfo: {
         /** Average cycles per iteration */

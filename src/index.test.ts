@@ -122,8 +122,8 @@ describe('All tests', function () {
 
     let exception: Error | undefined
     try {
-      calcPerformance({rdtsc               : rdtscNative,
-        time:
+      calcPerformance({rdtsc: rdtscNative,
+        time :
         100,
         funcs: [
           () => {
@@ -168,9 +168,9 @@ describe('All tests', function () {
     this.timeout(15000)
 
     const result = calcPerformance({
-      rdtsc               : rdtscNative,
-      time: 1000,
-      funcs               : [() => {
+      rdtsc: rdtscNative,
+      time : 1000,
+      funcs: [() => {
       }],
     })
 
@@ -181,9 +181,9 @@ describe('All tests', function () {
 
   it('rdtsc self cycles', function () {
     const result = calcPerformance({
-      rdtsc               : rdtscNative,
-      time: 1000,
-      funcs               : [
+      rdtsc: rdtscNative,
+      time : 1000,
+      funcs: [
         () => {
 
         },
@@ -200,9 +200,9 @@ describe('All tests', function () {
 
   it('rdtsc self cycles 2', function () {
     const result = calcPerformance({
-      rdtsc               : rdtscNative,
-      time: 1000,
-      funcs               : [
+      rdtsc: rdtscNative,
+      time : 1000,
+      funcs: [
         () => {
         },
         () => {
@@ -219,9 +219,9 @@ describe('All tests', function () {
   it('calc Object.keys performance', function () {
     const values: string[] = []
     const result = calcPerformance({
-      rdtsc               : rdtscNative,
-      time: 1000,
-      funcs               : [
+      rdtsc: rdtscNative,
+      time : 1000,
+      funcs: [
         () => {
 
         },
@@ -246,9 +246,9 @@ describe('All tests', function () {
     let result: any
     do {
       result = calcPerformance({
-        rdtsc               : rdtscNative,
-        time: 1000,
-        funcs               : [
+        rdtsc: rdtscNative,
+        time : 1000,
+        funcs: [
           () => {
 
           },
