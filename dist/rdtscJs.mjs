@@ -7,8 +7,14 @@ const rdtsc = typeof process === 'undefined'
     };
 const result = [];
 let index = 0;
+const MAX_BIGINT = (BigInt(1) << BigInt(64)) - BigInt(1);
 function init(funcsCount) {
-    result.length = funcsCount;
+    for (let i = 0; i < funcsCount; i++) {
+        result[i] = MAX_BIGINT;
+    }
+    if (result.length > funcsCount) {
+        result.length = funcsCount;
+    }
     index = 0;
 }
 let m0 = BigInt(0);
