@@ -1,6 +1,3 @@
-import { mark0, mark1, init, rdtsc, minCycles } from './binding/index.mjs';
-import { runInRealtimePriority } from './runInRealtimePriority.mjs';
-
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
 
@@ -26,7 +23,8 @@ function __awaiter(thisArg, _arguments, P, generator) {
     });
 }
 
-function calcPerformanceAsync(testTimeMilliseconds, ...funcs) {
+function calcPerformanceAsync({ rdtsc: _rdtsc, testTimeMilliseconds, funcs, }) {
+    const { init, mark0, mark1, minCycles, rdtsc, runInRealtimePriority, } = _rdtsc;
     return runInRealtimePriority(() => __awaiter(this, void 0, void 0, function* () {
         const testTime = testTimeMilliseconds;
         if (!testTime || testTime <= 0) {
@@ -66,10 +64,10 @@ function calcPerformanceAsync(testTimeMilliseconds, ...funcs) {
         } while (true);
         const cycles = minCycles();
         const absoluteDiff = funcsCount > 1
-            ? cycles.filter((o, i) => i).map(o => Number(o - cycles[0]))
+            ? cycles.filter((_, i) => i).map(o => Number(o - cycles[0]))
             : void 0;
         const relativeDiff = funcsCount > 2 && absoluteDiff[0] > 0
-            ? absoluteDiff.filter((o, i) => i).map(o => o / absoluteDiff[0])
+            ? absoluteDiff.filter((_, i) => i).map(o => o / absoluteDiff[0])
             : void 0;
         return {
             calcInfo: {

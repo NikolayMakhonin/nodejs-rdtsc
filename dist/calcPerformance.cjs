@@ -2,13 +2,9 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var binding_index = require('./binding/index.cjs');
-var runInRealtimePriority = require('./runInRealtimePriority.cjs');
-require('./binding/binding.cjs');
-require('./binding/import.cjs');
-
-function calcPerformance(testTimeMilliseconds, ...funcs) {
-    return runInRealtimePriority.runInRealtimePriority(() => {
+function calcPerformance({ rdtsc: _rdtsc, testTimeMilliseconds, funcs, }) {
+    const { init, mark0, mark1, minCycles, rdtsc, runInRealtimePriority, } = _rdtsc;
+    return runInRealtimePriority(() => {
         const testTime = testTimeMilliseconds;
         if (!testTime || testTime <= 0) {
             throw new Error(`testTime ${testTime} <= 0`);
@@ -23,13 +19,13 @@ function calcPerformance(testTimeMilliseconds, ...funcs) {
         if (!funcsCount) {
             throw new Error('functions count == 0');
         }
-        const m0 = binding_index.mark0;
-        const m1 = binding_index.mark1;
+        const m0 = mark0;
+        const m1 = mark1;
         const endTime = process.hrtime.bigint() + BigInt(testTime) * BigInt(1000000);
         let i = 0;
         let count = funcsCount;
-        binding_index.init(funcsCount);
-        const startCycles = binding_index.rdtsc();
+        init(funcsCount);
+        const startCycles = rdtsc();
         do {
             const fn = f[i % funcsCount];
             m0();
@@ -45,16 +41,16 @@ function calcPerformance(testTimeMilliseconds, ...funcs) {
                 count = (~~(count / funcsCount)) * funcsCount;
             }
         } while (true);
-        const cycles = binding_index.minCycles();
+        const cycles = minCycles();
         const absoluteDiff = funcsCount > 1
-            ? cycles.filter((o, i) => i).map(o => Number(o - cycles[0]))
+            ? cycles.filter((_, i) => i).map(o => Number(o - cycles[0]))
             : void 0;
         const relativeDiff = funcsCount > 2 && absoluteDiff[0] > 0
-            ? absoluteDiff.filter((o, i) => i).map(o => o / absoluteDiff[0])
+            ? absoluteDiff.filter((_, i) => i).map(o => o / absoluteDiff[0])
             : void 0;
         return {
             calcInfo: {
-                iterationCycles: Number(binding_index.rdtsc() - startCycles) / i,
+                iterationCycles: Number(rdtsc() - startCycles) / i,
                 iterations: i,
                 funcsCount,
                 testTime,

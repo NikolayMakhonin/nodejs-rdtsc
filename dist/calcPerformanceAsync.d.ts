@@ -1,11 +1,7 @@
-export declare function calcPerformanceAsync(testTimeMilliseconds: number, ...funcs: (() => any)[]): Promise<{
-    calcInfo: {
-        iterationCycles: number;
-        iterations: number;
-        funcsCount: number;
-        testTime: number;
-    };
-    cycles: bigint[];
-    absoluteDiff: number[] | undefined;
-    relativeDiff: number[] | undefined;
-}>;
+import { CalcPerformanceResult, Rdtsc } from "./types";
+export declare function calcPerformanceAsync({ rdtsc: _rdtsc, testTimeMilliseconds, funcs, }: {
+    rdtsc: Rdtsc;
+    /** Test time in milliseconds */
+    testTimeMilliseconds: number;
+    funcs: (() => any)[];
+}): Promise<CalcPerformanceResult>;

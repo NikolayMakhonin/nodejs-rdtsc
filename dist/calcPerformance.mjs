@@ -1,9 +1,5 @@
-import { mark0, mark1, init, rdtsc, minCycles } from './binding/index.mjs';
-import { runInRealtimePriority } from './runInRealtimePriority.mjs';
-import './binding/binding.mjs';
-import './binding/import.cjs';
-
-function calcPerformance(testTimeMilliseconds, ...funcs) {
+function calcPerformance({ rdtsc: _rdtsc, testTimeMilliseconds, funcs, }) {
+    const { init, mark0, mark1, minCycles, rdtsc, runInRealtimePriority, } = _rdtsc;
     return runInRealtimePriority(() => {
         const testTime = testTimeMilliseconds;
         if (!testTime || testTime <= 0) {
@@ -43,10 +39,10 @@ function calcPerformance(testTimeMilliseconds, ...funcs) {
         } while (true);
         const cycles = minCycles();
         const absoluteDiff = funcsCount > 1
-            ? cycles.filter((o, i) => i).map(o => Number(o - cycles[0]))
+            ? cycles.filter((_, i) => i).map(o => Number(o - cycles[0]))
             : void 0;
         const relativeDiff = funcsCount > 2 && absoluteDiff[0] > 0
-            ? absoluteDiff.filter((o, i) => i).map(o => o / absoluteDiff[0])
+            ? absoluteDiff.filter((_, i) => i).map(o => o / absoluteDiff[0])
             : void 0;
         return {
             calcInfo: {

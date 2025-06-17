@@ -1,11 +1,7 @@
-export declare function calcPerformance(testTimeMilliseconds: number, ...funcs: (() => any)[]): {
-    calcInfo: {
-        iterationCycles: number;
-        iterations: number;
-        funcsCount: number;
-        testTime: number;
-    };
-    cycles: bigint[];
-    absoluteDiff: number[] | undefined;
-    relativeDiff: number[] | undefined;
-};
+import { CalcPerformanceResult, Rdtsc } from "./types";
+export declare function calcPerformance({ rdtsc: _rdtsc, testTimeMilliseconds, funcs, }: {
+    rdtsc: Rdtsc;
+    /** Test time in milliseconds */
+    testTimeMilliseconds: number;
+    funcs: (() => any)[];
+}): CalcPerformanceResult;
