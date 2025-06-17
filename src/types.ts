@@ -14,7 +14,7 @@ export type Rdtsc = {
 }
 
 export type CalcPerformanceArgs = {
-  rdtsc: Rdtsc,
+  rdtsc?: null | Rdtsc,
   /** Test time in milliseconds */
   time: number,
   funcs: (() => any)[]

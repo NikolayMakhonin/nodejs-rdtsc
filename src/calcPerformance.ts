@@ -1,4 +1,5 @@
 import {CalcPerformanceArgs, CalcPerformanceResult} from 'src/types'
+import {getRdtscDefault} from 'src/rdtscDefault'
 
 export function calcPerformance({
   rdtsc: _rdtsc,
@@ -12,7 +13,7 @@ export function calcPerformance({
     minCycles,
     rdtsc,
     runInRealtimePriority,
-  } = _rdtsc
+  } = _rdtsc || getRdtscDefault()
   return runInRealtimePriority(() => {
     const testTime = time
     if (!testTime || testTime <= 0) {
