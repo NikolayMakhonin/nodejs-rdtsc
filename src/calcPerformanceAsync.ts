@@ -1,13 +1,23 @@
-import {
-  init,
-  mark0,
-  mark1,
-  minCycles,
-  rdtsc,
-} from 'src/binding'
-import {runInRealtimePriority} from 'src/runInRealtimePriority'
+import {CalcPerformanceResult, Rdtsc} from 'src/types'
 
-export function calcPerformanceAsync(testTimeMilliseconds: number, ...funcs: (() => any)[]) {
+export function calcPerformanceAsync({
+  rdtsc: _rdtsc,
+  testTimeMilliseconds,
+  funcs,
+}: {
+  rdtsc: Rdtsc,
+  /** Test time in milliseconds */
+  testTimeMilliseconds: number,
+  funcs: (() => any)[]
+}): Promise<CalcPerformanceResult> {
+  const {
+    init,
+    mark0,
+    mark1,
+    minCycles,
+    rdtsc,
+    runInRealtimePriority,
+  } = _rdtsc
   return runInRealtimePriority(async () => {
     const testTime = testTimeMilliseconds
     if (!testTime || testTime <= 0) {
@@ -53,11 +63,11 @@ export function calcPerformanceAsync(testTimeMilliseconds: number, ...funcs: (()
     const cycles = minCycles()
 
     const absoluteDiff = funcsCount > 1
-      ? cycles.filter((o, i) => i).map(o => Number(o - cycles[0]))
+      ? cycles.filter((_, i) => i).map(o => Number(o - cycles[0]))
       : void 0
 
     const relativeDiff = funcsCount > 2 && absoluteDiff![0] > 0
-      ? absoluteDiff!.filter((o, i) => i).map(o => o / absoluteDiff![0])
+      ? absoluteDiff!.filter((_, i) => i).map(o => o / absoluteDiff![0])
       : void 0
 
     return {

@@ -1,8 +1,8 @@
 import {createTestVariants} from '@flemist/test-variants'
 import {calcPerformance} from 'src/calcPerformance'
 import {calcPerformanceAsync} from 'src/calcPerformanceAsync'
-import {runInRealtimePriority} from 'src/runInRealtimePriority'
-import {objectToString} from "src/-test/helpers/objectToString";
+import {objectToString} from 'src/-test/helpers/objectToString'
+import {rdtscNative} from 'src/rdtscNative'
 
 describe('rdtsc > calcPerformance', function () {
   this.timeout(600000)
@@ -65,8 +65,8 @@ describe('rdtsc > calcPerformance', function () {
     })
 
     const result = async
-      ? await calcPerformanceAsync(time, ...funcs)
-      : calcPerformance(time, ...funcs)
+      ? await calcPerformanceAsync({rdtsc: rdtscNative, testTimeMilliseconds: time, funcs })
+      : calcPerformance({rdtsc: rdtscNative, testTimeMilliseconds: time, funcs })
 
     const elapsedTime = Number(process.hrtime.bigint() - startTime) / 1e6
     if (elapsedTime < time - 1 || elapsedTime > time + MAX_TIME_ERROR) {
@@ -109,7 +109,7 @@ describe('rdtsc > calcPerformance', function () {
   })
 
   it('variants', async function () {
-    await runInRealtimePriority(() => {
+    await rdtscNative.runInRealtimePriority(() => {
       return testVariants({
         async     : [false, true],
         time      : [1, 50, 100],

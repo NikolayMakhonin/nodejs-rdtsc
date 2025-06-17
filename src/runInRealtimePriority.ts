@@ -7,6 +7,31 @@ import {
   ThreadPriority,
 } from 'src/binding'
 
+export function threadPriorityToString(priority: ThreadPriority): string {
+  switch (priority) {
+    case ThreadPriority.Idle: return 'Idle'
+    case ThreadPriority.Lowest: return 'Lowest'
+    case ThreadPriority.BelowNormal: return 'BelowNormal'
+    case ThreadPriority.Normal: return 'Normal'
+    case ThreadPriority.AboveNormal: return 'AboveNormal'
+    case ThreadPriority.Highest: return 'Highest'
+    case ThreadPriority.Realtime: return 'Realtime'
+    default: return `Unknown(${priority})`
+  }
+}
+
+export function processPriorityToString(priority: ProcessPriority): string {
+  switch (priority) {
+    case ProcessPriority.Idle: return 'Idle'
+    case ProcessPriority.BelowNormal: return 'BelowNormal'
+    case ProcessPriority.Normal: return 'Normal'
+    case ProcessPriority.AboveNormal: return 'AboveNormal'
+    case ProcessPriority.Highest: return 'Highest'
+    case ProcessPriority.Realtime: return 'Realtime'
+    default: return `Unknown(${priority})`
+  }
+}
+
 export function runInRealtimePriority<T>(func: () => Promise<T>): Promise<T>
 export function runInRealtimePriority<T>(func: () => T): T
 export function runInRealtimePriority<T>(func: () => Promise<T>|T): Promise<T>|T {
@@ -25,6 +50,14 @@ export function runInRealtimePriority<T>(func: () => Promise<T>|T): Promise<T>|T
   try {
     setProcessPriority(ProcessPriority.Realtime)
     setThreadPriority(ThreadPriority.Realtime)
+    
+    const threadPriority = getThreadPriority()
+    const processPriority = getProcessPriority()
+    if (
+      threadPriority !== ThreadPriority.Realtime || processPriority !== ProcessPriority.Realtime
+    ) {
+      console.warn(`Failed to set realtime priority: process=${processPriorityToString(processPriority)}, thread=${threadPriorityToString(threadPriority)}`)
+    }
 
     const result = func()
 
@@ -44,3 +77,4 @@ export function runInRealtimePriority<T>(func: () => Promise<T>|T): Promise<T>|T
     _finally()
   }
 }
+
