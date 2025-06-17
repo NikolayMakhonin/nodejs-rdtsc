@@ -11,7 +11,3 @@ export const rdtscNative: Rdtsc = {
   rdtsc,
   runInRealtimePriority,
 }
-
-if (typeof process !== 'undefined') {
-  setRdtscDefault(rdtscNative)
-}

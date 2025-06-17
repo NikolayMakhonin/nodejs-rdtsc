@@ -2,7 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var rdtscDefault = require('../rdtscDefault.cjs');
+require('./setRdtscDefault.cjs');
 var rdtscNative = require('../rdtscNative.cjs');
 var calcPerformance = require('../calcPerformance.cjs');
 var calcPerformanceAsync = require('../calcPerformanceAsync2.cjs');
@@ -10,10 +10,12 @@ var rdtscJs = require('../rdtscJs.cjs');
 var binding_index = require('../binding/index.cjs');
 var runInRealtimePriority = require('../runInRealtimePriority.cjs');
 var binding_binding = require('../binding/binding.cjs');
+require('../rdtscDefault.cjs');
 require('../binding/import.cjs');
 
-rdtscDefault.setRdtscDefault(rdtscNative.rdtscNative);
 
+
+exports.rdtscNative = rdtscNative.rdtscNative;
 exports.calcPerformance = calcPerformance.calcPerformance;
 exports.calcPerformanceAsync = calcPerformanceAsync.calcPerformanceAsync;
 exports.rdtscJs = rdtscJs.rdtscJs;

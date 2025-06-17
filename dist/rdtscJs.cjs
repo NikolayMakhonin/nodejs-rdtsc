@@ -2,6 +2,8 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var rdtscDefault = require('./rdtscDefault.cjs');
+
 const rdtsc = typeof process === 'undefined'
     ? () => BigInt(performance.now())
     : () => {
@@ -39,6 +41,9 @@ const rdtscJs = {
     rdtsc,
     runInRealtimePriority,
 };
+if (typeof process === 'undefined') {
+    rdtscDefault.setRdtscDefault(rdtscJs);
+}
 
 exports.rdtsc = rdtsc;
 exports.rdtscJs = rdtscJs;

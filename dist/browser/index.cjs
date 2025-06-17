@@ -2,13 +2,14 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var rdtscDefault = require('../rdtscDefault.cjs');
-var rdtscJs = require('../rdtscJs.cjs');
+require('./setRdtscDefault.cjs');
 var calcPerformance = require('../calcPerformance.cjs');
 var calcPerformanceAsync = require('../calcPerformanceAsync2.cjs');
+var rdtscJs = require('../rdtscJs.cjs');
+require('../rdtscDefault.cjs');
 
-rdtscDefault.setRdtscDefault(rdtscJs.rdtscJs);
 
-exports.rdtscJs = rdtscJs.rdtscJs;
+
 exports.calcPerformance = calcPerformance.calcPerformance;
 exports.calcPerformanceAsync = calcPerformanceAsync.calcPerformanceAsync;
+exports.rdtscJs = rdtscJs.rdtscJs;

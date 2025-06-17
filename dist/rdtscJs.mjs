@@ -1,3 +1,5 @@
+import { setRdtscDefault } from './rdtscDefault.mjs';
+
 const rdtsc = typeof process === 'undefined'
     ? () => BigInt(performance.now())
     : () => {
@@ -35,5 +37,8 @@ const rdtscJs = {
     rdtsc,
     runInRealtimePriority,
 };
+if (typeof process === 'undefined') {
+    setRdtscDefault(rdtscJs);
+}
 
 export { rdtsc, rdtscJs, runInRealtimePriority };

@@ -1,4 +1,4 @@
-import '../rdtscNative'
+import './setRdtscDefault'
 export {
   rdtscNative,
 } from '../rdtscNative'

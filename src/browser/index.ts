@@ -1,2 +1,2 @@
-import '../rdtscJs'
+import './setRdtscDefault'
 export * from '../common'
