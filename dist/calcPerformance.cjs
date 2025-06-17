@@ -23,7 +23,7 @@ function calcPerformance({ rdtsc: _rdtsc, time, funcs, }) {
         }
         const m0 = mark0;
         const m1 = mark1;
-        const endTime = process.hrtime.bigint() + BigInt(testTime) * BigInt(1000000);
+        const endTime = performance.now() + testTime;
         let i = 0;
         let count = funcsCount;
         init(funcsCount);
@@ -35,7 +35,7 @@ function calcPerformance({ rdtsc: _rdtsc, time, funcs, }) {
             m1();
             i++;
             if (i >= count) {
-                const remainingTime = endTime - process.hrtime.bigint();
+                const remainingTime = endTime - performance.now();
                 if (remainingTime <= 0) {
                     break;
                 }

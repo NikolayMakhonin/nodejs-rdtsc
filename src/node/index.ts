@@ -1,5 +1,5 @@
-import {setRdtscDefault} from 'src/rdtscDefault'
-import {
+import '../rdtscNative'
+export {
   rdtscNative,
 } from '../rdtscNative'
 export * from '../common'
@@ -16,5 +16,3 @@ export {
 export {
   runInRealtimePriority,
 } from '../runInRealtimePriority'
-
-setRdtscDefault(rdtscNative)

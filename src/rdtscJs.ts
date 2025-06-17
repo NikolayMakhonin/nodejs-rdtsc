@@ -1,4 +1,5 @@
 import {Rdtsc} from 'src/types'
+import {setRdtscDefault} from 'src/rdtscDefault'
 
 export const rdtsc = typeof process === 'undefined'
   ? () => BigInt(performance.now())
@@ -45,4 +46,8 @@ export const rdtscJs: Rdtsc = {
   minCycles,
   rdtsc,
   runInRealtimePriority,
+}
+
+if (typeof process === 'undefined') {
+  setRdtscDefault(rdtscJs)
 }

@@ -1,7 +1,2 @@
-import {setRdtscDefault} from 'src/rdtscDefault'
-import {
-  rdtscJs,
-} from '../rdtscJs'
+import '../rdtscJs'
 export * from '../common'
-
-setRdtscDefault(rdtscJs)
