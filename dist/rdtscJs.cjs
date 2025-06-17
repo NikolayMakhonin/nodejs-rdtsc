@@ -5,7 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var rdtscDefault = require('./rdtscDefault.cjs');
 
 const rdtsc = typeof process === 'undefined'
-    ? () => BigInt(performance.now())
+    ? () => BigInt(Math.round(performance.now() * 1000))
     : () => {
         return process.hrtime.bigint();
     };

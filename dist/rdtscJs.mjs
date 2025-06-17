@@ -1,7 +1,7 @@
 import { setRdtscDefault } from './rdtscDefault.mjs';
 
 const rdtsc = typeof process === 'undefined'
-    ? () => BigInt(performance.now())
+    ? () => BigInt(Math.round(performance.now() * 1000))
     : () => {
         return process.hrtime.bigint();
     };
