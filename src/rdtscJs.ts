@@ -2,7 +2,7 @@ import {Rdtsc} from 'src/types'
 import {setRdtscDefault} from 'src/rdtscDefault'
 
 export const rdtsc = typeof process === 'undefined'
-  ? () => BigInt(performance.now())
+  ? () => BigInt(Math.round(performance.now() * 1000))
   : () => {
     return process.hrtime.bigint()
   }
