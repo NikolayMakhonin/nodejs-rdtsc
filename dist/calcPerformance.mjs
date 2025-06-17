@@ -1,5 +1,7 @@
+import { getRdtscDefault } from './rdtscDefault.mjs';
+
 function calcPerformance({ rdtsc: _rdtsc, time, funcs, }) {
-    const { init, mark0, mark1, minCycles, rdtsc, runInRealtimePriority, } = _rdtsc;
+    const { init, mark0, mark1, minCycles, rdtsc, runInRealtimePriority, } = _rdtsc || getRdtscDefault();
     return runInRealtimePriority(() => {
         const testTime = time;
         if (!testTime || testTime <= 0) {

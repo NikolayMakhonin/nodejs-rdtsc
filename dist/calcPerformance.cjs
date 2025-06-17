@@ -2,8 +2,10 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var rdtscDefault = require('./rdtscDefault.cjs');
+
 function calcPerformance({ rdtsc: _rdtsc, time, funcs, }) {
-    const { init, mark0, mark1, minCycles, rdtsc, runInRealtimePriority, } = _rdtsc;
+    const { init, mark0, mark1, minCycles, rdtsc, runInRealtimePriority, } = _rdtsc || rdtscDefault.getRdtscDefault();
     return runInRealtimePriority(() => {
         const testTime = time;
         if (!testTime || testTime <= 0) {

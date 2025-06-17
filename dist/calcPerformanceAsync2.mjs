@@ -1,3 +1,5 @@
+import { getRdtscDefault } from './rdtscDefault.mjs';
+
 /******************************************************************************
 Copyright (c) Microsoft Corporation.
 
@@ -24,7 +26,7 @@ function __awaiter(thisArg, _arguments, P, generator) {
 }
 
 function calcPerformanceAsync({ rdtsc: _rdtsc, time, funcs, }) {
-    const { init, mark0, mark1, minCycles, rdtsc, runInRealtimePriority, } = _rdtsc;
+    const { init, mark0, mark1, minCycles, rdtsc, runInRealtimePriority, } = _rdtsc || getRdtscDefault();
     return runInRealtimePriority(() => __awaiter(this, void 0, void 0, function* () {
         const testTime = time;
         if (!testTime || testTime <= 0) {
