@@ -77,6 +77,37 @@ describe('All tests', function () {
     assert.strictEqual(getProcessPriority(), previousProcessPriority)
   })
 
+  it('runInRealtimePriority async overlapping', async function () {
+    const previousThreadPriority = getThreadPriority()
+    const previousProcessPriority = getProcessPriority()
+
+    let resolveFirst: () => void = null!
+    let resolveSecond: () => void = null!
+    const first = runInRealtimePriority(() => new Promise<void>(resolve => {
+      resolveFirst = () => {
+        resolve()
+      }
+    }))
+    const second = runInRealtimePriority(() => new Promise<void>(resolve => {
+      resolveSecond = () => {
+        resolve()
+      }
+    }))
+
+    resolveFirst()
+    await first
+    if (isWin) {
+      // The second call still runs, so it keeps the priority
+      assert.strictEqual(getThreadPriority(), ThreadPriority.Realtime)
+      assert.strictEqual(getProcessPriority(), ProcessPriority.Realtime)
+    }
+
+    resolveSecond()
+    await second
+    assert.strictEqual(getThreadPriority(), previousThreadPriority)
+    assert.strictEqual(getProcessPriority(), previousProcessPriority)
+  })
+
   it('Thread priority', function () {
     const previousPriority = setThreadPriority(ThreadPriority.Highest)
     console.log('previousPriority =', previousPriority)

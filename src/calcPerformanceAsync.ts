@@ -51,7 +51,7 @@ export function calcPerformanceAsync({
         if (remainingTime <= 0) {
           break
         }
-        // Plans the next check halfway to the end at the rate so far, and at most twice as many iterations later,
+        // Plans the next check halfway to the end at the rate so far, and after at most as many iterations as done so far,
         // so that the clock is read a few dozen times and a rate of the first iterations cannot overshoot the test time
         const elapsedTime = testTime - remainingTime
         const halfwayIterations = elapsedTime > 0

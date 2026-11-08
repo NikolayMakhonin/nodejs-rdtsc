@@ -4,6 +4,7 @@
 
 #include <node.h>
 #include <v8.h>
+#include <vector>
 #include "cycleclock.h"
 
 using namespace v8;
@@ -16,10 +17,12 @@ namespace nodejsRdtsc{
 
 	const uint64_t maxNumber = 0xffffffffffffffff;
 
-	uint64_t cycles0;
-	uint64_t *minCycles;
-	int index;
-	int count;
+	// Per thread, because worker threads load the same binding, and a measurement in one thread
+	// must not touch the state of a measurement in another
+	thread_local uint64_t cycles0;
+	thread_local std::vector<uint64_t> minCycles;
+	thread_local int index;
+	thread_local int count;
 
 	inline void init(const FunctionCallbackInfo<Value>& args) {
 		Isolate* isolate = args.GetIsolate();
@@ -37,9 +40,7 @@ namespace nodejsRdtsc{
 		count = args[0].As<Number>()->Value();
 		index = 0;
 
-		delete[] minCycles;
-		minCycles = new uint64_t[count];
-		std::fill(minCycles, minCycles + count, maxNumber);
+		minCycles.assign(count, maxNumber);
 	}
 
 	inline void mark0(const FunctionCallbackInfo<Value>& args) {
@@ -48,9 +49,8 @@ namespace nodejsRdtsc{
 
 	inline void mark1(const FunctionCallbackInfo<Value>& args) {
 		uint64_t cycles = Now() - cycles0;
-		uint64_t min = *(minCycles + index);
-		if (cycles < min) {
-			*(minCycles + index) = cycles;
+		if (cycles < minCycles[index]) {
+			minCycles[index] = cycles;
 		}
 		index++;
 		if (index >= count) {
@@ -65,7 +65,7 @@ namespace nodejsRdtsc{
 		Local<Array> result = Array::New(isolate, count);
 
 		for (int i = 0; i < count; i++){
-			result->Set(context, i, BigInt::New(isolate, *(minCycles + i)));
+			result->Set(context, i, BigInt::New(isolate, minCycles[i]));
 		}
 
 		args.GetReturnValue().Set(result);

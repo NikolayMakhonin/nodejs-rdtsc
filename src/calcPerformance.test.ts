@@ -89,9 +89,11 @@ describe('rdtsc > calcPerformance', function () {
       cyclesSum += result.cycles[i]
     }
     // An iteration calls one function, so the minimum of a function slower than the others can exceed
-    // the average iteration, while a round of all functions cannot take less than the sum of their minimums
+    // the average iteration; but every function ran at least this many times, and each call took at least
+    // its minimum, so these rounds cannot take more cycles than all iterations together
+    const rounds = Math.floor(result.calcInfo.iterations / funcsSizes.length)
     assert.ok(
-      Number(cyclesSum) <= result.calcInfo.iterationCycles * funcsSizes.length,
+      Number(cyclesSum) * rounds <= result.calcInfo.iterationCycles * result.calcInfo.iterations,
       objectToString(result),
     )
 

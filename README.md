@@ -34,7 +34,7 @@ console.log(rdtsc() - rdtsc()) // -2971 cycles, minimum = -130 cycles
 
 ## Calc Performance
 
-Accuracy: +/- 4 cycles
+Accuracy: +/- 4 cycles where the time stamp counter of the processor changes by 1 cycle, as in the examples below. Some processors add several cycles to it at once, about every 10 ns: AMD Ryzen 7 PRO 6850U adds 27, so there every result is a multiple of 27 and the accuracy is +/- 27 cycles
 
 ### Syntax
 ```js
