@@ -3,6 +3,7 @@ import {calcPerformance} from 'src/calcPerformance'
 import {calcPerformanceAsync} from 'src/calcPerformanceAsync'
 import {objectToString} from 'src/-test/helpers/objectToString'
 import {rdtscNative} from 'src/rdtscNative'
+import {rdtscJs} from 'src/rdtscJs'
 
 describe('rdtsc > calcPerformance', function () {
   this.timeout(600000)
@@ -82,10 +83,17 @@ describe('rdtsc > calcPerformance', function () {
     assert.strictEqual(result.calcInfo.funcsCount, funcsSizes.length)
 
     assert.strictEqual(result.cycles.length, funcsSizes.length)
+    let cyclesSum = BigInt(0)
     for (let i = 0; i < funcsSizes.length; i++) {
       assert.ok(result.cycles[i] > 0)
-      assert.ok(result.cycles[i] <= result.calcInfo.iterationCycles, objectToString(result))
+      cyclesSum += result.cycles[i]
     }
+    // An iteration calls one function, so the minimum of a function slower than the others can exceed
+    // the average iteration, while a round of all functions cannot take less than the sum of their minimums
+    assert.ok(
+      Number(cyclesSum) <= result.calcInfo.iterationCycles * funcsSizes.length,
+      objectToString(result),
+    )
 
     if (funcsSizes.length > 1) {
       assert.strictEqual(result.absoluteDiff!.length, funcsSizes.length - 1)
@@ -119,5 +127,44 @@ describe('rdtsc > calcPerformance', function () {
         funcsSize4: ({funcsSize3}) => funcsSize3 == null ? [null] : [null, 0, 1, 2],
       })()
     })
+  })
+
+  it('rdtscJs keeps the minimum of all calls', function () {
+    let isFirstCall = true
+    const result = calcPerformance({
+      rdtsc: rdtscJs,
+      time : 100,
+      funcs: [() => {
+        if (isFirstCall) {
+          isFirstCall = false
+          const endTime = performance.now() + 10
+          while (performance.now() < endTime) {
+            // The first call takes 10 ms, so that a result of the first call alone shows
+          }
+        }
+      }],
+    })
+    // rdtsc of rdtscJs counts nanoseconds in Node
+    assert.ok(result.cycles[0] < BigInt(1000000), objectToString(result))
+  })
+
+  it('calcPerformance reads the clock a few dozen times', async function () {
+    const originalNow = performance.now
+    let clockReads = 0
+    performance.now = () => {
+      clockReads++
+      return originalNow.call(performance)
+    }
+    try {
+      const result = calcPerformance({rdtsc: rdtscNative, time: 100, funcs: [() => {}]})
+      assert.ok(clockReads < 1000, objectToString({clockReads, iterations: result.calcInfo.iterations}))
+
+      clockReads = 0
+      const resultAsync = await calcPerformanceAsync({rdtsc: rdtscNative, time: 100, funcs: [() => {}]})
+      assert.ok(clockReads < 1000, objectToString({clockReads, iterations: resultAsync.calcInfo.iterations}))
+    }
+    finally {
+      performance.now = originalNow
+    }
   })
 })

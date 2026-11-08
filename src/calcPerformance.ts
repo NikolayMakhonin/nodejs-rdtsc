@@ -51,8 +51,14 @@ export function calcPerformance({
         if (remainingTime <= 0) {
           break
         }
-        count = ~~Math.ceil(i * testTime / (testTime + Number(remainingTime) / 1000000))
-        count = (~~(count / funcsCount)) * funcsCount
+        // Plans the next check halfway to the end at the rate so far, and at most twice as many iterations later,
+        // so that the clock is read a few dozen times and a rate of the first iterations cannot overshoot the test time
+        const elapsedTime = testTime - remainingTime
+        const halfwayIterations = elapsedTime > 0
+          ? Math.ceil(i * remainingTime / elapsedTime / 2)
+          : i
+        count = i + Math.min(i, halfwayIterations)
+        count = Math.floor(count / funcsCount) * funcsCount
       }
     } while (true)
 

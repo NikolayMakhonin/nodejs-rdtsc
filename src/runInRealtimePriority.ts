@@ -47,10 +47,11 @@ export function runInRealtimePriority<T>(func: () => Promise<T>|T): Promise<T>|T
     setThreadPriority(previousThreadPriority)
   }
 
+  let result: Promise<T> | T
   try {
     setProcessPriority(ProcessPriority.Realtime)
     setThreadPriority(ThreadPriority.Realtime)
-    
+
     const threadPriority = getThreadPriority()
     const processPriority = getProcessPriority()
     if (
@@ -59,22 +60,25 @@ export function runInRealtimePriority<T>(func: () => Promise<T>|T): Promise<T>|T
       console.warn(`Failed to set realtime priority: process=${processPriorityToString(processPriority)}, thread=${threadPriorityToString(threadPriority)}`)
     }
 
-    const result = func()
-
-    if (result != null && typeof result === 'object' && typeof (result as any).then === 'function') {
-      return (result as any).then(o => {
-        _finally()
-        return o
-      }, (err) => {
-        _finally()
-        throw err
-      })
-    }
-
-    return result
+    result = func()
   }
-  finally {
+  catch (err) {
     _finally()
+    throw err
   }
+
+  // An async func keeps the priority until its promise settles
+  if (result != null && typeof result === 'object' && typeof (result as any).then === 'function') {
+    return (result as any).then(o => {
+      _finally()
+      return o
+    }, (err) => {
+      _finally()
+      throw err
+    })
+  }
+
+  _finally()
+  return result
 }
 

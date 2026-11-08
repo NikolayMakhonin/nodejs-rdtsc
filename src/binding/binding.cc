@@ -37,6 +37,7 @@ namespace nodejsRdtsc{
 		count = args[0].As<Number>()->Value();
 		index = 0;
 
+		delete[] minCycles;
 		minCycles = new uint64_t[count];
 		std::fill(minCycles, minCycles + count, maxNumber);
 	}

@@ -34,6 +34,9 @@ function mark1(): void {
     result[index] = diff
   }
   index++
+  if (index >= result.length) {
+    index = 0
+  }
 }
 
 function minCycles(): bigint[] {

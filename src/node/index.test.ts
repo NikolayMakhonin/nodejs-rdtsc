@@ -59,6 +59,24 @@ describe('All tests', function () {
     })
   })
 
+  it('runInRealtimePriority async', async function () {
+    const previousThreadPriority = getThreadPriority()
+    const previousProcessPriority = getProcessPriority()
+
+    await runInRealtimePriority(async () => {
+      await new Promise(resolve => {
+        setTimeout(resolve, 1)
+      })
+      if (isWin) {
+        assert.strictEqual(getThreadPriority(), ThreadPriority.Realtime)
+        assert.strictEqual(getProcessPriority(), ProcessPriority.Realtime)
+      }
+    })
+
+    assert.strictEqual(getThreadPriority(), previousThreadPriority)
+    assert.strictEqual(getProcessPriority(), previousProcessPriority)
+  })
+
   it('Thread priority', function () {
     const previousPriority = setThreadPriority(ThreadPriority.Highest)
     console.log('previousPriority =', previousPriority)
