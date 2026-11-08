@@ -39,28 +39,28 @@ export function runInRealtimePriority<T>(func: () => Promise<T>|T): Promise<T>|T
     return func()
   }
 
-  realtimeStart()
+  realtimePriorityStart()
   let result: Promise<T> | T
   try {
     result = func()
   }
   catch (err) {
-    realtimeEnd()
+    realtimePriorityEnd()
     throw err
   }
 
   // An async func keeps the priority until its promise settles
   if (result != null && typeof result === 'object' && typeof (result as any).then === 'function') {
     return (result as any).then(o => {
-      realtimeEnd()
+      realtimePriorityEnd()
       return o
     }, (err) => {
-      realtimeEnd()
+      realtimePriorityEnd()
       throw err
     })
   }
 
-  realtimeEnd()
+  realtimePriorityEnd()
   return result
 }
 
@@ -70,7 +70,7 @@ let realtimeCallsCount = 0
 let previousThreadPriority: ThreadPriority
 let previousProcessPriority: ProcessPriority
 
-function realtimeStart(): void {
+function realtimePriorityStart(): void {
   if (realtimeCallsCount === 0) {
     previousThreadPriority = getThreadPriority()
     previousProcessPriority = getProcessPriority()
@@ -82,13 +82,13 @@ function realtimeStart(): void {
     if (
       threadPriority !== ThreadPriority.Realtime || processPriority !== ProcessPriority.Realtime
     ) {
-      console.warn(`Failed to set realtime priority: process=${processPriorityToString(processPriority)}, thread=${threadPriorityToString(threadPriority)}`)
+      console.warn(`[runInRealtimePriority][realtimePriorityStart] failed to set realtime priority; processPriority: ${processPriorityToString(processPriority)}; threadPriority: ${threadPriorityToString(threadPriority)}`)
     }
   }
   realtimeCallsCount++
 }
 
-function realtimeEnd(): void {
+function realtimePriorityEnd(): void {
   realtimeCallsCount--
   if (realtimeCallsCount === 0) {
     setProcessPriority(previousProcessPriority)

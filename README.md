@@ -9,7 +9,7 @@
 
 This module provide cross platform function rdtsc().
 
-rdtsc() return counts the number of cycles since computer start
+rdtsc() returns the number of cycles of the time stamp counter of the processor since computer start. On processors since 2007 this counter runs at a fixed rate, the base frequency of the processor, whatever the current frequency of its cores, so its cycles measure time and equal the cycles of a core only while the core runs at the base frequency
 
 If you run in on Windows it will call C++ function __rdtsc() that call processor command [RDTSC (Read Time Stamp Counter)](https://en.wikipedia.org/wiki/Time_Stamp_Counter)
 
