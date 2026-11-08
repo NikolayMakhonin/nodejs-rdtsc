@@ -35,8 +35,12 @@
   },
   "typesVersions": {
     "*": {
-      "browser": ["./dist/browser/index.d.ts"],
-      "node": ["./dist/node/index.d.ts"]
+      "browser": [
+        "./dist/browser/index.d.ts"
+      ],
+      "node": [
+        "./dist/node/index.d.ts"
+      ]
     }
   },
   "engines": {
@@ -106,7 +110,7 @@
     "@types/assert": "1.5.6",
     "@types/fs-extra": "9.0.13",
     "@types/mocha": "9.1.1",
-    "@types/node": "18.0.0",
+    "@types/node": "20.14.8",
     "@zerollup/ts-transform-paths": "1.7.18",
     "cmake-js": "7.3.0",
     "cpy-cli": "=3.1.1",
