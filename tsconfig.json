@@ -29,6 +29,11 @@
       "node_modules/@types",
       "@types"
     ],
+    "types": [
+      "node",
+      "mocha",
+      "register"
+    ],
     "lib": [
       "DOM",
       "ESNext"
