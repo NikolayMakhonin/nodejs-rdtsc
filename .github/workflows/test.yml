@@ -9,45 +9,28 @@ name: Test
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      # Every environment runs to its end, so that one failure does not hide the results of the others
+      fail-fast: false
       matrix:
-        node-version: [22.x]
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-latest, macos-15-intel]
+        node-version: [22.x, 24.x, 26.x]
 
     steps:
+      - uses: actions/checkout@v7
+
+      # from: https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Check secrets
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        run: |
-          node -e "o=['COVERALLS_REPO_TOKEN'].filter(o=>!process.env[o]);o.length&&(console.log('You should set env variables: '+o.join(', ')),process.exit(1))"
-
-      - uses: actions/checkout@v7
-
-      # from: https://github.com/pnpm/action-setup
-      - name: Install pnpm
-        id: pnpm-install
-        uses: pnpm/action-setup@v6
-        with:
-          version: 10
-          run_install: false
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "pnpm_cache_dir=$(pnpm store path)" >> "$GITHUB_OUTPUT"
-
-      - uses: actions/cache@v6
-        name: Setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          cache: pnpm
 
       - name: Install dependencies
         run: |
@@ -68,12 +51,3 @@ jobs:
         shell: bash
         run: |
           pnpm run test:mocha:ci
-
-#      - name: Coveralls
-#        if: ${{ matrix.node-version == '18.x' }}
-#        env:
-#          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-#        shell: bash
-#        run: |
-#          pnpm add coveralls -D
-#          pnpm run coveralls

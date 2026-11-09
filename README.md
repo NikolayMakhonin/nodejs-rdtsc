@@ -1,7 +1,6 @@
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Build Status][github-image]][github-url]
-[![Test Coverage][coveralls-image]][coveralls-url]
 
 # Description
 
@@ -257,5 +256,3 @@ ProcessPriority.Realtime = 0x00000100 // REALTIME_PRIORITY_CLASS
 [downloads-url]: https://npmjs.org/package/rdtsc
 [github-image]: https://github.com/NikolayMakhonin/nodejs-rdtsc/actions/workflows/test.yml/badge.svg
 [github-url]: https://github.com/NikolayMakhonin/nodejs-rdtsc/actions
-[coveralls-image]: https://coveralls.io/repos/github/NikolayMakhonin/nodejs-rdtsc/badge.svg
-[coveralls-url]: https://coveralls.io/github/NikolayMakhonin/nodejs-rdtsc
