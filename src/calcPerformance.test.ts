@@ -24,10 +24,11 @@ describe('rdtsc > calcPerformance', function () {
     getGcToolsNative()
   })
 
-  const MAX_TIME_ERROR = 30
-  // The memory measurement checks the functions in at least two rounds and stops only after a whole round, so it can
-  // take up to two rounds longer than timeGc; a round forces 2 young collections per function
-  const MAX_GC_ROUND_TIME = 100
+  // How much longer than time and timeGc a call may take: the memory measurement ends only after a whole round (at
+  // least two), the first measurement of cyclesPerByte forces 100 young collections, and the shared runners of the CI
+  // pause the thread. Together they took up to 165 ms on the macOS runners of the CI, while a regression that makes
+  // calls take seconds still fails
+  const MAX_TIME_EXCESS = 1000
 
   const testVariants = createTestVariants(async ({
     async,
@@ -91,13 +92,13 @@ describe('rdtsc > calcPerformance', function () {
       : calcPerformance({rdtsc: rdtscNative, time: time, timeGc, funcs})
 
     const elapsedTime = Number(process.hrtime.bigint() - startTime) / 1e6
-    const maxTime = time + (timeGc == null ? 0 : timeGc + MAX_GC_ROUND_TIME) + MAX_TIME_ERROR
+    const maxTime = time + (timeGc ?? 0) + MAX_TIME_EXCESS
     if (elapsedTime < time - 1 || elapsedTime > maxTime) {
       assert.fail(`elapsedTime = ${elapsedTime}; ${time}`)
     }
 
     // calcInfo
-    if (result.calcInfo.testTime < time - 1 || result.calcInfo.testTime > time + MAX_TIME_ERROR) {
+    if (result.calcInfo.testTime < time - 1 || result.calcInfo.testTime > time + MAX_TIME_EXCESS) {
       assert.fail(`result.calcInfo.testTime = ${result.calcInfo.testTime}`)
     }
     assert.ok(result.calcInfo.iterationCycles > 0)

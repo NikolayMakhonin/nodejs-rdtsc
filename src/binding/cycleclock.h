@@ -36,9 +36,13 @@
 // declarations of some other intrinsics, breaking compilation.
 // Therefore, we simply declare __rdtsc ourselves. See also
 // http://connect.microsoft.com/VisualStudio/feedback/details/262047
-#if defined(COMPILER_MSVC) && !defined(_M_IX86)
+#if defined(COMPILER_MSVC) && !defined(_M_IX86) && !defined(_M_ARM64) && \
+    !defined(_M_ARM64EC)
 extern "C" uint64_t __rdtsc();
 #pragma intrinsic(__rdtsc)
+#endif
+#if defined(COMPILER_MSVC) && (defined(_M_ARM64) || defined(_M_ARM64EC))
+#include <intrin.h>
 #endif
 
 #ifndef BENCHMARK_OS_WINDOWS
@@ -97,6 +101,12 @@ inline BENCHMARK_ALWAYS_INLINE int64_t Now() {
   // when I know it will work.  Otherwise, I'll use __rdtsc and hope
   // the code is being compiled with a non-ancient compiler.
   _asm rdtsc
+#elif defined(COMPILER_MSVC) && (defined(_M_ARM64) || defined(_M_ARM64EC))
+  // __rdtsc exists exclusively on x86, so ARM64 reads the virtual counter of the system timer, as on Linux below
+  // docs: https://learn.microsoft.com/en-us/cpp/intrinsics/arm64-intrinsics
+  int64_t virtual_timer_value;
+  virtual_timer_value = _ReadStatusReg(ARM64_CNTVCT);
+  return virtual_timer_value;
 #elif defined(COMPILER_MSVC)
   return __rdtsc();
 #elif defined(__aarch64__)
