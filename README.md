@@ -17,19 +17,28 @@ On macOS rdtsc() returns `mach_absolute_time()`, and on 64-bit ARM processors th
 
 Notice: measure in one thread at a time: threads that measure in parallel take the processor cores from each other, and the priority that runInRealtimePriority sets belongs to the whole process, so one thread can restore it while another still measures
 
+# Verified environments
+
+Each major version is checked by its tests in the environments below; browsers are not checked. Older environments are not supported. When a newer Node needs changes in rdtsc, its major version grows
+
+- rdtsc 6: Node 22.22.2 (V8 12.4), Windows x64
+
+rdtsc throws where it detects that something goes otherwise than in these environments, instead of giving numbers that cannot be trusted
+
 # Install
 
 ```bash
-npm i rdtsc -S
+npm i rdtsc
 ```
 # Features
 
 ## RDTSC
 
 ```js
-var { rdtsc } = require('rdtsc')
-console.log(rdtsc()) // 3864063236708616 cycles
-console.log(rdtsc() - rdtsc()) // -2971 cycles, minimum = -130 cycles
+import { rdtsc } from 'rdtsc'
+
+console.log(rdtsc()) // 2365808188508759n: the cycles of the counter since the computer started
+console.log(rdtsc() - rdtsc()) // -540n: negative, because the second call reads the counter later
 ```
 
 ## Calc Performance
@@ -38,7 +47,7 @@ Accuracy: +/- 4 cycles where the time stamp counter of the processor changes by 
 
 calcPerformance calls the functions in turn for `time` milliseconds and keeps the minimum cycles of one call of each. The first function is the base: `absoluteDiff` holds each other value minus its value, and `relativeDiff` each further `absoluteDiff` divided by the first one, where the first one is positive. In Node the time of the garbage collections during a call is left out of its cycles
 
-With `timeGc`, it then calls each function between forced young collections for `timeGc` more milliseconds and keeps the minimum bytes of one call; `gc` of the result holds:
+With `timeGc`, it then calls each function between forced young collections for `timeGc` more milliseconds, in at least two rounds, and keeps the minimum bytes of one call; `gc` of the result holds:
 - `allocatedBytes` - bytes that the call puts into the young generation
 - `uncollectedBytes` - the part of them that the young collections right after the call do not collect
 - `allocatedInOldGenerationBytes` - bytes that the call creates straight in the old generation, as V8 does with the strings of fractional numbers
@@ -46,16 +55,21 @@ With `timeGc`, it then calls each function between forced young collections for 
 - `memory` - `allocatedBytes` times `cyclesPerByte`: the cycles of the young collections that the call causes
 - `logic` - the cycles of the call itself, so that `cycles` is `logic` plus `memory`
 
-`allocatedInOldGenerationBytes` has no price in `memory`, because these bytes burden the full collections, whose price is not measured. The memory can be measured in Node only: `isGcToolsSupported()` tells whether it can, and where it cannot, `gc` is null. Under the young mark-sweep of V8 (`node --minor-ms`) the byte counts would be wrong, so a measurement with `timeGc` throws there. To force collections, the first measurement of the memory or the first call of `isGcToolsSupported()` in Node turns on `--expose-gc` for the process, so `gc` also appears in the contexts created after it
+`allocatedInOldGenerationBytes` has no price in `memory`, because these bytes burden the full collections, whose price is not measured. The memory can be measured in Node only: `isGcToolsSupported()` tells whether it can, and where it cannot, `gc` is null. A measurement with `timeGc` throws where a value would be wrong, instead of giving it: under the young mark-sweep of V8 (`node --minor-ms`), for a function that causes a full collection in every call, and where V8 counts its heap otherwise than in the verified environments. To force collections, the first measurement of the memory or the first call of `isGcToolsSupported()` in Node turns on `--expose-gc` for the process, so `gc` also appears in the contexts created after it
 
 ### Syntax
 
 ```js
 const result = calcPerformance({
-  time: 1000, // milliseconds for the cycles
-  timeGc: 1000, // milliseconds for the memory, or null for the cycles alone
+  // How long to call the functions in turn, in milliseconds: result.cycles gets the fewest cycles of one call of each
+  time: 1000,
+  // How long to measure the memory after that, in milliseconds: result.gc gets the bytes of one call of each;
+  // null measures no memory, and result.gc is null
+  timeGc: 1000,
+  // The functions to measure; absoluteDiff and relativeDiff compare the others with the first one
   funcs: [func1, func2],
-  rdtsc: null, // optional: the counter, by default the native one in Node and the JavaScript one in browsers
+  // Optional: the counter; by default the native one in Node, and one that reads performance.now() in browsers
+  rdtsc: null,
 })
 ```
 
@@ -64,7 +78,7 @@ const result = calcPerformance({
 ### Examples
 
 ```js
-const { calcPerformance } = require('rdtsc')
+import { calcPerformance } from 'rdtsc'
 
 calcPerformance({
   time  : 1000,
@@ -149,39 +163,34 @@ calcPerformance({
 
 ## Thread Priority
 
-Implemented only for Windows platform
+Implemented only for Windows platform. `runInRealtimePriority` runs a function at the realtime priority of the process and the thread, and throws where Windows does not give this priority
 
 ### Examples
 
-<!-- eslint-disable indent -->
 ```js
-
-const { runInRealtimePriority, getThreadPriority, getProcessPriority } = require('rdtsc')
+import { runInRealtimePriority, getThreadPriority, getProcessPriority } from 'rdtsc'
 
 runInRealtimePriority(() => {
-    console.log('getThreadPriority = ', getThreadPriority()) // === ThreadPriority.Realtime
-    console.log('getProcessPriority = ', getProcessPriority()) // === ProcessPriority.Realtime
+  console.log('getThreadPriority = ', getThreadPriority()) // === ThreadPriority.Realtime
+  console.log('getProcessPriority = ', getProcessPriority()) // === ProcessPriority.Realtime
 })
-
 ```
 
-
-<!-- eslint-disable indent -->
 ```js
-const { setThreadPriority, getThreadPriority, isWin, ThreadPriority } = require('rdtsc')
+import { setThreadPriority, getThreadPriority, isWin, ThreadPriority } from 'rdtsc'
 
 if (isWin) {
-    console.log(getThreadPriority()) // === ThreadPriority.Normal
+  console.log(getThreadPriority()) // === ThreadPriority.Normal
 } else {
-    console.log(getThreadPriority()) // === undefined
+  console.log(getThreadPriority()) // === undefined
 }
 
-var previousPriority = setThreadPriority(ThreadPriority.Realtime)
+const previousPriority = setThreadPriority(ThreadPriority.Realtime)
 
 try {
-    // <your code>
+  // <your code>
 } finally {
-    setThreadPriority(previousPriority)
+  setThreadPriority(previousPriority)
 }
 ```
 
@@ -206,22 +215,21 @@ Implemented only for Windows platform
 
 ### Example
 
-<!-- eslint-disable indent -->
 ```js
-const { setProcessPriority, getProcessPriority, isWin, ProcessPriority } = require('rdtsc')
+import { setProcessPriority, getProcessPriority, isWin, ProcessPriority } from 'rdtsc'
 
 if (isWin) {
-    console.log(getProcessPriority()) // === ProcessPriority.Normal
+  console.log(getProcessPriority()) // === ProcessPriority.Normal
 } else {
-    console.log(getProcessPriority()) // === undefined
+  console.log(getProcessPriority()) // === undefined
 }
 
-var previousPriority = setProcessPriority(ProcessPriority.Realtime)
+const previousPriority = setProcessPriority(ProcessPriority.Realtime)
 
 try {
-    // <your code>
+  // <your code>
 } finally {
-    setProcessPriority(previousPriority)
+  setProcessPriority(previousPriority)
 }
 ```
 

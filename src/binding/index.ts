@@ -22,6 +22,7 @@ const {
   promotedBytesSinceMark,
   allocatedInOldGenerationBytesSinceMark,
   fullGcCount,
+  youngGcCount,
 } = binding
 
 export {
@@ -45,4 +46,5 @@ export {
   promotedBytesSinceMark,
   allocatedInOldGenerationBytesSinceMark,
   fullGcCount,
+  youngGcCount,
 }

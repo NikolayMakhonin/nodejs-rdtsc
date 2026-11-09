@@ -1,33 +1,12 @@
 import resolve from '@rollup/plugin-node-resolve'
 import multiInput from 'rollup-plugin-multi-input'
-// import del from 'rollup-plugin-delete'
 import typescript from '@rollup/plugin-typescript'
-import alias from '@rollup/plugin-alias'
-import replace from '@rollup/plugin-replace'
-import commonjs from '@rollup/plugin-commonjs'
-import json from '@rollup/plugin-json'
-import tsTransformPaths from '@zerollup/ts-transform-paths'
-import path from 'path'
 import pkg from './package.json'
 import { createFilter } from '@rollup/pluginutils'
 
 const dev = !!process.env.ROLLUP_WATCH
 
-const onwarnRollup = (warning, onwarn) => {
-  // prevent warn: (!) `this` has been rewritten to `undefined`
-  // if ( warning.code === 'THIS_IS_UNDEFINED' ) {
-  //   return false
-  // }
-  // if ( warning.code === 'EVAL' ) {
-  //   return false
-  // }
-  // if ( warning.code === 'SOURCEMAP_ERROR' ) {
-  //   return false
-  // }
-  // if ( warning.plugin === 'typescript' && /Rollup 'sourcemap' option must be set to generate source maps/.test(warning.message)) {
-  //   return false
-  // }
-
+const onwarnRollup = (warning) => {
   console.warn('onwarnRollup',
     [
       `${warning.code}: ${warning.message}`,
@@ -41,21 +20,6 @@ const onwarnRollup = (warning, onwarn) => {
       .filter(o => o)
       .join('\r\n') + '\r\n',
   )
-
-  return false
-}
-
-const aliasOptions = {
-  entries: [
-    {
-      find       : 'src',
-      replacement: path.resolve(__dirname, 'src'),
-    },
-    {
-      find       : '~',
-      replacement: path.resolve(__dirname),
-    },
-  ],
 }
 
 const nodeConfig = ({
@@ -73,37 +37,11 @@ const nodeConfig = ({
   },
   plugins: [
     multiInput({relative}),
-    alias(aliasOptions),
-    json(),
-    replace({
-      preventAssignment: true,
-    }),
     resolve(),
-    commonjs({
-      transformMixedEsModules: true,
-    }),
     typescript({
       sourceMap     : dev,
       declarationDir: outputDir,
       declaration   : true,
-      transformers  : {
-        before: [
-          {
-            type   : 'program',
-            factory: (program) => {
-              return tsTransformPaths(program).before
-            },
-          },
-        ],
-        afterDeclarations: [
-          {
-            type   : 'program',
-            factory: (program) => {
-              return tsTransformPaths(program).afterDeclarations
-            },
-          },
-        ],
-      },
     }),
   ],
   onwarn  : onwarnRollup,
@@ -117,16 +55,19 @@ const nodeConfig = ({
   ]),
 })
 
+// The inputs leave out src/types.ts, which holds exclusively types,
+// because rollup writes such an input as an empty types.mjs and types.cjs with the warning EMPTY_BUNDLE.
+// The typescript plugin still emits types.d.ts, because it emits the declarations of all files of tsconfig.json
 export default [
   nodeConfig({
-    input    : ['src/**/*.ts'],
+    input    : ['src/**/*.ts', '!src/types.ts'],
     outputDir: 'dist',
     relative : 'src',
     format   : 'es',
     extension: 'mjs',
   }),
   nodeConfig({
-    input    : ['src/**/*.ts'],
+    input    : ['src/**/*.ts', '!src/types.ts'],
     outputDir: 'dist',
     relative : 'src',
     format   : 'cjs',

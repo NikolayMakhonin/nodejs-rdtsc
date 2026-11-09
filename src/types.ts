@@ -21,7 +21,7 @@ export type GcTools = {
   allocatedBytesSinceMark: () => number,
   /** Cycles of young garbage collection per allocated byte */
   getCyclesPerByte: () => number,
-  /** Runs a young garbage collection */
+  /** Runs a young garbage collection; throws if none ran */
   collectYoungGeneration: () => void,
   /** Bytes that young collections moved from the young generation to the old one since bytesMark */
   promotedBytesSinceMark: () => number,
@@ -38,7 +38,9 @@ export type CalcPerformanceArgs = {
   time: number,
   /**
    * Time in milliseconds for measuring memory (the gc field of the result), after the cycles are measured.
+   * The memory is measured in at least two rounds of calls, which can take longer than timeGc.
    * null: memory is not measured, and gc of the result is null.
+   * calcPerformance throws where it cannot trust a value of the memory, instead of giving it.
    * The first call with timeGc also measures the cost of a young garbage collection, and measures it again
    * after V8 changes the size of the young generation.
    * In Node the first call with timeGc runs v8.setFlagsFromString('--expose-gc') for the whole process, to be able
@@ -91,15 +93,15 @@ export type CalcPerformanceGc = {
   allocatedBytes: CalcPerformanceValues<number>,
   /**
    * Bytes allocated by one call that are still alive after the young collections right after the call (the call keeps
-   * them, for example in a variable or an array). NaN if a full collection happened during every measurement of
-   * the function: a full collection changes the old generation, so these bytes cannot be counted
+   * them, for example in a variable or an array). calcPerformance throws if a full collection happened during every
+   * check of the function: a full collection changes the old generation, so these bytes cannot be counted
    */
   uncollectedBytes: CalcPerformanceValues<number>,
   /**
    * Bytes that one call allocates directly in the old generation; V8 does this, for example, with strings of
    * fractional numbers (Math.random() + ''). Not included in allocatedBytes and memory: these bytes cost time
-   * in full collections, which are not measured. NaN if a full collection happened during every measurement
-   * of the function
+   * in full collections, which are not measured. calcPerformance throws if a full collection happened during every
+   * check of the function
    */
   allocatedInOldGenerationBytes: CalcPerformanceValues<number>,
   /** Cost of young garbage collection per allocated byte, in cycles */

@@ -1,28 +1,9 @@
-import {createGcChecks} from './createGcChecks'
+import {createGcChecks, type GcChecks} from './createGcChecks'
 import type {GcTools} from './types'
 
 describe('rdtsc > createGcChecks', function () {
   it('minimums of the checks minus those of the empty function', function () {
-    // Byte counters of a fake heap; the test functions below change them directly
-    const counts = {allocated: 0, promoted: 0, allocatedInOldGeneration: 0, fullGcCount: 0}
-    const marks = {allocated: 0, promoted: 0, allocatedInOldGeneration: 0}
-    const gcTools: GcTools = {
-      getCyclesPerByte      : () => 2,
-      collectYoungGeneration: () => {
-        // Every collection adds 24 bytes, a constant cost that every check pays; the empty function measures it,
-        // and it is subtracted
-        counts.promoted += 24
-      },
-      bytesMark: () => {
-        marks.allocated = counts.allocated
-        marks.promoted = counts.promoted
-        marks.allocatedInOldGeneration = counts.allocatedInOldGeneration
-      },
-      allocatedBytesSinceMark               : () => counts.allocated - marks.allocated,
-      promotedBytesSinceMark                : () => counts.promoted - marks.promoted,
-      allocatedInOldGenerationBytesSinceMark: () => counts.allocatedInOldGeneration - marks.allocatedInOldGeneration,
-      fullGcCount                           : () => counts.fullGcCount,
-    }
+    const {counts, gcTools} = createFakeGcTools()
 
     let isFirstGarbageCall = true
     let isFirstFullGcCall = true
@@ -48,14 +29,6 @@ describe('rdtsc > createGcChecks', function () {
           isFirstFullGcCall = false
         }
       },
-      // Allocates 16 bytes and keeps them alive, allocates 32 directly in the old generation;
-      // a full collection happens in every call
-      () => {
-        counts.allocated += 16
-        counts.promoted += 16
-        counts.allocatedInOldGeneration += 32
-        counts.fullGcCount++
-      },
     ]
 
     const gcChecks = createGcChecks(gcTools, funcs)
@@ -66,13 +39,77 @@ describe('rdtsc > createGcChecks', function () {
         gcChecks.funcs[k]()
         gcChecks.checkEnd(k)
       }
+      assert.strictEqual(gcChecks.isRoundNeeded(), round === 0)
     }
 
     assert.deepStrictEqual(gcChecks.getMeasurement(), {
-      allocatedBytes               : [48, 48, 48, 16],
-      uncollectedBytes             : [0, 32, 16, NaN],
-      allocatedInOldGenerationBytes: [0, 0, 32, NaN],
+      allocatedBytes               : [48, 48, 48],
+      uncollectedBytes             : [0, 32, 16],
+      allocatedInOldGenerationBytes: [0, 0, 32],
       cyclesPerByte                : 2,
     })
   })
+
+  it('getMeasurement throws where every check of a function had a full collection', function () {
+    const {counts, gcTools} = createFakeGcTools()
+    const gcChecks = createGcChecks(gcTools, [() => {
+      counts.fullGcCount++
+    }])
+    checkRounds(gcChecks, 2)
+    assert.throws(() => gcChecks.getMeasurement(), /every check of funcs\[0\] had a full collection/)
+  })
+
+  it('getMeasurement throws where a function reads below the empty function', function () {
+    const {counts, gcTools} = createFakeGcTools()
+    // Makes the old generation 8 bytes smaller in every call, so its uncollected bytes read -8
+    const gcChecks = createGcChecks(gcTools, [() => {
+      counts.promoted -= 8
+    }])
+    checkRounds(gcChecks, 2)
+    assert.throws(
+      () => gcChecks.getMeasurement(),
+      /uncollectedBytes of funcs\[0\] \(-8\) are below those of the empty function/,
+    )
+  })
 })
+
+function checkRounds(gcChecks: GcChecks, roundsCount: number): void {
+  for (let round = 0; round < roundsCount; round++) {
+    for (let k = 0, len = gcChecks.funcs.length; k < len; k++) {
+      gcChecks.checkStart()
+      gcChecks.funcs[k]()
+      gcChecks.checkEnd(k)
+    }
+  }
+}
+
+// Byte counters of a fake heap; the test functions change them directly
+function createFakeGcTools(): {counts: FakeCounts, gcTools: GcTools} {
+  const counts: FakeCounts = {allocated: 0, promoted: 0, allocatedInOldGeneration: 0, fullGcCount: 0}
+  const marks = {allocated: 0, promoted: 0, allocatedInOldGeneration: 0}
+  const gcTools: GcTools = {
+    getCyclesPerByte      : () => 2,
+    collectYoungGeneration: () => {
+      // Every collection adds 24 bytes, a constant cost that every check pays; the empty function measures it,
+      // and it is subtracted
+      counts.promoted += 24
+    },
+    bytesMark: () => {
+      marks.allocated = counts.allocated
+      marks.promoted = counts.promoted
+      marks.allocatedInOldGeneration = counts.allocatedInOldGeneration
+    },
+    allocatedBytesSinceMark               : () => counts.allocated - marks.allocated,
+    promotedBytesSinceMark                : () => counts.promoted - marks.promoted,
+    allocatedInOldGenerationBytesSinceMark: () => counts.allocatedInOldGeneration - marks.allocatedInOldGeneration,
+    fullGcCount                           : () => counts.fullGcCount,
+  }
+  return {counts, gcTools}
+}
+
+type FakeCounts = {
+  allocated: number,
+  promoted: number,
+  allocatedInOldGeneration: number,
+  fullGcCount: number,
+}

@@ -5,6 +5,7 @@
 #include <node.h>
 #include <v8.h>
 #include <cstring>
+#include <string>
 #include <vector>
 #include "cycleclock.h"
 
@@ -148,8 +149,8 @@ namespace nodejsRdtsc{
 	// removed from it (youngTakenBytes). Like the variables above, these are per thread
 
 	// The types of collections that the callbacks receive: all types except incremental marking and the processing
-	// of weak callbacks, which are not collections by themselves. Written as "all except", because the name of
-	// the minor mark-sweep type differs between V8 versions
+	// of weak callbacks, which are not collections by themselves. Written as "all except", so that the callbacks also
+	// receive the collections that the byte counters do not model, which gcEpilogue reports
 	const GCType GC_TYPE_COLLECTIONS = static_cast<GCType>(
 		kGCTypeAll & ~(kGCTypeIncrementalMarking | kGCTypeProcessWeakCallbacks));
 
@@ -160,17 +161,19 @@ namespace nodejsRdtsc{
 	thread_local int newSpaceIndex = -1;
 	thread_local int newLargeObjectSpaceIndex = -1;
 	// Totals since the callbacks were added: the bytes that collections removed from the young generation, the bytes
-	// that young collections moved from it to the old generation, the number of full collections, and the cycles
-	// of the last collection
+	// that young collections moved from it to the old generation, the numbers of full and of young collections, and
+	// the cycles of the last collection
 	thread_local double youngTakenBytes;
 	thread_local double youngPromotedBytes;
 	thread_local double fullGcCount;
+	thread_local double youngGcCount;
 	thread_local uint64_t gcLastCycles;
 	// Set by completeSweeping, cleared by every full collection. False at the start, because a full collection can run
 	// before the callbacks are added
 	thread_local bool isSweepingCompleted;
-	// Set by gcEpilogue after a young collection other than the scavenger; bytesMark throws then
-	thread_local bool isYoungCollectorUnsupported;
+	// What gcEpilogue saw that the byte counters do not model, empty if nothing. The functions that read the counters
+	// throw it, because their values would be wrong
+	thread_local std::string unexpectedGcMessage;
 	// Saved by gcPrologue before a collection, for gcEpilogue after it
 	thread_local double youngUsedBytesBeforeGc;
 	thread_local double heapUsedBytesBeforeGc;
@@ -196,6 +199,25 @@ namespace nodejsRdtsc{
 		return getSpaceUsedBytes(isolate, newSpaceIndex) + getSpaceUsedBytes(isolate, newLargeObjectSpaceIndex);
 	}
 
+	// Keeps the first unexpected thing that gcEpilogue saw, because what follows it can be its consequence
+	inline void recordUnexpectedGc(const std::string& message) {
+		if (unexpectedGcMessage.empty()) {
+			unexpectedGcMessage = message;
+		}
+	}
+
+	// Throws the message of recordUnexpectedGc with the name of the function that reads the counters; returns whether
+	// it threw
+	inline bool throwIfUnexpectedGc(Isolate* isolate, const char* functionName) {
+		if (unexpectedGcMessage.empty()) {
+			return false;
+		}
+		std::string message = std::string("[") + functionName + "] " + unexpectedGcMessage;
+		isolate->ThrowException(Exception::Error(
+			String::NewFromUtf8(isolate, message.c_str(), NewStringType::kNormal).ToLocalChecked()));
+		return true;
+	}
+
 	void gcPrologue(Isolate* isolate, GCType type, GCCallbackFlags flags, void* data) {
 		// Read first: reading the heap statistics below also takes time, and mark1 must subtract that time
 		// from the call too
@@ -212,16 +234,26 @@ namespace nodejsRdtsc{
 			isSweepingCompleted = false;
 		}
 		else {
+			youngGcCount++;
 			// The counters model the scavenger. Under the young mark-sweep of V8 (--minor-ms), by measurement, the
 			// uncollected bytes read 0 for kept arrays, and new_space has no two halves for youngGenerationCapacity
 			if (type != kGCTypeScavenge) {
-				isYoungCollectorUnsupported = true;
+				recordUnexpectedGc("V8 collected the young generation by its young mark-sweep, as with --minor-ms;"
+					" the byte counters support exclusively the scavenger");
 			}
 			// A young collection frees nothing in the old generation, so the growth of the old generation is the bytes
 			// that this collection moved there. Until completeSweeping runs after a full collection, the growth also
 			// holds corrections of V8's count of the old generation
-			youngPromotedBytes += getHeapUsedBytes(isolate) - youngUsedBytes
+			double promotedBytes = getHeapUsedBytes(isolate) - youngUsedBytes
 				- (heapUsedBytesBeforeGc - youngUsedBytesBeforeGc);
+			// With the sweeping completed, nothing but this collection changes the old generation, so it cannot shrink
+			if (isSweepingCompleted && promotedBytes < 0) {
+				recordUnexpectedGc("a young collection made the old generation "
+					+ std::to_string(static_cast<long long>(-promotedBytes))
+					+ " bytes smaller after the sweeping was completed;"
+					+ " V8 counts the old generation differently than the byte counters expect");
+			}
+			youngPromotedBytes += promotedBytes;
 		}
 		gcLastCycles = Now() - gcStartCycles;
 		gcCycles += gcLastCycles;
@@ -299,12 +331,7 @@ namespace nodejsRdtsc{
 
 	inline void bytesMark(const FunctionCallbackInfo<Value>& args) {
 		Isolate* isolate = args.GetIsolate();
-		if (isYoungCollectorUnsupported) {
-			isolate->ThrowException(Exception::Error(
-				String::NewFromUtf8(isolate,
-					"[bytesMark] V8 collected the young generation by its young mark-sweep, as with --minor-ms;"
-					" the byte counters support exclusively the scavenger",
-					NewStringType::kNormal).ToLocalChecked()));
+		if (throwIfUnexpectedGc(isolate, "bytesMark")) {
 			return;
 		}
 		completeSweeping(isolate);
@@ -316,14 +343,23 @@ namespace nodejsRdtsc{
 	// These return small integers (below 2^30). V8 passes such an integer to JavaScript without creating an object,
 	// so reading a counter allocates nothing and does not change the counters
 	inline void allocatedBytesSinceMark(const FunctionCallbackInfo<Value>& args) {
+		if (throwIfUnexpectedGc(args.GetIsolate(), "allocatedBytesSinceMark")) {
+			return;
+		}
 		args.GetReturnValue().Set(getAllocatedBytes(args.GetIsolate()) - allocatedBytesMarkValue);
 	}
 
 	inline void promotedBytesSinceMark(const FunctionCallbackInfo<Value>& args) {
+		if (throwIfUnexpectedGc(args.GetIsolate(), "promotedBytesSinceMark")) {
+			return;
+		}
 		args.GetReturnValue().Set(youngPromotedBytes - promotedBytesMarkValue);
 	}
 
 	inline void allocatedInOldGenerationBytesSinceMark(const FunctionCallbackInfo<Value>& args) {
+		if (throwIfUnexpectedGc(args.GetIsolate(), "allocatedInOldGenerationBytesSinceMark")) {
+			return;
+		}
 		args.GetReturnValue().Set(getAllocatedInOldGenerationBytes(args.GetIsolate()) - allocatedInOldGenerationBytesMarkValue);
 	}
 
@@ -341,6 +377,10 @@ namespace nodejsRdtsc{
 
 	void _fullGcCount(const FunctionCallbackInfo<Value>& args) {
 		args.GetReturnValue().Set(fullGcCount);
+	}
+
+	void _youngGcCount(const FunctionCallbackInfo<Value>& args) {
+		args.GetReturnValue().Set(youngGcCount);
 	}
 
 	// Not using the full NODE_MODULE_INIT() macro here because we want to test the
@@ -368,6 +408,7 @@ namespace nodejsRdtsc{
 		NODE_SET_METHOD(exports, "promotedBytesSinceMark", promotedBytesSinceMark);
 		NODE_SET_METHOD(exports, "allocatedInOldGenerationBytesSinceMark", allocatedInOldGenerationBytesSinceMark);
 		NODE_SET_METHOD(exports, "fullGcCount", _fullGcCount);
+		NODE_SET_METHOD(exports, "youngGcCount", _youngGcCount);
 
 		// V8 14 of Node 26 removed Object::GetIsolate and Context::GetIsolate; node.h takes the isolate this way too
 		Isolate *isolate = Isolate::GetCurrent();

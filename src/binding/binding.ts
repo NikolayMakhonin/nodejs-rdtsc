@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import binding from './import.cjs'
 
 export enum ThreadPriority {
@@ -43,8 +42,9 @@ declare type Binding = {
    * After a full collection it first completes the sweeping that the collection started, which walks the old
    * generation: V8 corrects its count of the old generation when it uses swept pages, and the correction must not
    * fall between the mark and the readings.
-   * Throws after a young collection other than the scavenger, such as the young mark-sweep of --minor-ms, under which
-   * the counters are wrong
+   * It and the three ...SinceMark functions throw after a collection that the counters do not model, because their
+   * values would be wrong: a young collection other than the scavenger, such as the young mark-sweep of --minor-ms,
+   * or a young collection that shrank the old generation after the sweeping was completed
    */
   bytesMark(): void
   /** Bytes allocated in the young generation since bytesMark, including those that collections already removed */
@@ -59,6 +59,8 @@ declare type Binding = {
   allocatedInOldGenerationBytesSinceMark(): number
   /** Number of full garbage collections since the callbacks were added */
   fullGcCount(): number
+  /** Number of young garbage collections since the callbacks were added */
+  youngGcCount(): number
 }
 
 export default binding as Binding

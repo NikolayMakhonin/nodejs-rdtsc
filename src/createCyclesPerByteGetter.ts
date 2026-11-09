@@ -12,7 +12,13 @@ export function createCyclesPerByteGetter(
   return () => {
     const capacity = getYoungGenerationCapacity()
     if (capacity !== measuredCapacity) {
-      cyclesPerByte = measureYoungGcCycles() / capacity
+      const cycles = measureYoungGcCycles()
+      cyclesPerByte = cycles / capacity
+      // A collection takes time and the young generation has room, so any other value means a broken measurement
+      if (!(cyclesPerByte > 0 && Number.isFinite(cyclesPerByte))) {
+        throw new Error(`[getCyclesPerByte] cycles of a young collection (${cycles})`
+          + ` per bytes of the young generation (${capacity}) are not a positive finite number`)
+      }
       measuredCapacity = capacity
     }
     return cyclesPerByte

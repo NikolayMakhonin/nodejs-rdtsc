@@ -15,6 +15,14 @@ export type GcChecks = {
   checkStart: () => void,
   /** Ends the check of funcs[funcIndex]: reads its bytes, forces two young collections, and keeps the smallest values */
   checkEnd: (funcIndex: number) => void,
+  /**
+   * Whether one more round of checks is needed after timeGc: the checks need at least two rounds. The first check
+   * of the empty function read 192 more promoted bytes, and once 1232 more bytes in the old generation, than its later
+   * checks, by measurement, so a single round would leave them in its minimums. A full collection in one check can be
+   * a coincidence: after a full collection V8 raises the limit of the old generation, so the next one needs many
+   * checks; a full collection in two checks of a function in a row means that the function causes one in every call
+   */
+  isRoundNeeded: () => boolean,
   /** Returns, for each given function, its smallest bytes minus those of the empty function, and the cycles per byte */
   getMeasurement: () => GcMeasurement,
 }
@@ -40,6 +48,7 @@ export function createGcChecks(gcTools: GcTools, funcs: CalcPerformanceArgs['fun
   gcTools.collectYoungGeneration()
   gcTools.collectYoungGeneration()
   let fullGcCountBefore = 0
+  let roundsCount = 0
 
   function checkStart(): void {
     fullGcCountBefore = gcTools.fullGcCount()
@@ -67,20 +76,34 @@ export function createGcChecks(gcTools: GcTools, funcs: CalcPerformanceArgs['fun
         allocatedInOldGenerationBytesOfCall,
       )
     }
+    // The check of the last function ends a round
+    if (funcIndex === checkedFuncs.length - 1) {
+      roundsCount++
+    }
+  }
+
+  function isRoundNeeded(): boolean {
+    return roundsCount < 2
   }
 
   function getMeasurement(): GcMeasurement {
+    for (let i = 0, len = checkedFuncs.length; i < len; i++) {
+      // Infinity if every check of the function had a full collection, in at least two rounds by isRoundNeeded
+      if (uncollectedBytesMins[i] === Infinity) {
+        throw new Error(`[getMeasurement] every check of ${i === 0 ? 'the empty function' : `funcs[${i - 1}]`}`
+          + ' had a full collection, so its uncollected bytes cannot be measured;'
+          + ' a function that causes a full collection in every call can be measured with timeGc null only')
+      }
+    }
     const allocatedBytes: number[] = []
     const uncollectedBytes: number[] = []
     const allocatedInOldGenerationBytes: number[] = []
     for (let i = 1, len = checkedFuncs.length; i < len; i++) {
-      allocatedBytes.push(bytesMins[i] - bytesMins[0])
-      // Infinity if every check of this function, or of the empty function, had a full collection: then nothing
-      // was measured, and the result is NaN
-      const uncollected = uncollectedBytesMins[i] - uncollectedBytesMins[0]
-      uncollectedBytes.push(Number.isFinite(uncollected) ? uncollected : NaN)
-      const allocatedInOldGeneration = allocatedInOldGenerationBytesMins[i] - allocatedInOldGenerationBytesMins[0]
-      allocatedInOldGenerationBytes.push(Number.isFinite(allocatedInOldGeneration) ? allocatedInOldGeneration : NaN)
+      allocatedBytes.push(getBytesOfFunc(bytesMins, i, 'allocatedBytes'))
+      uncollectedBytes.push(getBytesOfFunc(uncollectedBytesMins, i, 'uncollectedBytes'))
+      allocatedInOldGenerationBytes.push(
+        getBytesOfFunc(allocatedInOldGenerationBytesMins, i, 'allocatedInOldGenerationBytes'),
+      )
     }
     return {
       allocatedBytes,
@@ -94,10 +117,21 @@ export function createGcChecks(gcTools: GcTools, funcs: CalcPerformanceArgs['fun
     funcs: checkedFuncs,
     checkStart,
     checkEnd,
+    isRoundNeeded,
     getMeasurement,
   }
 }
 
 function emptyFunc(): void {
   // Does nothing: its values are what the checking code itself adds
+}
+
+// The bytes of a call minus those of the empty function. They cannot be negative: the empty function does nothing,
+// and every check runs the same code around the call
+function getBytesOfFunc(bytesMins: number[], funcIndex: number, name: string): number {
+  const bytes = bytesMins[funcIndex] - bytesMins[0]
+  if (bytes < 0) {
+    throw new Error(`[getMeasurement] ${name} of funcs[${funcIndex - 1}] (${bytes}) are below those of the empty function`)
+  }
+  return bytes
 }

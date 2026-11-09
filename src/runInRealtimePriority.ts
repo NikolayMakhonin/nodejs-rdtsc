@@ -82,7 +82,10 @@ function realtimePriorityStart(): void {
     if (
       threadPriority !== ThreadPriority.Realtime || processPriority !== ProcessPriority.Realtime
     ) {
-      console.warn(`[runInRealtimePriority][realtimePriorityStart] failed to set realtime priority; processPriority: ${processPriorityToString(processPriority)}; threadPriority: ${threadPriorityToString(threadPriority)}`)
+      // No call holds the priority yet, so the previous one is restored before the throw
+      setProcessPriority(previousProcessPriority)
+      setThreadPriority(previousThreadPriority)
+      throw new Error(`[runInRealtimePriority][realtimePriorityStart] failed to set realtime priority; processPriority: ${processPriorityToString(processPriority)}; threadPriority: ${threadPriorityToString(threadPriority)}`)
     }
   }
   realtimePriorityCallsCount++

@@ -59,7 +59,7 @@ export function calcPerformance(args: CalcPerformanceArgs): CalcPerformanceResul
           func()
           gcChecks.checkEnd(k)
         }
-      } while (performance.now() < gcEndTime)
+      } while (performance.now() < gcEndTime || gcChecks.isRoundNeeded())
       gc = gcChecks.getMeasurement()
     }
 

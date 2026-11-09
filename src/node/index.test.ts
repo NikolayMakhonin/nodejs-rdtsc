@@ -27,15 +27,21 @@ describe('All tests', function () {
     console.log('rdtsc() - rdtsc() =', rdtsc() - rdtsc())
   })
 
+  // require.resolve gives the path of the binding, which the ES module copy of this test cannot get
   if (typeof require !== 'undefined') {
-    xit('Test multiple loading of the same module', function () {
+    it('the binding loads a second time', function () {
+      // The binding is context aware (NODE_MODULE_INITIALIZER), so Node runs its initializer again for a new module
+      // object, which gets new functions
       const bindingPath = require.resolve('../../build/Release/binding.node')
-      delete require.cache[bindingPath]
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const {rdtsc: requireRdtsc} = require('.')
-      assert.ok(rdtsc() > 0)
-      assert.ok(rdtsc() - rdtsc() < 0)
-      assert.notStrictEqual(rdtsc, requireRdtsc)
+      const secondModule: {exports: {rdtsc?: () => bigint}} = {exports: {}}
+      process.dlopen(secondModule, bindingPath)
+      const secondRdtsc = secondModule.exports.rdtsc
+      if (secondRdtsc == null) {
+        assert.fail('the second load of the binding exported no rdtsc')
+      }
+      assert.notStrictEqual(secondRdtsc, rdtsc)
+      assert.ok(secondRdtsc() > 0)
+      assert.ok(secondRdtsc() - secondRdtsc() < 0)
     })
   }
 

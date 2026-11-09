@@ -20,11 +20,13 @@ describe('rdtsc > calcPerformance', function () {
 
   before(function () {
     setGcToolsDefault(getGcToolsNative)
+    // Creates the tools, which set --expose-gc, so that every test can get the global gc from a new vm context
+    getGcToolsNative()
   })
 
   const MAX_TIME_ERROR = 30
-  // The memory measurement checks the functions in rounds and stops only after a whole round, so it can take one
-  // round longer than timeGc; a round forces 2 young collections per function
+  // The memory measurement checks the functions in at least two rounds and stops only after a whole round, so it can
+  // take up to two rounds longer than timeGc; a round forces 2 young collections per function
   const MAX_GC_ROUND_TIME = 100
 
   const testVariants = createTestVariants(async ({
@@ -274,21 +276,20 @@ describe('rdtsc > calcPerformance', function () {
     assert.ok(sink != null, objectToString(result))
   })
 
-  it('uncollectedBytes and allocatedInOldGenerationBytes are NaN for a function with a full collection in every call', function () {
+  it('calcPerformance throws for a function with a full collection in every call', function () {
     // The global gc exists because before() set --expose-gc; gc() without arguments runs a full collection
     const gc: () => void = vm.runInNewContext('gc')
-    const result = calcPerformance({
-      rdtsc : rdtscNative,
-      time  : 1,
-      timeGc: 100,
-      funcs : [() => {
-        gc()
-      }],
-    })
-    assert.ok(result.gc, objectToString(result))
-    assert.ok(Number.isFinite(result.gc.allocatedBytes.values[0]), objectToString(result))
-    assert.ok(Number.isNaN(result.gc.uncollectedBytes.values[0]), objectToString(result))
-    assert.ok(Number.isNaN(result.gc.allocatedInOldGenerationBytes.values[0]), objectToString(result))
+    assert.throws(
+      () => calcPerformance({
+        rdtsc : rdtscNative,
+        time  : 1,
+        timeGc: 100,
+        funcs : [() => {
+          gc()
+        }],
+      }),
+      /every check of funcs\[0\] had a full collection/,
+    )
   })
 
   it('cycles of a call leave out the collections during it', function () {
@@ -379,12 +380,6 @@ function checkValues(values: CalcPerformanceValues<bigint | number>, funcsCount:
   }
 }
 
-// uncollectedBytes and allocatedInOldGenerationBytes can be NaN (see their doc comments), and then so are their differences
 function checkNumber(actual: number, expected: number): void {
-  if (Number.isNaN(expected)) {
-    assert.ok(Number.isNaN(actual), `${actual} instead of NaN`)
-  }
-  else {
-    assert.ok(Math.abs(actual - expected) < 0.000001, `${actual} instead of ${expected}`)
-  }
+  assert.ok(Math.abs(actual - expected) < 0.000001, `${actual} instead of ${expected}`)
 }
