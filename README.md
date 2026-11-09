@@ -46,7 +46,7 @@ Accuracy: +/- 4 cycles where the time stamp counter of the processor changes by 
 
 calcPerformance calls the functions in turn for `time` milliseconds and keeps the minimum cycles of one call of each. The first function is the base: `absoluteDiff` holds each other value minus its value, and `relativeDiff` each further `absoluteDiff` divided by the first one, where the first one is positive. In Node the time of the garbage collections during a call is left out of its cycles
 
-With `timeGc`, it then calls each function between forced young collections for `timeGc` more milliseconds, in at least two rounds, and keeps the minimum bytes of one call; `gc` of the result holds:
+With `timeGc`, it then calls each function between forced young collections for `timeGc` more milliseconds, and further while a round still lowers a minimum, and keeps the minimum bytes of one call; `gc` of the result holds:
 - `allocatedBytes` - bytes that the call puts into the young generation
 - `uncollectedBytes` - the part of them that the young collections right after the call do not collect
 - `allocatedInOldGenerationBytes` - bytes that the call creates straight in the old generation, as V8 does with the strings of fractional numbers

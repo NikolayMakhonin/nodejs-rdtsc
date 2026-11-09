@@ -39,7 +39,9 @@ describe('rdtsc > createGcChecks', function () {
         gcChecks.funcs[k]()
         gcChecks.checkEnd(k)
       }
-      assert.strictEqual(gcChecks.isRoundNeeded(), round === 0)
+      // The second round still lowers minimums: the first call of funcs[0] allocated 1000 bytes, and the full
+      // collection in the first call of funcs[2] left out its uncollected and old generation bytes
+      assert.strictEqual(gcChecks.isRoundNeeded(), round < 2)
     }
 
     assert.deepStrictEqual(gcChecks.getMeasurement(), {

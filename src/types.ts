@@ -38,7 +38,8 @@ export type CalcPerformanceArgs = {
   time: number,
   /**
    * Time in milliseconds for measuring memory (the gc field of the result), after the cycles are measured.
-   * The memory is measured in at least two rounds of calls, which can take longer than timeGc.
+   * The memory is measured in rounds of calls, further while a round still lowers a minimum, which can take longer than
+   * timeGc.
    * null: memory is not measured, and gc of the result is null.
    * calcPerformance throws where it cannot trust a value of the memory, instead of giving it.
    * The first call with timeGc also measures the cost of a young garbage collection, and measures it again

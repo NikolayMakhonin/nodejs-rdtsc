@@ -16,11 +16,13 @@ export type GcChecks = {
   /** Ends the check of funcs[funcIndex]: reads its bytes, forces two young collections, and keeps the smallest values */
   checkEnd: (funcIndex: number) => void,
   /**
-   * Whether one more round of checks is needed after timeGc: the checks need at least two rounds. The first check
-   * of the empty function read 192 more promoted bytes, and once 1232 more bytes in the old generation, than its later
-   * checks, by measurement, so a single round would leave them in its minimums. A full collection in one check can be
-   * a coincidence: after a full collection V8 raises the limit of the old generation, so the next one needs many
-   * checks; a full collection in two checks of a function in a row means that the function causes one in every call
+   * Whether one more round of checks is needed after timeGc: as long as the last round lowered a minimum. A function
+   * does the same work on every call, and noise of other code only adds bytes, so the minimums stop dropping once every
+   * function had a check without noise. The first check of the empty function read 192 more promoted bytes, and once
+   * 1232 more bytes in the old generation, than its later checks, by measurement, and on a slow runner of the CI its
+   * second check read 80 more bytes. A full collection in one check can be a coincidence: after a full collection V8
+   * raises the limit of the old generation, so the next one needs many checks, and the next round lowers the minimums
+   * that this check left out; a function with a full collection in every call lowers none of them
    */
   isRoundNeeded: () => boolean,
   /** Returns, for each given function, its smallest bytes minus those of the empty function, and the cycles per byte */
@@ -48,7 +50,8 @@ export function createGcChecks(gcTools: GcTools, funcs: CalcPerformanceArgs['fun
   gcTools.collectYoungGeneration()
   gcTools.collectYoungGeneration()
   let fullGcCountBefore = 0
-  let roundsCount = 0
+  let hasRoundLoweredMinimum = false
+  let hasLastRoundLoweredMinimum = true
 
   function checkStart(): void {
     fullGcCountBefore = gcTools.fullGcCount()
@@ -66,29 +69,34 @@ export function createGcChecks(gcTools: GcTools, funcs: CalcPerformanceArgs['fun
     gcTools.collectYoungGeneration()
     // Stored only after the collections. With this store before them, the collections counted 16 more uncollected
     // bytes in most checks of every function, by measurement
-    bytesMins[funcIndex] = Math.min(bytesMins[funcIndex], allocatedBytesOfCall)
+    keepMinimum(bytesMins, funcIndex, allocatedBytesOfCall)
     // A full collection also frees objects in the old generation, so the uncollected and the old generation bytes
     // of this check are wrong: they are not kept
     if (gcTools.fullGcCount() === fullGcCountBefore) {
-      uncollectedBytesMins[funcIndex] = Math.min(uncollectedBytesMins[funcIndex], gcTools.promotedBytesSinceMark())
-      allocatedInOldGenerationBytesMins[funcIndex] = Math.min(
-        allocatedInOldGenerationBytesMins[funcIndex],
-        allocatedInOldGenerationBytesOfCall,
-      )
+      keepMinimum(uncollectedBytesMins, funcIndex, gcTools.promotedBytesSinceMark())
+      keepMinimum(allocatedInOldGenerationBytesMins, funcIndex, allocatedInOldGenerationBytesOfCall)
     }
     // The check of the last function ends a round
     if (funcIndex === checkedFuncs.length - 1) {
-      roundsCount++
+      hasLastRoundLoweredMinimum = hasRoundLoweredMinimum
+      hasRoundLoweredMinimum = false
     }
   }
 
   function isRoundNeeded(): boolean {
-    return roundsCount < 2
+    return hasLastRoundLoweredMinimum
+  }
+
+  function keepMinimum(mins: number[], funcIndex: number, value: number): void {
+    if (value < mins[funcIndex]) {
+      mins[funcIndex] = value
+      hasRoundLoweredMinimum = true
+    }
   }
 
   function getMeasurement(): GcMeasurement {
     for (let i = 0, len = checkedFuncs.length; i < len; i++) {
-      // Infinity if every check of the function had a full collection, in at least two rounds by isRoundNeeded
+      // Infinity if every check of the function had a full collection, in all the rounds that isRoundNeeded asked for
       if (uncollectedBytesMins[i] === Infinity) {
         throw new Error(`[getMeasurement] every check of ${i === 0 ? 'the empty function' : `funcs[${i - 1}]`}`
           + ' had a full collection, so its uncollected bytes cannot be measured;'
