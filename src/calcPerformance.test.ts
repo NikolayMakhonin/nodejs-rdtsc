@@ -106,7 +106,8 @@ describe('rdtsc > calcPerformance', function () {
 
     checkValues(result.cycles, funcsSizes.length)
     for (let i = 0; i < funcsSizes.length; i++) {
-      assert.ok(result.cycles.values[i] > 0)
+      // 0 where one step of the counter is longer than a call of the function, as on arm64
+      assert.ok(result.cycles.values[i] >= 0)
     }
 
     if (timeGc == null) {
