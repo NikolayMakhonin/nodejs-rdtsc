@@ -5,7 +5,7 @@ import {
   ProcessPriority,
   setProcessPriority, setThreadPriority,
   ThreadPriority,
-} from 'src/binding'
+} from './binding'
 
 export function threadPriorityToString(priority: ThreadPriority): string {
   switch (priority) {
@@ -50,11 +50,11 @@ export function runInRealtimePriority<T>(func: () => Promise<T>|T): Promise<T>|T
   }
 
   // An async func keeps the priority until its promise settles
-  if (result != null && typeof result === 'object' && typeof (result as any).then === 'function') {
-    return (result as any).then(o => {
+  if (isPromise(result)) {
+    return result.then(o => {
       realtimePriorityEnd()
       return o
-    }, (err) => {
+    }, err => {
       realtimePriorityEnd()
       throw err
     })
@@ -64,14 +64,14 @@ export function runInRealtimePriority<T>(func: () => Promise<T>|T): Promise<T>|T
   return result
 }
 
-// Calls that run at the same time share the realtime priority: the first one raises it, and the last one restores
-// the priority from before the first, because async calls can end in any order
-let realtimeCallsCount = 0
+// Several calls can run at the same time (async functions). The first call raises the priority, and the last call
+// that ends restores the original priority; the calls are counted, because they can end in any order
+let realtimePriorityCallsCount = 0
 let previousThreadPriority: ThreadPriority
 let previousProcessPriority: ProcessPriority
 
 function realtimePriorityStart(): void {
-  if (realtimeCallsCount === 0) {
+  if (realtimePriorityCallsCount === 0) {
     previousThreadPriority = getThreadPriority()
     previousProcessPriority = getProcessPriority()
     setProcessPriority(ProcessPriority.Realtime)
@@ -85,14 +85,20 @@ function realtimePriorityStart(): void {
       console.warn(`[runInRealtimePriority][realtimePriorityStart] failed to set realtime priority; processPriority: ${processPriorityToString(processPriority)}; threadPriority: ${threadPriorityToString(threadPriority)}`)
     }
   }
-  realtimeCallsCount++
+  realtimePriorityCallsCount++
 }
 
 function realtimePriorityEnd(): void {
-  realtimeCallsCount--
-  if (realtimeCallsCount === 0) {
+  realtimePriorityCallsCount--
+  if (realtimePriorityCallsCount === 0) {
     setProcessPriority(previousProcessPriority)
     setThreadPriority(previousThreadPriority)
   }
+}
+
+// Checks for a then method instead of instanceof Promise: a promise from another context (for example vm)
+// is not an instance of the Promise of this context
+function isPromise<T>(value: Promise<T> | T): value is Promise<T> {
+  return value != null && typeof value === 'object' && typeof (value as Promise<T>).then === 'function'
 }
 

@@ -1,5 +1,5 @@
-import {Rdtsc} from 'src/types'
-import {setRdtscDefault} from 'src/rdtscDefault'
+import type {Rdtsc} from './types'
+import {setRdtscDefault} from './rdtscDefault'
 
 export const rdtsc = typeof process === 'undefined'
   ? () => BigInt(Math.round(performance.now() * 1000))
@@ -40,7 +40,8 @@ function mark1(): void {
 }
 
 function minCycles(): bigint[] {
-  return result
+  // Returns a copy, because the next init overwrites this array
+  return result.slice()
 }
 
 export function runInRealtimePriority<T>(func: () => Promise<T>): Promise<T>

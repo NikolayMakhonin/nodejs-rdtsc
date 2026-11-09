@@ -1,7 +1,7 @@
 import binding, {
   ThreadPriority,
   ProcessPriority,
-} from 'src/binding/binding'
+} from './binding'
 
 const {
   init,
@@ -14,6 +14,14 @@ const {
   setProcessPriority,
   getProcessPriority,
   isWin,
+  addGcCallbacks,
+  bytesMark,
+  allocatedBytesSinceMark,
+  youngGenerationCapacity,
+  gcLastCycles,
+  promotedBytesSinceMark,
+  allocatedInOldGenerationBytesSinceMark,
+  fullGcCount,
 } = binding
 
 export {
@@ -29,4 +37,12 @@ export {
   setProcessPriority,
   getProcessPriority,
   isWin,
+  addGcCallbacks,
+  bytesMark,
+  allocatedBytesSinceMark,
+  youngGenerationCapacity,
+  gcLastCycles,
+  promotedBytesSinceMark,
+  allocatedInOldGenerationBytesSinceMark,
+  fullGcCount,
 }

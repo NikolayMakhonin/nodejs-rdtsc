@@ -1,49 +1,31 @@
-import {CalcPerformanceArgs, CalcPerformanceResult} from 'src/types'
-import {getRdtscDefault} from 'src/rdtscDefault'
+import type {CalcPerformanceArgs, CalcPerformanceResult} from './types'
+import {getRdtscDefault} from './rdtscDefault'
+import {getGcToolsDefault} from './gcToolsDefault'
+import {createCalcPerformanceResult, type GcMeasurement} from './createCalcPerformanceResult'
+import {createGcChecks} from './createGcChecks'
+import {validateCalcPerformanceArgs} from './validateCalcPerformanceArgs'
 
-export function calcPerformance({
-  rdtsc: _rdtsc,
-  time,
-  funcs,
-}: CalcPerformanceArgs): CalcPerformanceResult {
-  const {
-    init,
-    mark0,
-    mark1,
-    minCycles,
-    rdtsc,
-    runInRealtimePriority,
-  } = _rdtsc || getRdtscDefault()
-  return runInRealtimePriority(() => {
-    const testTime = time
-    if (!testTime || testTime <= 0) {
-      throw new Error(`testTime ${testTime} <= 0`)
-    }
+export function calcPerformance(args: CalcPerformanceArgs): CalcPerformanceResult {
+  const rdtscTools = args.rdtsc || getRdtscDefault()
+  const gcTools = args.timeGc == null ? null : getGcToolsDefault()
+  return rdtscTools.runInRealtimePriority(() => {
+    // Copied into local variables of this function: the loop below reads mark1 inside the measured time,
+    // and a local variable is read faster than a variable of the outer function calcPerformance
+    const {time, timeGc, funcs} = args
+    const {init, mark0, mark1, minCycles, rdtsc} = rdtscTools
+    validateCalcPerformanceArgs(args)
+    const funcsCount = funcs.length
 
-    const f = funcs
-    f.forEach(o => {
-      if (typeof o !== 'function') {
-        throw new Error(`argument (${o}) is not a function`)
-      }
-    })
-    const funcsCount = f.length
-
-    if (!funcsCount) {
-      throw new Error('functions count == 0')
-    }
-
-    const m0 = mark0
-    const m1 = mark1
-    const endTime = performance.now() + testTime
+    const endTime = performance.now() + time
     let i = 0
     let count = funcsCount
     init(funcsCount)
     const startCycles = rdtsc()
     do {
-      const fn = f[i % funcsCount]
-      m0()
-      fn()
-      m1()
+      const func = funcs[i % funcsCount]
+      mark0()
+      func()
+      mark1()
 
       i++
       if (i >= count) {
@@ -51,9 +33,10 @@ export function calcPerformance({
         if (remainingTime <= 0) {
           break
         }
-        // Plans the next check halfway to the end at the rate so far, and after at most as many iterations as done so far,
-        // so that the clock is read a few dozen times and a rate of the first iterations cannot overshoot the test time
-        const elapsedTime = testTime - remainingTime
+        // Reading the clock (performance.now) is slow, so the loop reads it only a few dozen times. The next reading
+        // is planned for the middle of the remaining time, by the speed so far, but no later than after as many
+        // iterations again as done so far, so that a wrong early estimate cannot run much past the end time
+        const elapsedTime = time - remainingTime
         const halfwayIterations = elapsedTime > 0
           ? Math.ceil(i * remainingTime / elapsedTime / 2)
           : i
@@ -62,26 +45,33 @@ export function calcPerformance({
       }
     } while (true)
 
-    const cycles = minCycles()
+    const loopCycles = Number(rdtsc() - startCycles)
+    const logicCycles = minCycles()
 
-    const absoluteDiff = funcsCount > 1
-      ? cycles.filter((_, i) => i).map(o => Number(o - cycles[0]))
-      : void 0
+    let gc: null | GcMeasurement = null
+    if (gcTools != null && timeGc != null) {
+      const gcChecks = createGcChecks(gcTools, funcs)
+      const gcEndTime = performance.now() + timeGc
+      do {
+        for (let k = 0, len = gcChecks.funcs.length; k < len; k++) {
+          const func = gcChecks.funcs[k]
+          gcChecks.checkStart()
+          func()
+          gcChecks.checkEnd(k)
+        }
+      } while (performance.now() < gcEndTime)
+      gc = gcChecks.getMeasurement()
+    }
 
-    const relativeDiff = funcsCount > 2 && absoluteDiff![0] > 0
-      ? absoluteDiff!.filter((_, i) => i).map(o => o / absoluteDiff![0])
-      : void 0
-
-    return {
+    return createCalcPerformanceResult({
       calcInfo: {
-        iterationCycles: Number(rdtsc() - startCycles) / i,
+        iterationCycles: loopCycles / i,
         iterations     : i,
         funcsCount,
-        testTime,
+        testTime       : time,
       },
-      cycles,
-      absoluteDiff,
-      relativeDiff,
-    }
+      logicCycles,
+      gc,
+    })
   })
 }

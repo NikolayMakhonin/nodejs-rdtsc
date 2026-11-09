@@ -33,6 +33,32 @@ declare type Binding = {
   setProcessPriority(priority: ProcessPriority): ProcessPriority
   getProcessPriority(): ProcessPriority
   isWin: boolean
+  /**
+   * Adds the garbage collection callbacks of this thread, if init has not added them yet; the functions below need them.
+   * Throws if V8 has no new_space or new_large_object_space, which the byte counters read
+   */
+  addGcCallbacks(): void
+  /**
+   * Saves the current byte counters; the three ...SinceMark functions return the change since this call.
+   * After a full collection it first completes the sweeping that the collection started, which walks the old
+   * generation: V8 corrects its count of the old generation when it uses swept pages, and the correction must not
+   * fall between the mark and the readings.
+   * Throws after a young collection other than the scavenger, such as the young mark-sweep of --minor-ms, under which
+   * the counters are wrong
+   */
+  bytesMark(): void
+  /** Bytes allocated in the young generation since bytesMark, including those that collections already removed */
+  allocatedBytesSinceMark(): number
+  /** Bytes of new objects after which a young collection starts */
+  youngGenerationCapacity(): number
+  /** Cycles of the last garbage collection, by the same counter as rdtsc */
+  gcLastCycles(): number
+  /** Bytes that young collections moved from the young generation to the old one since bytesMark */
+  promotedBytesSinceMark(): number
+  /** Bytes that V8 created directly in the old generation since bytesMark */
+  allocatedInOldGenerationBytesSinceMark(): number
+  /** Number of full garbage collections since the callbacks were added */
+  fullGcCount(): number
 }
 
 export default binding as Binding
