@@ -20,7 +20,7 @@ Notice: measure in one thread at a time: threads that measure in parallel take t
 
 Each major version is checked by its tests in the environments below; browsers are not checked. Older environments are not supported. When a newer Node needs changes in rdtsc, its major version grows
 
-- rdtsc 6: Node 22.22.2 (V8 12.4), Windows x64
+- rdtsc 6: Node 22 (V8 12.4) on Linux, Windows, and macOS, each on x64 and arm64
 
 rdtsc throws where it detects that something goes otherwise than in these environments, instead of giving numbers that cannot be trusted
 
