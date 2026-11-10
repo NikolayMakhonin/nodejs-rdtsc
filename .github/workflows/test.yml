@@ -46,6 +46,7 @@ jobs:
         run: |
           pnpm run audit
           pnpm run lint
+          pnpm run check:types
 
       - name: Mocha tests
         shell: bash
