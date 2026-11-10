@@ -46,6 +46,11 @@
   "engines": {
     "node": ">=22.22.2"
   },
+  "lint-staged": {
+    "*.{js,cjs,mjs,ts,cts,mts,json,json5,jsonc}": [
+      "eslint --fix"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/NikolayMakhonin/nodejs-rdtsc.git"
@@ -80,9 +85,11 @@
   "scripts": {
     "install": "npm run build:gyp",
     "prepublishOnly": "pnpm run audit && pnpm run build && pnpm run lint && pnpm run check:types && pnpm run test:all",
+    "prepare": "node .husky/install.mjs",
     "audit": "pnpm audit --prod",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
+    "lint-staged": "lint-staged",
     "check:types": "tsc --noEmit",
     "build:js": "vite build",
     "build:gyp": "node-gyp rebuild",
@@ -104,6 +111,8 @@
     "eslint-plugin-jsonc": "3.4.2",
     "eslint-plugin-prettier": "5.5.7",
     "globals": "16.0.0",
+    "husky": "9.1.2",
+    "lint-staged": "15.2.7",
     "node-gyp": "13.0.1",
     "prettier": "3.9.10",
     "typescript": "npm:@typescript/typescript6@6.0.2",
