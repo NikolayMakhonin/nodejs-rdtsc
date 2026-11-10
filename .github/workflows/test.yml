@@ -35,6 +35,14 @@ jobs:
           path: ${{ runner.temp }}/node-gyp
           key: node-gyp-${{ runner.os }}-${{ runner.arch }}-${{ steps.node.outputs.node-version }}
 
+      # node-gyp skips its search for Visual Studio, 10 s on windows-latest and 65 s on windows-11-arm, where VCINSTALLDIR
+      # of a developer environment names the installation
+      - name: Visual Studio developer environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ runner.arch == 'ARM64' && 'arm64' || 'x64' }}
+
       # After a change of pnpm-lock.yaml its cache restores the latest store of this system and architecture, so that pnpm
       # downloads exclusively the changed packages, while cache: pnpm of setup-node restores exclusively by the exact hash;
       # after the job it prunes the store and saves it under the new hash
