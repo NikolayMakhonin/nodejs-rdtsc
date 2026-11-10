@@ -23,15 +23,26 @@ jobs:
 
       # Comes before the install, because the script install of package.json compiles the binding for the running Node
       - name: Use Node.js ${{ matrix.node-version }}
+        id: node
         uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
+
+      # node-gyp unpacks the headers of Node on every install, 42-44 s on the Windows runners
+      - name: Cache the headers of Node for node-gyp
+        uses: actions/cache@v6
+        with:
+          path: ${{ runner.temp }}/node-gyp
+          key: node-gyp-${{ runner.os }}-${{ runner.arch }}-${{ steps.node.outputs.node-version }}
 
       # After a change of pnpm-lock.yaml its cache restores the latest store of this system and architecture, so that pnpm
       # downloads exclusively the changed packages, while cache: pnpm of setup-node restores exclusively by the exact hash;
       # after the job it prunes the store and saves it under the new hash
       - name: Install pnpm and dependencies
         uses: pnpm/action-setup@v6
+        env:
+          # The folder where node-gyp keeps the headers of Node, cached by the step above
+          npm_config_devdir: ${{ runner.temp }}/node-gyp
         with:
           version: 10
           cache: true
