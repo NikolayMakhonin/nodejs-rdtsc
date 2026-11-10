@@ -1,6 +1,6 @@
 import assert from 'assert'
-import {describe, it} from 'vitest'
-import {createCyclesPerByteGetter} from './createCyclesPerByteGetter'
+import { describe, it } from 'vitest'
+import { createCyclesPerByteGetter } from './createCyclesPerByteGetter'
 
 describe('rdtsc > createCyclesPerByteGetter', () => {
   it('measures once and again when the capacity changes', () => {

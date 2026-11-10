@@ -1,13 +1,6 @@
 {
-  "include": [
-    "src/**/*",
-    "vite.config.ts",
-    "vite.projects.ts"
-  ],
-  "exclude": [
-    "node_modules/**/*",
-    "dist/**/*"
-  ],
+  "include": ["src/**/*", "vite.config.ts", "vite.projects.ts"],
+  "exclude": ["node_modules/**/*", "dist/**/*"],
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
@@ -19,12 +12,7 @@
     "strictNullChecks": true,
     "skipLibCheck": true,
     "newLine": "LF",
-    "types": [
-      "node"
-    ],
-    "lib": [
-      "DOM",
-      "ESNext"
-    ]
+    "types": ["node"],
+    "lib": ["DOM", "ESNext"]
   }
 }

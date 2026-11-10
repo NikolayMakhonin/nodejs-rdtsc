@@ -1,7 +1,7 @@
-import {describe, expect, it} from 'vitest'
+import { describe, expect, it } from 'vitest'
 import * as fs from 'fs'
 import * as path from 'path'
-import {fileURLToPath} from 'url'
+import { fileURLToPath } from 'url'
 import ts from 'typescript'
 
 const SRC_DIR = path.dirname(fileURLToPath(import.meta.url))
@@ -19,12 +19,15 @@ function getRuntimeImports(file: string, text: string): string[] {
     if (ts.isImportDeclaration(statement)) {
       const clause = statement.importClause
       specifier = statement.moduleSpecifier
-      isTypeOnly = clause != null
-        && (clause.isTypeOnly || clause.name == null && isEverySpecifierTypeOnly(clause.namedBindings))
-    }
-    else if (ts.isExportDeclaration(statement)) {
+      isTypeOnly =
+        clause != null &&
+        (clause.isTypeOnly ||
+          (clause.name == null &&
+            isEverySpecifierTypeOnly(clause.namedBindings)))
+    } else if (ts.isExportDeclaration(statement)) {
       specifier = statement.moduleSpecifier
-      isTypeOnly = statement.isTypeOnly || isEverySpecifierTypeOnly(statement.exportClause)
+      isTypeOnly =
+        statement.isTypeOnly || isEverySpecifierTypeOnly(statement.exportClause)
     }
     if (specifier != null && ts.isStringLiteral(specifier) && !isTypeOnly) {
       result.push(specifier.text)
@@ -36,12 +39,18 @@ function getRuntimeImports(file: string, text: string): string[] {
 function isEverySpecifierTypeOnly(
   bindings: ts.NamedImportBindings | ts.NamedExportBindings | undefined,
 ): boolean {
-  return bindings != null
-    && (ts.isNamedImports(bindings) || ts.isNamedExports(bindings))
-    && bindings.elements.every(o => o.isTypeOnly)
+  return (
+    bindings != null &&
+    (ts.isNamedImports(bindings) || ts.isNamedExports(bindings)) &&
+    bindings.elements.every(o => o.isTypeOnly)
+  )
 }
 
-function resolveImport(files: Set<string>, fromFile: string, spec: string): string | null {
+function resolveImport(
+  files: Set<string>,
+  fromFile: string,
+  spec: string,
+): string | null {
   if (!spec.startsWith('.')) {
     return null
   }
@@ -55,8 +64,10 @@ function resolveImport(files: Set<string>, fromFile: string, spec: string): stri
 }
 
 async function findImportCycles(): Promise<string[]> {
-  const names = await fs.promises.readdir(SRC_DIR, {recursive: true})
-  const files = new Set(names.filter(o => o.endsWith('.ts')).map(o => path.join(SRC_DIR, o)))
+  const names = await fs.promises.readdir(SRC_DIR, { recursive: true })
+  const files = new Set(
+    names.filter(o => o.endsWith('.ts')).map(o => path.join(SRC_DIR, o)),
+  )
   const graph = new Map<string, string[]>()
   for (const file of files) {
     const text = await fs.promises.readFile(file, 'utf8')
@@ -86,8 +97,7 @@ async function findImportCycles(): Promise<string[]> {
             .map(o => path.relative(SRC_DIR, o).replace(/\\/g, '/'))
             .join(' -> '),
         )
-      }
-      else if (state == null) {
+      } else if (state == null) {
         visit(target)
       }
     }

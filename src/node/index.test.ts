@@ -14,10 +14,10 @@ import {
   ThreadPriority,
   type CalcPerformanceResult,
 } from '.'
-import {describe, it} from 'vitest'
-import {objectToString} from '../-test/helpers/objectToString'
-import {rdtscNative} from '../rdtscNative'
-import {bindingPath} from '../binding/binding'
+import { describe, it } from 'vitest'
+import { objectToString } from '../-test/helpers/objectToString'
+import { rdtscNative } from '../rdtscNative'
+import { bindingPath } from '../binding/binding'
 
 console.log('isWin =', isWin)
 
@@ -32,7 +32,7 @@ describe('All tests', () => {
   it('the binding loads a second time', () => {
     // The binding is context aware (NODE_MODULE_INITIALIZER), so Node runs its initializer again for a new module
     // object, which gets new functions
-    const secondModule: {exports: {rdtsc?: () => bigint}} = {exports: {}}
+    const secondModule: { exports: { rdtsc?: () => bigint } } = { exports: {} }
     process.dlopen(secondModule, bindingPath)
     const secondRdtsc = secondModule.exports.rdtsc
     if (secondRdtsc == null) {
@@ -45,7 +45,10 @@ describe('All tests', () => {
 
   it('runInRealtimePriority', () => {
     assert.ok(runInRealtimePriority(() => rdtsc() - rdtsc()))
-    console.log('rdtsc() - rdtsc() =', runInRealtimePriority(() => rdtsc() - rdtsc()))
+    console.log(
+      'rdtsc() - rdtsc() =',
+      runInRealtimePriority(() => rdtsc() - rdtsc()),
+    )
 
     console.log('previous ThreadPriority =', getThreadPriority())
     console.log('previous ProcessPriority =', getProcessPriority())
@@ -53,13 +56,12 @@ describe('All tests', () => {
     runInRealtimePriority(() => {
       let threadPriority: ThreadPriority
       let processPriority: ProcessPriority
-      console.log('ThreadPriority =', threadPriority = getThreadPriority()) // === THREAD_PRIORITY_REALTIME
-      console.log('ProcessPriority =', processPriority = getProcessPriority()) // === PROCESS_PRIORITY_REALTIME
+      console.log('ThreadPriority =', (threadPriority = getThreadPriority())) // === THREAD_PRIORITY_REALTIME
+      console.log('ProcessPriority =', (processPriority = getProcessPriority())) // === PROCESS_PRIORITY_REALTIME
       if (isWin) {
         assert.strictEqual(threadPriority, ThreadPriority.Realtime)
         assert.strictEqual(processPriority, ProcessPriority.Realtime)
-      }
-      else {
+      } else {
         assert.strictEqual(threadPriority, void 0)
         assert.strictEqual(processPriority, void 0)
       }
@@ -90,16 +92,22 @@ describe('All tests', () => {
 
     let resolveFirst: () => void = null!
     let resolveSecond: () => void = null!
-    const first = runInRealtimePriority(() => new Promise<void>(resolve => {
-      resolveFirst = () => {
-        resolve()
-      }
-    }))
-    const second = runInRealtimePriority(() => new Promise<void>(resolve => {
-      resolveSecond = () => {
-        resolve()
-      }
-    }))
+    const first = runInRealtimePriority(
+      () =>
+        new Promise<void>(resolve => {
+          resolveFirst = () => {
+            resolve()
+          }
+        }),
+    )
+    const second = runInRealtimePriority(
+      () =>
+        new Promise<void>(resolve => {
+          resolveSecond = () => {
+            resolve()
+          }
+        }),
+    )
 
     resolveFirst()
     await first
@@ -120,8 +128,7 @@ describe('All tests', () => {
     console.log('previousPriority =', previousPriority)
     if (isWin) {
       assert.notStrictEqual(previousPriority, void 0)
-    }
-    else {
+    } else {
       assert.strictEqual(previousPriority, void 0)
     }
 
@@ -129,8 +136,7 @@ describe('All tests', () => {
     console.log('priority =', priority)
     if (isWin) {
       assert.strictEqual(priority, ThreadPriority.Highest)
-    }
-    else {
+    } else {
       assert.strictEqual(priority, void 0)
     }
 
@@ -148,8 +154,7 @@ describe('All tests', () => {
     console.log('previousPriority =', previousPriority)
     if (isWin) {
       assert.notStrictEqual(previousPriority, void 0)
-    }
-    else {
+    } else {
       assert.strictEqual(previousPriority, void 0)
     }
 
@@ -157,8 +162,7 @@ describe('All tests', () => {
     console.log('priority =', priority)
     if (isWin) {
       assert.strictEqual(priority, ProcessPriority.Highest)
-    }
-    else {
+    } else {
       assert.strictEqual(priority, void 0)
     }
 
@@ -178,20 +182,20 @@ describe('All tests', () => {
 
     let exception: unknown
     try {
-      calcPerformance({rdtsc: rdtscNative,
-        time :
-        100,
+      calcPerformance({
+        rdtsc: rdtscNative,
+        time: 100,
         timeGc: null,
-        funcs : [
+        funcs: [
           () => {
             testErrorFunc()
           },
           () => {
-          // do nothing
+            // do nothing
           },
-        ]})
-    }
-    catch (ex) {
+        ],
+      })
+    } catch (ex) {
       exception = ex
     }
 
@@ -202,55 +206,117 @@ describe('All tests', () => {
 
   it('calcPerformance throws', () => {
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, time: 1000, timeGc: null, funcs: [null!, null!]})
+      calcPerformance({
+        rdtsc: rdtscNative,
+        time: 1000,
+        timeGc: null,
+        funcs: [null!, null!],
+      })
     }, Error)
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, time: 1000, timeGc: null, funcs: [null!]})
+      calcPerformance({
+        rdtsc: rdtscNative,
+        time: 1000,
+        timeGc: null,
+        funcs: [null!],
+      })
     }, Error)
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, time: 1000, timeGc: null, funcs: null! })
+      calcPerformance({
+        rdtsc: rdtscNative,
+        time: 1000,
+        timeGc: null,
+        funcs: null!,
+      })
     }, Error)
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, time: 0, timeGc: null, funcs: [() => {}]})
+      calcPerformance({
+        rdtsc: rdtscNative,
+        time: 0,
+        timeGc: null,
+        funcs: [() => {}],
+      })
     }, Error)
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, time: null!, timeGc: null, funcs: [() => {}]})
+      calcPerformance({
+        rdtsc: rdtscNative,
+        time: null!,
+        timeGc: null,
+        funcs: [() => {}],
+      })
     }, Error)
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, time: 1000, timeGc: -1, funcs: [() => {}]})
+      calcPerformance({
+        rdtsc: rdtscNative,
+        time: 1000,
+        timeGc: -1,
+        funcs: [() => {}],
+      })
     }, Error)
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, time: 1000, timeGc: NaN, funcs: [() => {}]})
+      calcPerformance({
+        rdtsc: rdtscNative,
+        time: 1000,
+        timeGc: NaN,
+        funcs: [() => {}],
+      })
     }, Error)
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, time: Infinity, timeGc: null, funcs: [() => {}]})
+      calcPerformance({
+        rdtsc: rdtscNative,
+        time: Infinity,
+        timeGc: null,
+        funcs: [() => {}],
+      })
     }, Error)
     assert.throws(() => {
-      calcPerformance({rdtsc: rdtscNative, time: 1000, timeGc: Infinity, funcs: [() => {}]})
+      calcPerformance({
+        rdtsc: rdtscNative,
+        time: 1000,
+        timeGc: Infinity,
+        funcs: [() => {}],
+      })
     }, Error)
   })
 
   it('calcPerformanceAsync rejects invalid arguments', async () => {
-    await assert.rejects(calcPerformanceAsync({rdtsc: rdtscNative, time: 0, timeGc: null, funcs: [() => {}]}), Error)
+    await assert.rejects(
+      calcPerformanceAsync({
+        rdtsc: rdtscNative,
+        time: 0,
+        timeGc: null,
+        funcs: [() => {}],
+      }),
+      Error,
+    )
   })
 
   it('gc is measured in Node unless timeGc is null', () => {
     assert.strictEqual(isGcToolsSupported(), true)
 
-    const result = calcPerformance({rdtsc: rdtscNative, time: 50, timeGc: 50, funcs: [() => {}]})
+    const result = calcPerformance({
+      rdtsc: rdtscNative,
+      time: 50,
+      timeGc: 50,
+      funcs: [() => {}],
+    })
     assert.ok(result.gc, objectToString(result))
 
-    const resultWithoutGc = calcPerformance({rdtsc: rdtscNative, time: 50, timeGc: null, funcs: [() => {}]})
+    const resultWithoutGc = calcPerformance({
+      rdtsc: rdtscNative,
+      time: 50,
+      timeGc: null,
+      funcs: [() => {}],
+    })
     assert.strictEqual(resultWithoutGc.gc, null)
   })
 
   it('calcPerformance self cycles', () => {
     const result = calcPerformance({
-      rdtsc : rdtscNative,
-      time  : 1000,
+      rdtsc: rdtscNative,
+      time: 1000,
       timeGc: null,
-      funcs : [() => {
-      }],
+      funcs: [() => {}],
     })
 
     console.log(result)
@@ -261,13 +327,11 @@ describe('All tests', () => {
 
   it('rdtsc self cycles', () => {
     const result = calcPerformance({
-      rdtsc : rdtscNative,
-      time  : 1000,
+      rdtsc: rdtscNative,
+      time: 1000,
       timeGc: null,
-      funcs : [
-        () => {
-
-        },
+      funcs: [
+        () => {},
         () => {
           rdtsc()
         },
@@ -282,12 +346,11 @@ describe('All tests', () => {
 
   it('rdtsc self cycles 2', () => {
     const result = calcPerformance({
-      rdtsc : rdtscNative,
-      time  : 1000,
+      rdtsc: rdtscNative,
+      time: 1000,
       timeGc: null,
-      funcs : [
-        () => {
-        },
+      funcs: [
+        () => {},
         () => {
           rdtsc()
         },
@@ -303,13 +366,11 @@ describe('All tests', () => {
   it('calc Object.keys performance', () => {
     const values: string[] = []
     const result = calcPerformance({
-      rdtsc : rdtscNative,
-      time  : 1000,
+      rdtsc: rdtscNative,
+      time: 1000,
       timeGc: null,
-      funcs : [
-        () => {
-
-        },
+      funcs: [
+        () => {},
         () => {
           values.push(Math.random() + '')
         },
@@ -322,27 +383,22 @@ describe('All tests', () => {
     console.log(result)
     // 0 where one step of the counter is longer than a call of the function, as on arm64
     assert.ok(result.cycles.absoluteDiff![0] >= 0, objectToString(result))
-    assert.strictEqual(result.cycles.relativeDiff != null, result.cycles.absoluteDiff![0] > 0, objectToString(result))
+    assert.strictEqual(
+      result.cycles.relativeDiff != null,
+      result.cycles.absoluteDiff![0] > 0,
+      objectToString(result),
+    )
   })
 
-  it('calc performance relativeDiff', {timeout: 1000 * 100 + 15000}, () => {
+  it('calc performance relativeDiff', { timeout: 1000 * 100 + 15000 }, () => {
     let count = 100
     let result: CalcPerformanceResult
     do {
       result = calcPerformance({
-        rdtsc : rdtscNative,
-        time  : 1000,
+        rdtsc: rdtscNative,
+        time: 1000,
         timeGc: null,
-        funcs : [
-          () => {
-
-          },
-          () => {
-
-          },
-          () => {
-
-          }],
+        funcs: [() => {}, () => {}, () => {}],
       })
     } while (result.cycles.absoluteDiff![0] !== 0 && --count >= 0)
 

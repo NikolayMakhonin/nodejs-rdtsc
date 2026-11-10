@@ -1,4 +1,4 @@
-import type {GcTools} from './types'
+import type { GcTools } from './types'
 
 let gcToolsGetter: () => null | GcTools = () => null
 

@@ -1,4 +1,4 @@
-import {createRequire} from 'module'
+import { createRequire } from 'module'
 import * as path from 'path'
 
 export enum ThreadPriority {
@@ -68,6 +68,9 @@ const nodeRequire = createRequire(import.meta.url)
 
 // The install script compiles the binding into build/Release of the package. The path starts from the package.json of
 // rdtsc, because the built entries in dist and the sources in src lie at different depths
-export const bindingPath = path.join(path.dirname(nodeRequire.resolve('rdtsc/package.json')), 'build/Release/binding.node')
+export const bindingPath = path.join(
+  path.dirname(nodeRequire.resolve('rdtsc/package.json')),
+  'build/Release/binding.node',
+)
 
 export default nodeRequire(bindingPath) as Binding

@@ -1,7 +1,4 @@
-import binding, {
-  ThreadPriority,
-  ProcessPriority,
-} from './binding'
+import binding, { ThreadPriority, ProcessPriority } from './binding'
 
 const {
   init,

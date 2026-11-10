@@ -1,11 +1,11 @@
 import assert from 'assert'
-import {describe, it} from 'vitest'
-import {createGcChecks, type GcChecks} from './createGcChecks'
-import type {GcTools} from './types'
+import { describe, it } from 'vitest'
+import { createGcChecks, type GcChecks } from './createGcChecks'
+import type { GcTools } from './types'
 
 describe('rdtsc > createGcChecks', () => {
   it('minimums of the checks minus those of the empty function', () => {
-    const {counts, gcTools} = createFakeGcTools()
+    const { counts, gcTools } = createFakeGcTools()
 
     let isFirstGarbageCall = true
     let isFirstFullGcCall = true
@@ -47,28 +47,35 @@ describe('rdtsc > createGcChecks', () => {
     }
 
     assert.deepStrictEqual(gcChecks.getMeasurement(), {
-      allocatedBytes               : [48, 48, 48],
-      uncollectedBytes             : [0, 32, 16],
+      allocatedBytes: [48, 48, 48],
+      uncollectedBytes: [0, 32, 16],
       allocatedInOldGenerationBytes: [0, 0, 32],
-      cyclesPerByte                : 2,
+      cyclesPerByte: 2,
     })
   })
 
   it('getMeasurement throws where every check of a function had a full collection', () => {
-    const {counts, gcTools} = createFakeGcTools()
-    const gcChecks = createGcChecks(gcTools, [() => {
-      counts.fullGcCount++
-    }])
+    const { counts, gcTools } = createFakeGcTools()
+    const gcChecks = createGcChecks(gcTools, [
+      () => {
+        counts.fullGcCount++
+      },
+    ])
     checkRounds(gcChecks, 2)
-    assert.throws(() => gcChecks.getMeasurement(), /every check of funcs\[0\] had a full collection/)
+    assert.throws(
+      () => gcChecks.getMeasurement(),
+      /every check of funcs\[0\] had a full collection/,
+    )
   })
 
   it('getMeasurement throws where a function reads below the empty function', () => {
-    const {counts, gcTools} = createFakeGcTools()
+    const { counts, gcTools } = createFakeGcTools()
     // Makes the old generation 8 bytes smaller in every call, so its uncollected bytes read -8
-    const gcChecks = createGcChecks(gcTools, [() => {
-      counts.promoted -= 8
-    }])
+    const gcChecks = createGcChecks(gcTools, [
+      () => {
+        counts.promoted -= 8
+      },
+    ])
     checkRounds(gcChecks, 2)
     assert.throws(
       () => gcChecks.getMeasurement(),
@@ -88,11 +95,16 @@ function checkRounds(gcChecks: GcChecks, roundsCount: number): void {
 }
 
 // Byte counters of a fake heap; the test functions change them directly
-function createFakeGcTools(): {counts: FakeCounts, gcTools: GcTools} {
-  const counts: FakeCounts = {allocated: 0, promoted: 0, allocatedInOldGeneration: 0, fullGcCount: 0}
-  const marks = {allocated: 0, promoted: 0, allocatedInOldGeneration: 0}
+function createFakeGcTools(): { counts: FakeCounts; gcTools: GcTools } {
+  const counts: FakeCounts = {
+    allocated: 0,
+    promoted: 0,
+    allocatedInOldGeneration: 0,
+    fullGcCount: 0,
+  }
+  const marks = { allocated: 0, promoted: 0, allocatedInOldGeneration: 0 }
   const gcTools: GcTools = {
-    getCyclesPerByte      : () => 2,
+    getCyclesPerByte: () => 2,
     collectYoungGeneration: () => {
       // Every collection adds 24 bytes, a constant cost that every check pays; the empty function measures it,
       // and it is subtracted
@@ -103,17 +115,18 @@ function createFakeGcTools(): {counts: FakeCounts, gcTools: GcTools} {
       marks.promoted = counts.promoted
       marks.allocatedInOldGeneration = counts.allocatedInOldGeneration
     },
-    allocatedBytesSinceMark               : () => counts.allocated - marks.allocated,
-    promotedBytesSinceMark                : () => counts.promoted - marks.promoted,
-    allocatedInOldGenerationBytesSinceMark: () => counts.allocatedInOldGeneration - marks.allocatedInOldGeneration,
-    fullGcCount                           : () => counts.fullGcCount,
+    allocatedBytesSinceMark: () => counts.allocated - marks.allocated,
+    promotedBytesSinceMark: () => counts.promoted - marks.promoted,
+    allocatedInOldGenerationBytesSinceMark: () =>
+      counts.allocatedInOldGeneration - marks.allocatedInOldGeneration,
+    fullGcCount: () => counts.fullGcCount,
   }
-  return {counts, gcTools}
+  return { counts, gcTools }
 }
 
 type FakeCounts = {
-  allocated: number,
-  promoted: number,
-  allocatedInOldGeneration: number,
-  fullGcCount: number,
+  allocated: number
+  promoted: number
+  allocatedInOldGeneration: number
+  fullGcCount: number
 }

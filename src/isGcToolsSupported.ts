@@ -1,4 +1,4 @@
-import {getGcToolsDefault} from './gcToolsDefault'
+import { getGcToolsDefault } from './gcToolsDefault'
 
 /**
  * Whether calcPerformance can measure memory (timeGc) in this runtime: true in Node, false in browsers. In Node the

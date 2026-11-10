@@ -1,11 +1,12 @@
-import type {Rdtsc} from './types'
-import {setRdtscDefault} from './rdtscDefault'
+import type { Rdtsc } from './types'
+import { setRdtscDefault } from './rdtscDefault'
 
-export const rdtsc = typeof process === 'undefined'
-  ? () => BigInt(Math.round(performance.now() * 1000))
-  : () => {
-    return process.hrtime.bigint()
-  }
+export const rdtsc =
+  typeof process === 'undefined'
+    ? () => BigInt(Math.round(performance.now() * 1000))
+    : () => {
+        return process.hrtime.bigint()
+      }
 
 const result: bigint[] = []
 let index = 0
@@ -46,7 +47,9 @@ function minCycles(): bigint[] {
 
 export function runInRealtimePriority<T>(func: () => Promise<T>): Promise<T>
 export function runInRealtimePriority<T>(func: () => T): T
-export function runInRealtimePriority<T>(func: () => Promise<T>|T): Promise<T>|T {
+export function runInRealtimePriority<T>(
+  func: () => Promise<T> | T,
+): Promise<T> | T {
   return func()
 }
 

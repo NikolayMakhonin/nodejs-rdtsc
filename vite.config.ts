@@ -1,6 +1,6 @@
-import {configDefaults, defineConfig} from 'vitest/config'
+import { configDefaults, defineConfig } from 'vitest/config'
 import dts from 'vite-plugin-dts'
-import {builtinModules} from 'module'
+import { builtinModules } from 'module'
 
 export default defineConfig({
   plugins: [
@@ -22,34 +22,31 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
-        'common/index' : 'src/common/index.ts',
-        'node/index'   : 'src/node/index.ts',
+        'common/index': 'src/common/index.ts',
+        'node/index': 'src/node/index.ts',
         'browser/index': 'src/browser/index.ts',
       },
     },
     rollupOptions: {
       // Without it, the CommonJS build turns import.meta.url into undefined, and createRequire of the binding throws
       platform: 'node',
-      external: [
-        ...builtinModules,
-        ...builtinModules.map(o => `node:${o}`),
-      ],
+      external: [...builtinModules, ...builtinModules.map(o => `node:${o}`)],
       output: [
         {
-          format        : 'es',
+          format: 'es',
           entryFileNames: '[name].mjs',
         },
         {
-          format        : 'cjs',
+          format: 'cjs',
           entryFileNames: '[name].cjs',
         },
       ],
     },
-    target   : 'node22',
-    minify   : true,
+    target: 'node22',
+    minify: true,
     sourcemap: false,
     // node-gyp builds the binding into build
-    outDir   : 'dist',
+    outDir: 'dist',
   },
   test: {
     include: [
@@ -60,18 +57,18 @@ export default defineConfig({
       '**/{tmp,temp,-tmp,-temp}/**',
       './*.ts',
     ],
-    testTimeout    : 10000,
-    hookTimeout    : 10000,
+    testTimeout: 10000,
+    hookTimeout: 10000,
     // The tests measure time, so test files measuring in parallel processes would slow each other down
     fileParallelism: false,
-    coverage       : {
-      provider        : 'v8',
-      include         : ['src/**'],
-      exclude         : ['**/{tmp,temp,-tmp,-temp}/**'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**'],
+      exclude: ['**/{tmp,temp,-tmp,-temp}/**'],
       reportsDirectory: 'tmp/coverage',
-      clean           : true,
-      cleanOnRerun    : true,
-      reportOnFailure : true,
+      clean: true,
+      cleanOnRerun: true,
+      reportOnFailure: true,
     },
   },
 })

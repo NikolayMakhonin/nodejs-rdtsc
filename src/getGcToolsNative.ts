@@ -1,7 +1,7 @@
 import * as v8 from 'v8'
 import * as vm from 'vm'
-import type {GcTools} from './types'
-import {createCyclesPerByteGetter} from './createCyclesPerByteGetter'
+import type { GcTools } from './types'
+import { createCyclesPerByteGetter } from './createCyclesPerByteGetter'
 import {
   addGcCallbacks,
   bytesMark,
@@ -14,7 +14,7 @@ import {
   youngGcCount,
 } from './binding'
 
-type GcRun = (options: {type: 'minor'}) => void
+type GcRun = (options: { type: 'minor' }) => void
 
 let gcTools: undefined | GcTools
 
@@ -36,9 +36,11 @@ function createGcToolsNative(): GcTools {
   // Without a young collection the counters would stay as they were, and every call would read as keeping nothing
   function collectYoungGeneration(): void {
     const youngGcCountBefore = youngGcCount()
-    gc({type: 'minor'})
+    gc({ type: 'minor' })
     if (youngGcCount() === youngGcCountBefore) {
-      throw new Error("[collectYoungGeneration] gc({type: 'minor'}) ran no young collection")
+      throw new Error(
+        "[collectYoungGeneration] gc({type: 'minor'}) ran no young collection",
+      )
     }
   }
 
@@ -60,9 +62,13 @@ function createGcToolsNative(): GcTools {
 // in contexts created after that, so a new vm context is created to get it
 function exposeGc(): GcRun {
   v8.setFlagsFromString('--expose-gc')
-  const gc: null | GcRun = vm.runInNewContext("typeof gc === 'function' ? gc : null")
+  const gc: null | GcRun = vm.runInNewContext(
+    "typeof gc === 'function' ? gc : null",
+  )
   if (gc == null) {
-    throw new Error("[exposeGc] no gc function after v8.setFlagsFromString('--expose-gc')")
+    throw new Error(
+      "[exposeGc] no gc function after v8.setFlagsFromString('--expose-gc')",
+    )
   }
   return gc
 }
