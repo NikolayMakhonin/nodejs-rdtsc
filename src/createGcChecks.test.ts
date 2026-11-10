@@ -1,9 +1,10 @@
 import assert from 'assert'
+import {describe, it} from 'vitest'
 import {createGcChecks, type GcChecks} from './createGcChecks'
 import type {GcTools} from './types'
 
-describe('rdtsc > createGcChecks', function () {
-  it('minimums of the checks minus those of the empty function', function () {
+describe('rdtsc > createGcChecks', () => {
+  it('minimums of the checks minus those of the empty function', () => {
     const {counts, gcTools} = createFakeGcTools()
 
     let isFirstGarbageCall = true
@@ -53,7 +54,7 @@ describe('rdtsc > createGcChecks', function () {
     })
   })
 
-  it('getMeasurement throws where every check of a function had a full collection', function () {
+  it('getMeasurement throws where every check of a function had a full collection', () => {
     const {counts, gcTools} = createFakeGcTools()
     const gcChecks = createGcChecks(gcTools, [() => {
       counts.fullGcCount++
@@ -62,7 +63,7 @@ describe('rdtsc > createGcChecks', function () {
     assert.throws(() => gcChecks.getMeasurement(), /every check of funcs\[0\] had a full collection/)
   })
 
-  it('getMeasurement throws where a function reads below the empty function', function () {
+  it('getMeasurement throws where a function reads below the empty function', () => {
     const {counts, gcTools} = createFakeGcTools()
     // Makes the old generation 8 bytes smaller in every call, so its uncollected bytes read -8
     const gcChecks = createGcChecks(gcTools, [() => {

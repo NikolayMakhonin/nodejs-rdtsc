@@ -14,38 +14,36 @@ import {
   ThreadPriority,
   type CalcPerformanceResult,
 } from '.'
+import {describe, it} from 'vitest'
 import {objectToString} from '../-test/helpers/objectToString'
 import {rdtscNative} from '../rdtscNative'
+import {bindingPath} from '../binding/binding'
 
 console.log('isWin =', isWin)
 
-describe('All tests', function () {
-  it('Base tests', function () {
+describe('All tests', () => {
+  it('Base tests', () => {
     assert.ok(rdtsc() > 0)
     assert.ok(rdtsc() - rdtsc() < 0)
     console.log('rdtsc() =', rdtsc())
     console.log('rdtsc() - rdtsc() =', rdtsc() - rdtsc())
   })
 
-  // require.resolve gives the path of the binding, which the ES module copy of this test cannot get
-  if (typeof require !== 'undefined') {
-    it('the binding loads a second time', function () {
-      // The binding is context aware (NODE_MODULE_INITIALIZER), so Node runs its initializer again for a new module
-      // object, which gets new functions
-      const bindingPath = require.resolve('../../build/Release/binding.node')
-      const secondModule: {exports: {rdtsc?: () => bigint}} = {exports: {}}
-      process.dlopen(secondModule, bindingPath)
-      const secondRdtsc = secondModule.exports.rdtsc
-      if (secondRdtsc == null) {
-        assert.fail('the second load of the binding exported no rdtsc')
-      }
-      assert.notStrictEqual(secondRdtsc, rdtsc)
-      assert.ok(secondRdtsc() > 0)
-      assert.ok(secondRdtsc() - secondRdtsc() < 0)
-    })
-  }
+  it('the binding loads a second time', () => {
+    // The binding is context aware (NODE_MODULE_INITIALIZER), so Node runs its initializer again for a new module
+    // object, which gets new functions
+    const secondModule: {exports: {rdtsc?: () => bigint}} = {exports: {}}
+    process.dlopen(secondModule, bindingPath)
+    const secondRdtsc = secondModule.exports.rdtsc
+    if (secondRdtsc == null) {
+      assert.fail('the second load of the binding exported no rdtsc')
+    }
+    assert.notStrictEqual(secondRdtsc, rdtsc)
+    assert.ok(secondRdtsc() > 0)
+    assert.ok(secondRdtsc() - secondRdtsc() < 0)
+  })
 
-  it('runInRealtimePriority', function () {
+  it('runInRealtimePriority', () => {
     assert.ok(runInRealtimePriority(() => rdtsc() - rdtsc()))
     console.log('rdtsc() - rdtsc() =', runInRealtimePriority(() => rdtsc() - rdtsc()))
 
@@ -68,7 +66,7 @@ describe('All tests', function () {
     })
   })
 
-  it('runInRealtimePriority async', async function () {
+  it('runInRealtimePriority async', async () => {
     const previousThreadPriority = getThreadPriority()
     const previousProcessPriority = getProcessPriority()
 
@@ -86,7 +84,7 @@ describe('All tests', function () {
     assert.strictEqual(getProcessPriority(), previousProcessPriority)
   })
 
-  it('runInRealtimePriority async overlapping', async function () {
+  it('runInRealtimePriority async overlapping', async () => {
     const previousThreadPriority = getThreadPriority()
     const previousProcessPriority = getProcessPriority()
 
@@ -117,7 +115,7 @@ describe('All tests', function () {
     assert.strictEqual(getProcessPriority(), previousProcessPriority)
   })
 
-  it('Thread priority', function () {
+  it('Thread priority', () => {
     const previousPriority = setThreadPriority(ThreadPriority.Highest)
     console.log('previousPriority =', previousPriority)
     if (isWin) {
@@ -145,7 +143,7 @@ describe('All tests', function () {
     }
   })
 
-  it('Process priority', function () {
+  it('Process priority', () => {
     const previousPriority = setProcessPriority(ProcessPriority.Highest)
     console.log('previousPriority =', previousPriority)
     if (isWin) {
@@ -173,7 +171,7 @@ describe('All tests', function () {
     }
   })
 
-  it('throw catch', function () {
+  it('throw catch', () => {
     function testErrorFunc() {
       throw new Error('test error')
     }
@@ -202,7 +200,7 @@ describe('All tests', function () {
     assert.ok(exception.stack.indexOf('calcPerformance') > 0)
   })
 
-  it('calcPerformance throws', function () {
+  it('calcPerformance throws', () => {
     assert.throws(() => {
       calcPerformance({rdtsc: rdtscNative, time: 1000, timeGc: null, funcs: [null!, null!]})
     }, Error)
@@ -232,11 +230,11 @@ describe('All tests', function () {
     }, Error)
   })
 
-  it('calcPerformanceAsync rejects invalid arguments', async function () {
+  it('calcPerformanceAsync rejects invalid arguments', async () => {
     await assert.rejects(calcPerformanceAsync({rdtsc: rdtscNative, time: 0, timeGc: null, funcs: [() => {}]}), Error)
   })
 
-  it('gc is measured in Node unless timeGc is null', function () {
+  it('gc is measured in Node unless timeGc is null', () => {
     assert.strictEqual(isGcToolsSupported(), true)
 
     const result = calcPerformance({rdtsc: rdtscNative, time: 50, timeGc: 50, funcs: [() => {}]})
@@ -246,9 +244,7 @@ describe('All tests', function () {
     assert.strictEqual(resultWithoutGc.gc, null)
   })
 
-  it('calcPerformance self cycles', function () {
-    this.timeout(15000)
-
+  it('calcPerformance self cycles', () => {
     const result = calcPerformance({
       rdtsc : rdtscNative,
       time  : 1000,
@@ -263,7 +259,7 @@ describe('All tests', function () {
     assert.strictEqual(result.cycles.absoluteDiff, void 0)
   })
 
-  it('rdtsc self cycles', function () {
+  it('rdtsc self cycles', () => {
     const result = calcPerformance({
       rdtsc : rdtscNative,
       time  : 1000,
@@ -284,7 +280,7 @@ describe('All tests', function () {
     assert.strictEqual(result.cycles.relativeDiff, void 0)
   })
 
-  it('rdtsc self cycles 2', function () {
+  it('rdtsc self cycles 2', () => {
     const result = calcPerformance({
       rdtsc : rdtscNative,
       time  : 1000,
@@ -304,7 +300,7 @@ describe('All tests', function () {
     assert.strictEqual(result.cycles.relativeDiff, void 0)
   })
 
-  it('calc Object.keys performance', function () {
+  it('calc Object.keys performance', () => {
     const values: string[] = []
     const result = calcPerformance({
       rdtsc : rdtscNative,
@@ -329,9 +325,7 @@ describe('All tests', function () {
     assert.strictEqual(result.cycles.relativeDiff != null, result.cycles.absoluteDiff![0] > 0, objectToString(result))
   })
 
-  it('calc performance relativeDiff', function () {
-    this.timeout(1000 * 100 + 15000)
-
+  it('calc performance relativeDiff', {timeout: 1000 * 100 + 15000}, () => {
     let count = 100
     let result: CalcPerformanceResult
     do {

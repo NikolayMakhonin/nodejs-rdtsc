@@ -1,21 +1,17 @@
 {
-  "ts-node": {
-    "compilerOptions": {
-      "module": "nodenext",
-      "moduleResolution": "nodenext"
-    },
-  },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "vite.config.ts",
+    "vite.projects.ts"
   ],
   "exclude": [
     "node_modules/**/*",
     "dist/**/*"
   ],
   "compilerOptions": {
-    "target": "es6",
-    "module": "es6",
-    "isolatedModules": false,
+    "target": "esnext",
+    "module": "esnext",
+    "isolatedModules": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "moduleResolution": "bundler",
@@ -24,8 +20,7 @@
     "skipLibCheck": true,
     "newLine": "LF",
     "types": [
-      "node",
-      "mocha"
+      "node"
     ],
     "lib": [
       "DOM",

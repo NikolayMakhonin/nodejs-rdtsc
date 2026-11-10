@@ -46,13 +46,6 @@ jobs:
           run_install: |
             args: [--frozen-lockfile]
 
-      # Builds exclusively the JS: pnpm install already compiled the binding by the script install of package.json,
-      # and pnpm run build would delete it and compile it again
-      - name: Build
-        shell: bash
-        run: |
-          pnpm run build:js
-
       - name: Lint
         shell: bash
         run: |
@@ -60,7 +53,7 @@ jobs:
           pnpm run lint
           pnpm run check:types
 
-      - name: Mocha tests
+      - name: Tests
         shell: bash
         run: |
-          pnpm run test:mocha:ci
+          pnpm run test:all

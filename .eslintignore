@@ -2,6 +2,7 @@
 /dist/**/test/**
 /dist/**/*.test.*
 /tmp/
+/-tmp/
 /node_modules/
 
 # additional rules

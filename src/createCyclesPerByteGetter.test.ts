@@ -1,8 +1,9 @@
 import assert from 'assert'
+import {describe, it} from 'vitest'
 import {createCyclesPerByteGetter} from './createCyclesPerByteGetter'
 
-describe('rdtsc > createCyclesPerByteGetter', function () {
-  it('measures once and again when the capacity changes', function () {
+describe('rdtsc > createCyclesPerByteGetter', () => {
+  it('measures once and again when the capacity changes', () => {
     let capacity = 1000
     let measurementsCount = 0
     const getCyclesPerByte = createCyclesPerByteGetter(

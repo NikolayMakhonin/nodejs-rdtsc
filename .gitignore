@@ -1,5 +1,6 @@
 /dist/
 /tmp/
+/-tmp/
 /node_modules/
 /*.log
 /build/
