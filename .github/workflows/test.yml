@@ -7,10 +7,6 @@ name: Test
     branches:
       - 'master'
   workflow_dispatch:
-    inputs:
-      runners:
-        description: JSON array of the runners to test on
-        default: '["ubuntu-latest", "ubuntu-24.04-arm", "windows-latest", "windows-11-arm", "macos-latest", "macos-15-intel"]'
 
 jobs:
   test:
@@ -19,11 +15,7 @@ jobs:
       # Every environment runs to its end, so that one failure does not hide the results of the others
       fail-fast: false
       matrix:
-        # During the move to the standard of simple-utils a push tests exclusively macos-latest, so that a run ends sooner:
-        # it differs most from the Windows x64 of development and failed the most tests in the first run of all runners.
-        # A change of the binding or of what depends on the platform or on a version of Node that development lacks gets
-        # a run by hand, by default on all runners
-        os: ${{ fromJSON(inputs.runners || '["macos-latest"]') }}
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-latest, macos-15-intel]
         node-version: [22.x]
 
     steps:
