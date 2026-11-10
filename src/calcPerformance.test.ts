@@ -12,6 +12,7 @@ import {youngGenerationCapacity} from './binding'
 import {setRdtscDefault} from './rdtscDefault'
 
 // Holds the last created object, so that V8 cannot remove the allocations as unused
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- false report: the writes keep the allocations and the last object alive, nothing has to read them
 let sink: unknown = null
 
 describe('rdtsc > calcPerformance', () => {

@@ -21,7 +21,7 @@ export function calcPerformance(args: CalcPerformanceArgs): CalcPerformanceResul
     let count = funcsCount
     init(funcsCount)
     const startCycles = rdtsc()
-    do {
+    while (true) {
       const func = funcs[i % funcsCount]
       mark0()
       func()
@@ -43,7 +43,7 @@ export function calcPerformance(args: CalcPerformanceArgs): CalcPerformanceResul
         count = i + Math.min(i, halfwayIterations)
         count = Math.floor(count / funcsCount) * funcsCount
       }
-    } while (true)
+    }
 
     const loopCycles = Number(rdtsc() - startCycles)
     const logicCycles = minCycles()

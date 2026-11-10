@@ -1,4 +1,4 @@
-export function objectToString(obj: any): string {
+export function objectToString(obj: unknown): string {
   return JSON.stringify(obj, (key, value) => {
     if (typeof value === 'bigint') {
       return value + 'n'
