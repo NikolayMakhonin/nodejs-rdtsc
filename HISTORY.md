@@ -1,4 +1,4 @@
-6.0.0 / unreleased
+6.0.0 / 2026-11-10
 ===================
 
 * Breaking: `calcPerformance` and `calcPerformanceAsync` require `timeGc`: `null` measures no garbage collection, a number of milliseconds measures it after the loop of the cycles
