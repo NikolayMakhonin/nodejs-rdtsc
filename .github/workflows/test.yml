@@ -46,12 +46,10 @@ jobs:
           run_install: |
             args: [--frozen-lockfile]
 
-      - name: Lint
+      - name: Check
         shell: bash
         run: |
-          pnpm run audit
-          pnpm run lint
-          pnpm run check:types
+          pnpm run check
 
       - name: Tests
         shell: bash
