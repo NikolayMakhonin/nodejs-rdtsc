@@ -1,3 +1,4 @@
+import assert from 'assert'
 import {createGcChecks, type GcChecks} from './createGcChecks'
 import type {GcTools} from './types'
 

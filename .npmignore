@@ -1,6 +1,7 @@
 /*
 !/dist
 /dist/**/test/**
+/dist/**/-test/**
 /dist/**/*.test.*
 !/binding.gyp
 !/src

@@ -97,12 +97,10 @@
   },
   "devDependencies": {
     "@flemist/copy-glob-flat": "0.0.5",
-    "@flemist/test-utils": "0.0.7",
     "@flemist/test-variants": "0.0.14",
     "@rollup/plugin-node-resolve": "13.3.0",
     "@rollup/plugin-typescript": "12.3.0",
     "@rollup/pluginutils": "4.2.1",
-    "@types/assert": "1.5.6",
     "@types/mocha": "9.1.1",
     "@types/node": "24.13.3",
     "@typescript/native": "npm:typescript@7.0.2",

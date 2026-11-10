@@ -1,3 +1,4 @@
+import assert from 'assert'
 import {createCyclesPerByteGetter} from './createCyclesPerByteGetter'
 
 describe('rdtsc > createCyclesPerByteGetter', function () {

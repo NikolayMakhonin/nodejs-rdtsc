@@ -46,15 +46,21 @@ const nodeConfig = ({
     }),
   ],
   onwarn  : onwarnRollup,
-  external: createFilter([
-    'src/**/*.{js,cjs,mjs}',
-    ...[
-      ...Object.keys(pkg.dependencies),
-      ...Object.keys(pkg.devDependencies),
-      ...require('module').builtinModules || Object.keys(process.binding('natives')),
-    ].map(o => `node_modules/${o}/**`),
-  ]),
+  external: isExternal,
 })
+
+const externalPackages = [
+  ...Object.keys(pkg.dependencies),
+  ...Object.keys(pkg.devDependencies),
+  ...require('module').builtinModules || Object.keys(process.binding('natives')),
+]
+const isSrcScript = createFilter('src/**/*.{js,cjs,mjs}')
+
+// Keeps the imports of the packages and of the scripts of src as imports. A package matches by its name, because pnpm
+// resolves it to its real path in node_modules/.pnpm, which a pattern of node_modules/<name> does not match
+function isExternal(id) {
+  return isSrcScript(id) || externalPackages.some(name => id === name || id.startsWith(name + '/'))
+}
 
 // The inputs leave out src/types.ts, which holds exclusively types,
 // because rollup writes such an input as an empty types.mjs and types.cjs with the warning EMPTY_BUNDLE.

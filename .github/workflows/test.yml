@@ -20,26 +20,29 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # from: https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#caching-packages-data
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6
-        with:
-          version: 10
-
+      # Comes before the install, because the script install of package.json compiles the binding for the running Node
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
-          cache: pnpm
 
-      - name: Install dependencies
-        run: |
-          pnpm install --frozen-lockfile
+      # After a change of pnpm-lock.yaml its cache restores the latest store of this system and architecture, so that pnpm
+      # downloads exclusively the changed packages, while cache: pnpm of setup-node restores exclusively by the exact hash;
+      # after the job it prunes the store and saves it under the new hash
+      - name: Install pnpm and dependencies
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10
+          cache: true
+          run_install: |
+            args: [--frozen-lockfile]
 
+      # Builds exclusively the JS: pnpm install already compiled the binding by the script install of package.json,
+      # and pnpm run build would delete it and compile it again
       - name: Build
         shell: bash
         run: |
-          pnpm run build
+          pnpm run build:js
 
       - name: Lint
         shell: bash

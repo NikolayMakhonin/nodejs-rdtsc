@@ -6,7 +6,6 @@
     },
   },
   "include": [
-    "@types/**/*",
     "src/**/*"
   ],
   "exclude": [
@@ -22,15 +21,11 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "strictNullChecks": true,
+    "skipLibCheck": true,
     "newLine": "LF",
-    "typeRoots": [
-      "node_modules/@types",
-      "@types"
-    ],
     "types": [
       "node",
-      "mocha",
-      "register"
+      "mocha"
     ],
     "lib": [
       "DOM",

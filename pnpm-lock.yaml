@@ -15,9 +15,6 @@ importers:
       '@flemist/copy-glob-flat':
         specifier: 0.0.5
         version: 0.0.5
-      '@flemist/test-utils':
-        specifier: 0.0.7
-        version: 0.0.7
       '@flemist/test-variants':
         specifier: 0.0.14
         version: 0.0.14
@@ -30,9 +27,6 @@ importers:
       '@rollup/pluginutils':
         specifier: 4.2.1
         version: 4.2.1
-      '@types/assert':
-        specifier: 1.5.6
-        version: 1.5.6
       '@types/mocha':
         specifier: 9.1.1
         version: 9.1.1
@@ -169,10 +163,6 @@ packages:
   '@flemist/copy-glob-flat@0.0.5':
     resolution: {integrity: sha512-nw2x3zS78uRv7jlR709oXiMXhtTlTS2+WJiy3aTabcayv50CNHMKXevv9WR7YjUJzS7743EdPJl5wAKjIq9Fdg==}
     hasBin: true
-
-  '@flemist/test-utils@0.0.7':
-    resolution: {integrity: sha512-HJxyDzk0JzTmroizBpnyUfFxTS+Zklwta2jyVbSljiykH8xgNF/M6Y8WXLUrF8c6bw2dhvD0ZzGdivR3yU2Ihg==}
-    engines: {node: '>=10.4.0', pnpm: ^7.1.6}
 
   '@flemist/test-variants@0.0.14':
     resolution: {integrity: sha512-s2CHX4D2wyeSNTi1wTkpB4HqAuNSlXxiwJwvbQwZCGUclfalOKJxnG5t20S9lMx0y4cGNe8MAptXboD6jYzDDg==}
@@ -343,9 +333,6 @@ packages:
 
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
-
-  '@types/assert@1.5.6':
-    resolution: {integrity: sha512-Y7gDJiIqb9qKUHfBQYOWGngUpLORtirAVPuj/CWJrU2C6ZM4/y3XLwuwfGMF8s7QzW746LQZx23m0+1FSgjfug==}
 
   '@types/estree@0.0.39':
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
@@ -2527,6 +2514,9 @@ packages:
   tslib@2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
 
+  tslib@2.8.1:
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
   tsutils@3.21.0:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}
     engines: {node: '>= 6'}
@@ -2863,13 +2853,9 @@ snapshots:
     dependencies:
       tslib: 2.4.0
 
-  '@flemist/test-utils@0.0.7':
-    dependencies:
-      tslib: 2.4.0
-
   '@flemist/test-variants@0.0.14':
     dependencies:
-      tslib: 2.4.0
+      tslib: 2.8.1
 
   '@humanwhocodes/config-array@0.9.5':
     dependencies:
@@ -3034,8 +3020,6 @@ snapshots:
   '@tsconfig/node14@1.0.3': {}
 
   '@tsconfig/node16@1.0.4': {}
-
-  '@types/assert@1.5.6': {}
 
   '@types/estree@0.0.39': {}
 
@@ -5441,6 +5425,8 @@ snapshots:
   tslib@1.14.1: {}
 
   tslib@2.4.0: {}
+
+  tslib@2.8.1: {}
 
   tsutils@3.21.0(@typescript/typescript6@6.0.2):
     dependencies:

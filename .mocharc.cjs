@@ -3,7 +3,6 @@
 module.exports = {
   require: [
     'ts-node/register',
-    '@flemist/test-utils/register',
   ],
   'watch-files': ['./src/**'],
   ignore       : ['./**/*.d.ts'],

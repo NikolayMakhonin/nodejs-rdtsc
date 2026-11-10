@@ -1,3 +1,4 @@
+import assert from 'assert'
 import * as vm from 'vm'
 import {createTestVariants} from '@flemist/test-variants'
 import {calcPerformance} from './calcPerformance'
@@ -143,6 +144,8 @@ describe('rdtsc > calcPerformance', function () {
 
   it('variants', async function () {
     await rdtscNative.runInRealtimePriority(() => {
+      // GC_Interval: 0 turns off the pause once a second, at which @flemist/test-variants 0.0.14 skips the variant that
+      // it has already taken; the pauses exist for the timeout of browsers under karma
       return testVariants({
         async     : [false, true],
         timeGc    : [null, 10],
@@ -151,7 +154,7 @@ describe('rdtsc > calcPerformance', function () {
         funcsSize2: ({funcsSize1}) => funcsSize1 == null ? [null] : [null, 0, 2, 3],
         funcsSize3: ({funcsSize2}) => funcsSize2 == null ? [null] : [null, 0, 1, 3],
         funcsSize4: ({funcsSize3}) => funcsSize3 == null ? [null] : [null, 0, 1, 2],
-      })()
+      })({GC_Interval: 0})
     })
   })
 
