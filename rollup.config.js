@@ -40,6 +40,7 @@ const nodeConfig = ({
     resolve(),
     typescript({
       sourceMap     : dev,
+      rootDir       : 'src',
       declarationDir: outputDir,
       declaration   : true,
     }),

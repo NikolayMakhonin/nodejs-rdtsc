@@ -178,7 +178,7 @@ describe('All tests', function () {
       throw new Error('test error')
     }
 
-    let exception: Error | undefined
+    let exception: unknown
     try {
       calcPerformance({rdtsc: rdtscNative,
         time :
@@ -197,10 +197,7 @@ describe('All tests', function () {
       exception = ex
     }
 
-    // console.log('Test exception:');
-    // console.log(JSON.stringify(exception), exception.stack);
-
-    assert.ok(exception)
+    assert.ok(exception instanceof Error)
     assert.ok(exception.stack)
     assert.ok(exception.stack.indexOf('calcPerformance') > 0)
   })

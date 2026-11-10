@@ -1,7 +1,8 @@
 {
   "ts-node": {
     "compilerOptions": {
-      "module": "CommonJS"
+      "module": "nodenext",
+      "moduleResolution": "nodenext"
     },
   },
   "include": [
@@ -18,9 +19,8 @@
     "isolatedModules": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
-    "downlevelIteration": true,
     "strictNullChecks": true,
     "newLine": "LF",
     "typeRoots": [
