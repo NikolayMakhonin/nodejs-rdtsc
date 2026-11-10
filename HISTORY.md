@@ -1,3 +1,27 @@
+6.0.0 / unreleased
+===================
+
+* Breaking: `calcPerformance` and `calcPerformanceAsync` require `timeGc`: `null` measures no garbage collection, a number of milliseconds measures it after the loop of the cycles
+* Breaking: the result holds `cycles` (`values`, `absoluteDiff`, `relativeDiff`) instead of top-level arrays, and `gc`: logic and memory cycles, `allocatedBytes`, `uncollectedBytes`, `allocatedInOldGenerationBytes`, `cyclesPerByte`; `null` with `timeGc: null`
+* Added `isGcToolsSupported`
+* The cycles of a call leave out the garbage collections during it
+* Throws at every situation that would give wrong numbers: unexpected collections, a realtime priority that Windows refuses, invalid arguments, no default counter
+* Fixed: the priority was restored before an async function finished, overlapping async calls left the realtime priority, the browser fallback kept the first call instead of the minimum, the clock was read on every iteration
+* Per-thread state of the native counter, safe in worker threads
+* Requires Node 22.22.2 or later; verified on Node 22 on Linux, Windows, and macOS, each on x64 and arm64
+* Entries `rdtsc`, `rdtsc/node`, `rdtsc/browser` as ES modules and CommonJS, built by vite; no runtime dependencies
+
+5.0.0 / 2025-06-17
+===================
+
+* Added `rdtscJs`, the browser fallback, and `rdtscNative`
+* `calcPerformance` takes the counter by its `rdtsc` argument
+
+4.0.0 / 2025-06-04
+===================
+
+* Supports Node 20
+
 3.0.0 / 2022-06-26
 ===================
 
