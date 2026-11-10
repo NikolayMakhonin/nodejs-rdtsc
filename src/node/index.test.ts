@@ -60,7 +60,7 @@ describe('All tests', () => {
       console.log('ProcessPriority =', (processPriority = getProcessPriority())) // === PROCESS_PRIORITY_REALTIME
       if (isWin) {
         assert.strictEqual(threadPriority, ThreadPriority.Realtime)
-        assert.strictEqual(processPriority, ProcessPriority.Realtime)
+        assertRaisedProcessPriority(processPriority)
       } else {
         assert.strictEqual(threadPriority, void 0)
         assert.strictEqual(processPriority, void 0)
@@ -78,7 +78,7 @@ describe('All tests', () => {
       })
       if (isWin) {
         assert.strictEqual(getThreadPriority(), ThreadPriority.Realtime)
-        assert.strictEqual(getProcessPriority(), ProcessPriority.Realtime)
+        assertRaisedProcessPriority(getProcessPriority())
       }
     })
 
@@ -114,7 +114,7 @@ describe('All tests', () => {
     if (isWin) {
       // The second call still runs, so it keeps the priority
       assert.strictEqual(getThreadPriority(), ThreadPriority.Realtime)
-      assert.strictEqual(getProcessPriority(), ProcessPriority.Realtime)
+      assertRaisedProcessPriority(getProcessPriority())
     }
 
     resolveSecond()
@@ -409,3 +409,12 @@ describe('All tests', () => {
     assert.strictEqual(result.cycles.relativeDiff, void 0)
   })
 })
+
+// Windows gives the high priority class instead of the realtime one without the privilege "Increase scheduling priority"
+function assertRaisedProcessPriority(priority: ProcessPriority): void {
+  assert.ok(
+    priority === ProcessPriority.Realtime ||
+      priority === ProcessPriority.Highest,
+    `process priority ${priority}`,
+  )
+}

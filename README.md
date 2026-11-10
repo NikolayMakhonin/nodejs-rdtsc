@@ -162,7 +162,7 @@ calcPerformance({
 
 ## Thread Priority
 
-Implemented only for Windows platform. `runInRealtimePriority` runs a function at the realtime priority of the process and the thread, and throws where Windows does not give this priority
+Implemented only for Windows platform. `runInRealtimePriority` runs a function at the realtime priority of the process and the thread. Without the privilege "Increase scheduling priority", which administrators have, Windows gives the process the high priority instead; `runInRealtimePriority` throws where the process gets less than high or the thread less than realtime
 
 ### Examples
 
@@ -171,7 +171,7 @@ import { runInRealtimePriority, getThreadPriority, getProcessPriority } from 'rd
 
 runInRealtimePriority(() => {
   console.log('getThreadPriority = ', getThreadPriority()) // === ThreadPriority.Realtime
-  console.log('getProcessPriority = ', getProcessPriority()) // === ProcessPriority.Realtime
+  console.log('getProcessPriority = ', getProcessPriority()) // === ProcessPriority.Realtime, or Highest without the privilege
 })
 ```
 

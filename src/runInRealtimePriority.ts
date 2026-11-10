@@ -99,9 +99,13 @@ function realtimePriorityStart(): void {
 
     const threadPriority = getThreadPriority()
     const processPriority = getProcessPriority()
+    // Without the privilege "Increase scheduling priority", which administrators have, Windows gives the high priority
+    // class instead of the realtime one
+    // see: https://learn.microsoft.com/en-us/windows/win32/procthread/scheduling-priorities
     if (
       threadPriority !== ThreadPriority.Realtime ||
-      processPriority !== ProcessPriority.Realtime
+      (processPriority !== ProcessPriority.Realtime &&
+        processPriority !== ProcessPriority.Highest)
     ) {
       // No call holds the priority yet, so the previous one is restored before the throw
       setProcessPriority(previousProcessPriority)
