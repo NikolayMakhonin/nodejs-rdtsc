@@ -46,7 +46,7 @@ Accuracy: +/- 4 cycles where the time stamp counter of the processor changes by 
 
 calcPerformance calls the functions in turn for `time` milliseconds and keeps the minimum cycles of one call of each. The first function is the base: `absoluteDiff` holds each other value minus its value, and `relativeDiff` each further `absoluteDiff` divided by the first one, where the first one is positive. In Node the time of the garbage collections during a call is left out of its cycles
 
-With `timeGc`, it then calls each function between forced young collections for `timeGc` more milliseconds, and further while a round still lowers a minimum, and keeps the minimum bytes of one call; `gc` of the result holds:
+With `timeGc`, it then calls each function between forced young collections for `timeGc` more milliseconds, and further while a round still lowers a minimum or a function has not read the same bytes twice in a row yet, and keeps of each byte count the smallest value that two checks of a function in a row read, because during a collection V8 frees the unused rest of the allocation buffers of its background threads, so a single check can read fewer bytes than the call keeps; `gc` of the result holds:
 - `allocatedBytes` - bytes that the call puts into the young generation
 - `uncollectedBytes` - the part of them that the young collections right after the call do not collect
 - `allocatedInOldGenerationBytes` - bytes that the call creates straight in the old generation, as V8 does with the strings of fractional numbers
@@ -54,7 +54,7 @@ With `timeGc`, it then calls each function between forced young collections for 
 - `memory` - `allocatedBytes` times `cyclesPerByte`: the cycles of the young collections that the call causes
 - `logic` - the cycles of the call itself, so that `cycles` is `logic` plus `memory`
 
-`allocatedInOldGenerationBytes` has no price in `memory`, because these bytes burden the full collections, whose price is not measured. The memory can be measured in Node only: `isGcToolsSupported()` tells whether it can, and where it cannot, `gc` is null. A measurement with `timeGc` throws where a value would be wrong, instead of giving it: under the young mark-sweep of V8 (`node --minor-ms`), for a function that causes a full collection in every call, and where V8 counts its heap otherwise than in the verified environments. To force collections, the first measurement of the memory or the first call of `isGcToolsSupported()` in Node turns on `--expose-gc` for the process, so `gc` also appears in the contexts created after it
+`allocatedInOldGenerationBytes` has no price in `memory`, because these bytes burden the full collections, whose price is not measured. The memory can be measured in Node only: `isGcToolsSupported()` tells whether it can, and where it cannot, `gc` is null. A measurement with `timeGc` throws where a value would be wrong, instead of giving it: under the young mark-sweep of V8 (`node --minor-ms`), for a function that causes a full collection in every call, for a function that reads different bytes in every check, and where V8 counts its heap otherwise than in the verified environments. To force collections, the first measurement of the memory or the first call of `isGcToolsSupported()` in Node turns on `--expose-gc` for the process, so `gc` also appears in the contexts created after it
 
 ### Syntax
 

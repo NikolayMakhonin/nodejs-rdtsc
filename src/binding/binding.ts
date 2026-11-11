@@ -44,8 +44,7 @@ declare type Binding = {
    * generation: V8 corrects its count of the old generation when it uses swept pages, and the correction must not
    * fall between the mark and the readings.
    * It and the three ...SinceMark functions throw after a collection that the counters do not model, because their
-   * values would be wrong: a young collection other than the scavenger, such as the young mark-sweep of --minor-ms,
-   * or a young collection that shrank the old generation after the sweeping was completed
+   * values would be wrong: a young collection other than the scavenger, such as the young mark-sweep of --minor-ms
    */
   bytesMark(): void
   /** Bytes allocated in the young generation since bytesMark, including those that collections already removed */
@@ -54,7 +53,10 @@ declare type Binding = {
   youngGenerationCapacity(): number
   /** Cycles of the last garbage collection, by the same counter as rdtsc */
   gcLastCycles(): number
-  /** Bytes that young collections moved from the young generation to the old one since bytesMark */
+  /**
+   * Bytes that young collections moved from the young generation to the old one since bytesMark, less the unused rest
+   * of the allocation buffers of the background threads of V8, which the collections free
+   */
   promotedBytesSinceMark(): number
   /** Bytes that V8 created directly in the old generation since bytesMark */
   allocatedInOldGenerationBytesSinceMark(): number

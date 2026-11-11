@@ -160,8 +160,9 @@ namespace nodejsRdtsc{
 	// or hold V8's own data, such as compiled code
 	thread_local int newSpaceIndex = -1;
 	thread_local int newLargeObjectSpaceIndex = -1;
-	// Totals since the callbacks were added: the bytes that collections removed from the young generation, the bytes
-	// that young collections moved from it to the old generation, the numbers of full and of young collections, and
+	// Totals since the callbacks were added: the bytes that collections removed from the young generation, the change
+	// of the old generation during young collections (the bytes that they moved there, less the unused rest of the
+	// allocation buffers of the background threads that they freed), the numbers of full and of young collections, and
 	// the cycles of the last collection
 	thread_local double youngTakenBytes;
 	thread_local double youngPromotedBytes;
@@ -241,18 +242,11 @@ namespace nodejsRdtsc{
 				recordUnexpectedGc("V8 collected the young generation by its young mark-sweep, as with --minor-ms;"
 					" the byte counters support exclusively the scavenger");
 			}
-			// A young collection frees nothing in the old generation, so the growth of the old generation is the bytes
-			// that this collection moved there. Until completeSweeping runs after a full collection, the growth also
-			// holds corrections of V8's count of the old generation
+			// The change of the old generation during this collection: the bytes that the collection moved there, less
+			// the unused rest of the allocation buffers of the background threads, which the collection frees; until
+			// completeSweeping runs after a full collection, also corrections of V8's count of the old generation
 			double promotedBytes = getHeapUsedBytes(isolate) - youngUsedBytes
 				- (heapUsedBytesBeforeGc - youngUsedBytesBeforeGc);
-			// With the sweeping completed, nothing but this collection changes the old generation, so it cannot shrink
-			if (isSweepingCompleted && promotedBytes < 0) {
-				recordUnexpectedGc("a young collection made the old generation "
-					+ std::to_string(static_cast<long long>(-promotedBytes))
-					+ " bytes smaller after the sweeping was completed;"
-					+ " V8 counts the old generation differently than the byte counters expect");
-			}
 			youngPromotedBytes += promotedBytes;
 		}
 		gcLastCycles = Now() - gcStartCycles;
@@ -301,8 +295,8 @@ namespace nodejsRdtsc{
 		return getYoungUsedBytes(isolate) + youngTakenBytes;
 	}
 
-	// Bytes allocated directly in the old generation. The old generation grows in two ways: young collections move
-	// objects there (youngPromotedBytes), and V8 creates some new objects there directly. Subtracting the first
+	// Bytes allocated directly in the old generation. The old generation changes during young collections
+	// (youngPromotedBytes), and between them, where V8 creates some new objects there directly. Subtracting the first
 	// leaves the second
 	inline double getAllocatedInOldGenerationBytes(Isolate* isolate) {
 		return getHeapUsedBytes(isolate) - getYoungUsedBytes(isolate) - youngPromotedBytes;

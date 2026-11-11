@@ -23,7 +23,10 @@ export type GcTools = {
   getCyclesPerByte: () => number
   /** Runs a young garbage collection; throws if none ran */
   collectYoungGeneration: () => void
-  /** Bytes that young collections moved from the young generation to the old one since bytesMark */
+  /**
+   * Bytes that young collections moved from the young generation to the old one since bytesMark, less the unused rest
+   * of the allocation buffers of the background threads of V8, which the collections free
+   */
   promotedBytesSinceMark: () => number
   /** Bytes that V8 created directly in the old generation since bytesMark */
   allocatedInOldGenerationBytesSinceMark: () => number
@@ -38,8 +41,9 @@ export type CalcPerformanceArgs = {
   time: number
   /**
    * Time in milliseconds for measuring memory (the gc field of the result), after the cycles are measured.
-   * The memory is measured in rounds of calls, further while a round still lowers a minimum, which can take longer than
-   * timeGc.
+   * The memory is measured in rounds of calls, further while a round still lowers a minimum or a function has not read
+   * the same bytes twice in a row yet, which can take longer than timeGc; of each byte count of a function, the smallest
+   * value that two of its checks in a row read is kept.
    * null: memory is not measured, and gc of the result is null.
    * calcPerformance throws where it cannot trust a value of the memory, instead of giving it.
    * The first call with timeGc also measures the cost of a young garbage collection, and measures it again
