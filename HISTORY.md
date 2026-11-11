@@ -1,3 +1,9 @@
+6.0.1 / 2026-11-11
+===================
+
+* Fixed: a young collection that made the old generation smaller threw from every function that reads the byte counters, also on Node 22, while V8 frees the unused rest of the allocation buffers of its background threads during a collection
+* The memory measurement keeps of each byte count the smallest value that two checks of a function in a row read, so a single disturbed check no longer sets the result; it throws for a function whose checks read no value twice in a row in 20 checks
+
 6.0.0 / 2026-11-10
 ===================
 
